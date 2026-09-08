@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiPasal.MainPage"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <VerticalStackLayout
+        VerticalOptions="Center"
+        HorizontalOptions="Center"
+        Spacing="0">
+
+        <Border BackgroundColor="{StaticResource TealPrimary}"
+                StrokeThickness="0"
+                WidthRequest="84" HeightRequest="84"
+                HorizontalOptions="Center">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="20"/>
+            </Border.StrokeShape>
+            <Label Text="🏪" FontSize="42"
+                   HorizontalOptions="Center" VerticalOptions="Center"/>
+        </Border>
+
+        <Label
+            Text="DigiPasal"
+            FontSize="30"
+            FontAttributes="Bold"
+            TextColor="{StaticResource TealPrimary}"
+            HorizontalOptions="Center"
+            Margin="0,20,0,0"/>
+
+        <Label
+            Text="Digital pasal for your shop"
+            FontSize="14"
+            TextColor="{StaticResource TextSecondary}"
+            HorizontalOptions="Center"
+            Margin="0,4,0,0"/>
+
+        <ActivityIndicator
+            x:Name="LoadingIndicator"
+            IsRunning="True"
+            IsVisible="True"
+            HorizontalOptions="Center"
+            HeightRequest="44"
+            WidthRequest="44"
+            Margin="0,18,0,0"/>
+    </VerticalStackLayout>
+
+</ContentPage>

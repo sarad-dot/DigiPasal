@@ -1,0 +1,975 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="DigiPasal.Views.DashboardPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    Title="DigiPasal"
+    BackgroundColor="{StaticResource AppBackground}"
+    Shell.NavBarIsVisible="False"
+    Shell.TabBarIsVisible="False">
+
+    <ContentPage.Resources>
+
+        <ResourceDictionary>
+
+            <!-- =========================
+                 COMMON STYLES
+                 ========================= -->
+
+            <Style x:Key="CardFrameStyle"
+                   TargetType="Border">
+
+                <Setter Property="BackgroundColor"
+                        Value="{StaticResource CardBackground}" />
+
+                <Setter Property="StrokeThickness"
+                        Value="0" />
+
+                <Setter Property="StrokeShape"
+                        Value="RoundRectangle 12" />
+
+                <Setter Property="Padding"
+                        Value="16" />
+
+                <Setter Property="Margin"
+                        Value="0" />
+
+            </Style>
+
+
+            <Style x:Key="MetricTitleStyle"
+                   TargetType="Label">
+
+                <Setter Property="FontSize"
+                        Value="13" />
+
+                <Setter Property="TextColor"
+                        Value="{StaticResource TextSecondary}" />
+
+                <Setter Property="FontAttributes"
+                        Value="None" />
+
+            </Style>
+
+
+            <Style x:Key="MetricValueStyle"
+                   TargetType="Label">
+
+                <Setter Property="FontSize"
+                        Value="20" />
+
+                <Setter Property="FontAttributes"
+                        Value="Bold" />
+
+                <Setter Property="TextColor"
+                        Value="{StaticResource TextPrimary}" />
+
+            </Style>
+
+
+            <Style x:Key="TrendStyle"
+                   TargetType="Label">
+
+                <Setter Property="FontSize"
+                        Value="12" />
+
+                <Setter Property="FontAttributes"
+                        Value="Bold" />
+
+            </Style>
+
+
+            <Style x:Key="BottomNavLabelStyle"
+                   TargetType="Label">
+
+                <Setter Property="FontSize"
+                        Value="10" />
+
+                <Setter Property="HorizontalTextAlignment"
+                        Value="Center" />
+
+                <Setter Property="HorizontalOptions"
+                        Value="Center" />
+
+            </Style>
+
+        </ResourceDictionary>
+
+    </ContentPage.Resources>
+
+
+    <!-- ============================================================
+         ROOT
+         ============================================================ -->
+
+    <Grid RowDefinitions="*,56"
+          BackgroundColor="{StaticResource AppBackground}">
+
+
+        <!-- ========================================================
+             SCROLLABLE CONTENT
+             ======================================================== -->
+
+        <ScrollView Grid.Row="0">
+
+            <VerticalStackLayout
+                Padding="16,18,16,20"
+                Spacing="16">
+
+
+                <!-- =================================================
+                     HEADER
+                     ================================================= -->
+
+                <Grid ColumnDefinitions="*,Auto"
+                      RowDefinitions="Auto,Auto"
+                      ColumnSpacing="12">
+
+                    <!-- App title -->
+                    <HorizontalStackLayout
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Spacing="8"
+                        VerticalOptions="Center">
+
+                        <Label
+                            Text="🏪"
+                            FontSize="24"
+                            VerticalOptions="Center" />
+
+                        <Label
+                            Text="DigiPasal"
+                            FontSize="20"
+                            FontAttributes="Bold"
+                            TextColor="{StaticResource TealPrimary}"
+                            VerticalOptions="Center" />
+
+                    </HorizontalStackLayout>
+
+
+                    <!-- Profile pill -->
+                    <Border
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        x:Name="ProfilePill"
+                        BackgroundColor="{StaticResource CardBackground}"
+                        Stroke="{StaticResource TealPrimary}"
+                        StrokeThickness="1"
+                        Padding="5"
+                        HeightRequest="36"
+                        VerticalOptions="Start">
+
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="18"/>
+                        </Border.StrokeShape>
+
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="ProfilePill_Tapped"/>
+                        </Border.GestureRecognizers>
+
+                        <Grid ColumnDefinitions="Auto,Auto"
+                              ColumnSpacing="6">
+
+                            <Border
+                                Grid.Column="0"
+                                BackgroundColor="{StaticResource TealPrimary}"
+                                StrokeThickness="0"
+                                WidthRequest="26"
+                                HeightRequest="26"
+                                VerticalOptions="Center">
+
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="13"/>
+                                </Border.StrokeShape>
+
+                                <Label
+                                    x:Name="ProfileAvatarLabel"
+                                    Text="👤"
+                                    FontSize="12"
+                                    TextColor="White"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center"/>
+                            </Border>
+
+                            <Label
+                                Grid.Column="1"
+                                x:Name="ProfileNameLabel"
+                                Text="Profile"
+                                FontSize="12"
+                                FontAttributes="Bold"
+                                TextColor="{StaticResource TealPrimary}"
+                                VerticalOptions="Center"/>
+
+                        </Grid>
+                    </Border>
+
+
+                    <!-- Subtitle -->
+                    <Label
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="2"
+                        Text="Manage your kirana business easily"
+                        FontSize="13"
+                        TextColor="{StaticResource TextSecondary}"
+                        Margin="32,2,0,0" />
+
+                </Grid>
+
+
+                <!-- =================================================
+                     TAGLINE BANNER
+                     ================================================= -->
+
+                <Border
+                    BackgroundColor="{StaticResource SuccessGreen}"
+                    StrokeThickness="0"
+                    Padding="16"
+                    StrokeShape="RoundRectangle 12">
+
+                    <VerticalStackLayout
+                        Spacing="4">
+
+                        <Label
+                            Text="Manage your business easily"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            TextColor="White" />
+
+                        <Label
+                            Text="Nepal's trusted Kirana management app"
+                            FontSize="12"
+                            TextColor="White"
+                            Opacity="0.92" />
+
+                    </VerticalStackLayout>
+
+                </Border>
+
+
+                <!-- =================================================
+                     METRIC CARDS
+                     ================================================= -->
+
+                <Grid
+                    ColumnDefinitions="*,*"
+                    RowDefinitions="Auto,Auto"
+                    ColumnSpacing="12"
+                    RowSpacing="12">
+
+
+                    <!-- RECEIVABLE -->
+
+                    <Border
+                        Grid.Row="0"
+                        Grid.Column="0"
+                        Style="{StaticResource CardFrameStyle}">
+
+                        <VerticalStackLayout Spacing="8">
+
+                            <Label
+                                Text="Receivable"
+                                Style="{StaticResource MetricTitleStyle}" />
+
+                            <Label
+                                Text="₹80,000"
+                                Style="{StaticResource MetricValueStyle}" />
+
+                            <Label
+                                Text="⬆️ +5%"
+                                Style="{StaticResource TrendStyle}"
+                                TextColor="{StaticResource SuccessGreen}" />
+
+                        </VerticalStackLayout>
+
+                    </Border>
+
+
+                    <!-- PAYABLE -->
+
+                    <Border
+                        Grid.Row="0"
+                        Grid.Column="1"
+                        Style="{StaticResource CardFrameStyle}">
+
+                        <VerticalStackLayout Spacing="8">
+
+                            <Label
+                                Text="Payable"
+                                Style="{StaticResource MetricTitleStyle}" />
+
+                            <Label
+                                Text="₹70,000"
+                                Style="{StaticResource MetricValueStyle}" />
+
+                            <Label
+                                Text="⬇️ -2%"
+                                Style="{StaticResource TrendStyle}"
+                                TextColor="{StaticResource DangerRed}" />
+
+                        </VerticalStackLayout>
+
+                    </Border>
+
+
+                    <!-- SALES -->
+
+                    <Border
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        Style="{StaticResource CardFrameStyle}">
+
+                        <VerticalStackLayout Spacing="8">
+
+                            <Label
+                                Text="Sales"
+                                Style="{StaticResource MetricTitleStyle}" />
+
+                            <Label
+                                Text="₹70,335"
+                                Style="{StaticResource MetricValueStyle}" />
+
+                            <Label
+                                Text="⬆️ +12%"
+                                Style="{StaticResource TrendStyle}"
+                                TextColor="{StaticResource SuccessGreen}" />
+
+                        </VerticalStackLayout>
+
+                    </Border>
+
+
+                    <!-- PURCHASES -->
+
+                    <Border
+                        Grid.Row="1"
+                        Grid.Column="1"
+                        Style="{StaticResource CardFrameStyle}">
+
+                        <VerticalStackLayout Spacing="8">
+
+                            <Label
+                                Text="Purchases"
+                                Style="{StaticResource MetricTitleStyle}" />
+
+                            <Label
+                                Text="₹12,730"
+                                Style="{StaticResource MetricValueStyle}" />
+
+                            <Label
+                                Text="⬇️ -8%"
+                                Style="{StaticResource TrendStyle}"
+                                TextColor="{StaticResource DangerRed}" />
+
+                        </VerticalStackLayout>
+
+                    </Border>
+
+                </Grid>
+
+
+                <!-- =================================================
+                     EXPENSES CARD
+                     ================================================= -->
+
+                <Border
+                    Style="{StaticResource CardFrameStyle}"
+                    Padding="16">
+
+                    <Grid ColumnDefinitions="*,Auto"
+                          RowDefinitions="Auto,Auto"
+                          RowSpacing="6">
+
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Text="Expenses"
+                            Style="{StaticResource MetricTitleStyle}" />
+
+                        <Label
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Text="₹34,045"
+                            FontSize="22"
+                            FontAttributes="Bold"
+                            TextColor="{StaticResource DangerRed}" />
+
+                        <Button
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Grid.Column="1"
+                            Text="Details →"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource TealPrimary}"
+                            FontSize="13"
+                            FontAttributes="Bold"
+                            Padding="8"
+                            VerticalOptions="Center"
+                            Clicked="ExpensesDetails_Clicked" />
+
+                    </Grid>
+
+                </Border>
+
+
+                <!-- =================================================
+                     TOTAL BALANCE CARD
+                     ================================================= -->
+
+                <Border
+                    Style="{StaticResource CardFrameStyle}"
+                    Padding="16">
+
+                    <VerticalStackLayout Spacing="5">
+
+                        <Label
+                            Text="Total Balance"
+                            Style="{StaticResource MetricTitleStyle}" />
+
+                        <Label
+                            Text="₹34,045"
+                            FontSize="24"
+                            FontAttributes="Bold"
+                            TextColor="{StaticResource TealPrimary}" />
+
+                        <Label
+                            Text="(Business + Bank)"
+                            FontSize="12"
+                            TextColor="{StaticResource TextSecondary}" />
+
+                    </VerticalStackLayout>
+
+                </Border>
+
+
+                <!-- =================================================
+                     QUICK ACTIONS
+                     ================================================= -->
+
+                <VerticalStackLayout Spacing="10">
+
+                    <Label
+                        Text="Quick Actions"
+                        FontSize="14"
+                        FontAttributes="Bold"
+                        TextColor="{StaticResource TextPrimary}" />
+
+
+                    <Grid
+                        ColumnDefinitions="*,*,*,*"
+                        ColumnSpacing="8">
+
+
+                        <!-- SALE -->
+
+                        <Border
+                            Grid.Column="0"
+                            BackgroundColor="{StaticResource SaleBlue}"
+                            StrokeThickness="0"
+                            Padding="8"
+                            HeightRequest="82">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+
+                            <Border.GestureRecognizers>
+
+                                <TapGestureRecognizer
+                                    Tapped="SaleAction_Tapped" />
+
+                            </Border.GestureRecognizers>
+
+                            <VerticalStackLayout
+                                Spacing="5"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center">
+
+                                <Label
+                                    Text="📄"
+                                    FontSize="25"
+                                    HorizontalTextAlignment="Center" />
+
+                                <Label
+                                    Text="Sale"
+                                    FontSize="12"
+                                    FontAttributes="Bold"
+                                    TextColor="{StaticResource SaleBlueText}"
+                                    HorizontalTextAlignment="Center" />
+
+                            </VerticalStackLayout>
+
+                        </Border>
+
+
+                        <!-- BUY -->
+
+                        <Border
+                            Grid.Column="1"
+                            BackgroundColor="{StaticResource BuyOrange}"
+                            StrokeThickness="0"
+                            Padding="8"
+                            HeightRequest="82">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+
+                            <Border.GestureRecognizers>
+
+                                <TapGestureRecognizer
+                                    Tapped="BuyAction_Tapped" />
+
+                            </Border.GestureRecognizers>
+
+                            <VerticalStackLayout
+                                Spacing="5"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center">
+
+                                <Label
+                                    Text="📦"
+                                    FontSize="25"
+                                    HorizontalTextAlignment="Center" />
+
+                                <Label
+                                    Text="Buy"
+                                    FontSize="12"
+                                    FontAttributes="Bold"
+                                    TextColor="{StaticResource BuyOrangeText}"
+                                    HorizontalTextAlignment="Center" />
+
+                            </VerticalStackLayout>
+
+                        </Border>
+
+
+                        <!-- MONEY IN -->
+
+                        <Border
+                            Grid.Column="2"
+                            BackgroundColor="{StaticResource MoneyGreen}"
+                            StrokeThickness="0"
+                            Padding="8"
+                            HeightRequest="82">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+
+                            <Border.GestureRecognizers>
+
+                                <TapGestureRecognizer
+                                    Tapped="MoneyIn_Tapped" />
+
+                            </Border.GestureRecognizers>
+
+                            <VerticalStackLayout
+                                Spacing="5"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center">
+
+                                <Label
+                                    Text="💰"
+                                    FontSize="25"
+                                    HorizontalTextAlignment="Center" />
+
+                                <Label
+                                    Text="In"
+                                    FontSize="12"
+                                    FontAttributes="Bold"
+                                    TextColor="{StaticResource MoneyGreenText}"
+                                    HorizontalTextAlignment="Center" />
+
+                            </VerticalStackLayout>
+
+                        </Border>
+
+
+                        <!-- MONEY OUT -->
+
+                        <Border
+                            Grid.Column="3"
+                            BackgroundColor="{StaticResource MoneyTeal}"
+                            StrokeThickness="0"
+                            Padding="8"
+                            HeightRequest="82">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+
+                            <Border.GestureRecognizers>
+
+                                <TapGestureRecognizer
+                                    Tapped="MoneyOut_Tapped" />
+
+                            </Border.GestureRecognizers>
+
+                            <VerticalStackLayout
+                                Spacing="5"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center">
+
+                                <Label
+                                    Text="💸"
+                                    FontSize="25"
+                                    HorizontalTextAlignment="Center" />
+
+                                <Label
+                                    Text="Out"
+                                    FontSize="12"
+                                    FontAttributes="Bold"
+                                    TextColor="{StaticResource MoneyTealText}"
+                                    HorizontalTextAlignment="Center" />
+
+                            </VerticalStackLayout>
+
+                        </Border>
+
+                    </Grid>
+
+                </VerticalStackLayout>
+
+
+                <!-- Extra bottom spacing so content isn't hidden -->
+                <BoxView
+                    HeightRequest="8"
+                    Opacity="0" />
+
+            </VerticalStackLayout>
+
+        </ScrollView>
+
+
+        <!-- ========================================================
+             FIXED BOTTOM NAVIGATION
+             ======================================================== -->
+
+        <Grid
+            Grid.Row="1"
+            BackgroundColor="{StaticResource CardBackground}"
+            ColumnDefinitions="*,*,*,*,*"
+            HeightRequest="56"
+            Padding="4,2"
+            RowSpacing="0">
+
+            <!-- HOME -->
+
+            <Grid
+                Grid.Column="0">
+
+                <Grid.GestureRecognizers>
+
+                    <TapGestureRecognizer
+                        Tapped="HomeTab_Tapped" />
+
+                </Grid.GestureRecognizers>
+
+                <VerticalStackLayout
+                    Spacing="1"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center">
+
+                    <Label
+                        Text="🏪"
+                        FontSize="20"
+                        HorizontalTextAlignment="Center" />
+
+                    <Label
+                        Text="Home"
+                        Style="{StaticResource BottomNavLabelStyle}"
+                        TextColor="{StaticResource SecondaryGold}"
+                        FontAttributes="Bold" />
+
+                </VerticalStackLayout>
+
+            </Grid>
+
+
+            <!-- SALES -->
+
+            <Grid
+                Grid.Column="1">
+
+                <Grid.GestureRecognizers>
+
+                    <TapGestureRecognizer
+                        Tapped="SalesTab_Tapped" />
+
+                </Grid.GestureRecognizers>
+
+                <VerticalStackLayout
+                    Spacing="1"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center">
+
+                    <Label
+                        Text="📊"
+                        FontSize="20"
+                        HorizontalTextAlignment="Center" />
+
+                    <Label
+                        Text="Sales"
+                        Style="{StaticResource BottomNavLabelStyle}"
+                        TextColor="{StaticResource TextSecondary}" />
+
+                </VerticalStackLayout>
+
+            </Grid>
+
+
+            <!-- CREDIT -->
+
+            <Grid
+                Grid.Column="2">
+
+                <Grid.GestureRecognizers>
+
+                    <TapGestureRecognizer
+                        Tapped="CreditTab_Tapped" />
+
+                </Grid.GestureRecognizers>
+
+                <VerticalStackLayout
+                    Spacing="1"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center">
+
+                    <Label
+                        Text="📋"
+                        FontSize="20"
+                        HorizontalTextAlignment="Center" />
+
+                    <Label
+                        Text="Credit"
+                        Style="{StaticResource BottomNavLabelStyle}"
+                        TextColor="{StaticResource TextSecondary}" />
+
+                </VerticalStackLayout>
+
+            </Grid>
+
+
+            <!-- STOCK -->
+
+            <Grid
+                Grid.Column="3">
+
+                <Grid.GestureRecognizers>
+
+                    <TapGestureRecognizer
+                        Tapped="StockTab_Tapped" />
+
+                </Grid.GestureRecognizers>
+
+                <VerticalStackLayout
+                    Spacing="1"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center">
+
+                    <Label
+                        Text="📦"
+                        FontSize="20"
+                        HorizontalTextAlignment="Center" />
+
+                    <Label
+                        Text="Stock"
+                        Style="{StaticResource BottomNavLabelStyle}"
+                        TextColor="{StaticResource TextSecondary}" />
+
+                </VerticalStackLayout>
+
+            </Grid>
+
+
+            <!-- SETTINGS -->
+
+            <Grid
+                Grid.Column="4">
+
+                <Grid.GestureRecognizers>
+
+                    <TapGestureRecognizer
+                        Tapped="SettingsTab_Tapped" />
+
+                </Grid.GestureRecognizers>
+
+                <VerticalStackLayout
+                    Spacing="1"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center">
+
+                    <Label
+                        Text="⚙️"
+                        FontSize="20"
+                        HorizontalTextAlignment="Center" />
+
+                    <Label
+                        Text="Settings"
+                        Style="{StaticResource BottomNavLabelStyle}"
+                        TextColor="{StaticResource TextSecondary}" />
+
+                </VerticalStackLayout>
+
+            </Grid>
+
+        </Grid>
+
+        <!-- ========================================================
+             PROFILE DROPDOWN OVERLAY
+             ======================================================== -->
+
+        <Grid
+            Grid.RowSpan="2"
+            x:Name="ProfileDropdownOverlay"
+            IsVisible="False"
+            InputTransparent="False">
+
+            <!-- Semi-transparent scrim; tap to dismiss -->
+            <BoxView
+                x:Name="ProfileDropdownScrim"
+                BackgroundColor="#33000000">
+
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="ProfileDropdownDismiss_Tapped"/>
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+            <!-- Dropdown menu card -->
+            <Border
+                BackgroundColor="{StaticResource CardBackground}"
+                Stroke="{StaticResource InputStroke}"
+                StrokeThickness="1"
+                Padding="0"
+                WidthRequest="220"
+                HorizontalOptions="End"
+                VerticalOptions="Start"
+                Margin="0,60,16,0"
+                ZIndex="10">
+
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="12"/>
+                </Border.StrokeShape>
+
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,3" Radius="10" Opacity="0.16"/>
+                </Border.Shadow>
+
+                <VerticalStackLayout Spacing="0">
+
+                    <!-- User header -->
+                    <VerticalStackLayout
+                        Padding="16,12"
+                        Spacing="2"
+                        BackgroundColor="{StaticResource TealLight}">
+
+                        <Label
+                            x:Name="MenuUserNameLabel"
+                            Text="User"
+                            FontSize="14"
+                            FontAttributes="Bold"
+                            TextColor="{StaticResource TextPrimary}"/>
+
+                        <Label
+                            x:Name="MenuUserHandleLabel"
+                            Text=""
+                            FontSize="12"
+                            TextColor="{StaticResource TextSecondary}"/>
+
+                    </VerticalStackLayout>
+
+                    <BoxView
+                        HeightRequest="1"
+                        Color="{StaticResource DividerColor}"/>
+
+                    <!-- My Profile -->
+                    <Grid
+                        Padding="16,12"
+                        ColumnDefinitions="Auto,*"
+                        ColumnSpacing="10">
+
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="MenuProfile_Tapped"/>
+                        </Grid.GestureRecognizers>
+
+                        <Label
+                            Text="👤"
+                            FontSize="16"
+                            VerticalOptions="Center"/>
+
+                        <Label
+                            Grid.Column="1"
+                            Text="My Profile"
+                            FontSize="14"
+                            TextColor="{StaticResource TextPrimary}"
+                            VerticalOptions="Center"/>
+
+                    </Grid>
+
+                    <BoxView
+                        HeightRequest="1"
+                        Color="{StaticResource DividerColor}"
+                        Margin="16,0,0,0"/>
+
+                    <!-- Change Password -->
+                    <Grid
+                        Padding="16,12"
+                        ColumnDefinitions="Auto,*"
+                        ColumnSpacing="10">
+
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="MenuChangePassword_Tapped"/>
+                        </Grid.GestureRecognizers>
+
+                        <Label
+                            Text="🔑"
+                            FontSize="16"
+                            VerticalOptions="Center"/>
+
+                        <Label
+                            Grid.Column="1"
+                            Text="Change Password"
+                            FontSize="14"
+                            TextColor="{StaticResource TextPrimary}"
+                            VerticalOptions="Center"/>
+
+                    </Grid>
+
+                    <BoxView
+                        HeightRequest="1"
+                        Color="{StaticResource DividerColor}"/>
+
+                    <!-- Logout -->
+                    <Grid
+                        Padding="16,12"
+                        ColumnDefinitions="Auto,*"
+                        ColumnSpacing="10">
+
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="MenuLogout_Tapped"/>
+                        </Grid.GestureRecognizers>
+
+                        <Label
+                            Text="🚪"
+                            FontSize="16"
+                            VerticalOptions="Center"/>
+
+                        <Label
+                            Grid.Column="1"
+                            Text="Logout"
+                            FontSize="14"
+                            FontAttributes="Bold"
+                            TextColor="{StaticResource DangerRed}"
+                            VerticalOptions="Center"/>
+
+                    </Grid>
+
+                </VerticalStackLayout>
+            </Border>
+
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

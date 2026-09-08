@@ -40,10 +40,10 @@ namespace DigiPasal.ViewModels
             _authService = authService;
             Title = "Dashboard";
 
-            NavigateToSalesCommand = new Command(async () => await Shell.Current.GoToAsync("//Sales"));
-            NavigateToProductsCommand = new Command(async () => await Shell.Current.GoToAsync("//Products"));
-            NavigateToCreditCommand = new Command(async () => await Shell.Current.GoToAsync("//Credit"));
-            LogoutCommand = new Command(Logout);
+            NavigateToSalesCommand = new Command(async () => await Shell.Current.GoToAsync("Sales"));
+            NavigateToProductsCommand = new Command(async () => await Shell.Current.GoToAsync("Products"));
+            NavigateToCreditCommand = new Command(async () => await Shell.Current.GoToAsync("Credit"));
+            LogoutCommand = new Command(async () => await Logout());
         }
 
         public async Task LoadUserAsync()
@@ -65,7 +65,7 @@ namespace DigiPasal.ViewModels
             }
         }
 
-        private async void Logout()
+        private async Task Logout()
         {
             _authService.SignOut();
             await Shell.Current.GoToAsync("//Login");
