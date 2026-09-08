@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiPasal.Views.CreditPage"
+             Title="Credit"
+             Shell.TabBarIsVisible="False">
+
+    <VerticalStackLayout
+        Padding="24"
+        Spacing="16"
+        VerticalOptions="Center">
+
+        <Label
+            Text="Credit"
+            Style="{StaticResource Headline}" />
+
+        <Label
+            Text="Credit tracking is coming soon. You will be able to record customer credit sales and payments from here."
+            TextColor="{StaticResource Gray500}"
+            HorizontalTextAlignment="Center" />
+    </VerticalStackLayout>
+
+</ContentPage>

@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             x:Class="DigiPasal.Views.LoginPage"
+             x:DataType="vm:LoginViewModel"
+             Title="Login"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarIsVisible="False"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <ScrollView>
+        <VerticalStackLayout Spacing="0">
+
+            <!-- ====== BRANDED HEADER ====== -->
+            <Grid BackgroundColor="{StaticResource TealPrimary}"
+                  Padding="24,48,24,28"
+                  ColumnDefinitions="Auto,*"
+                  ColumnSpacing="14">
+
+                <Border Grid.Column="0"
+                        BackgroundColor="#FFFFFF20"
+                        StrokeThickness="0"
+                        WidthRequest="52" HeightRequest="52"
+                        VerticalOptions="Center">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="14"/>
+                    </Border.StrokeShape>
+                    <Label Text="🏪" FontSize="26"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+                </Border>
+
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label Text="DigiPasal"
+                           FontSize="24" FontAttributes="Bold"
+                           TextColor="White"/>
+                    <Label Text="Nepal Retail Management"
+                           FontSize="13"
+                           TextColor="#CCFFFFFF"/>
+                </VerticalStackLayout>
+            </Grid>
+
+            <!-- ====== FORM CARD ====== -->
+            <Border BackgroundColor="{StaticResource CardBackground}"
+                    StrokeThickness="0"
+                    Margin="16,16,16,0"
+                    Padding="20,24">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="16"/>
+                </Border.StrokeShape>
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="12" Opacity="0.08"/>
+                </Border.Shadow>
+
+                <VerticalStackLayout Spacing="0">
+
+                    <!-- Subheader -->
+                    <Label Text="Secure Login"
+                           FontSize="18" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           HorizontalOptions="Center"
+                           Margin="0,0,0,18"/>
+
+                    <!-- Error Message -->
+                    <Label Text="{Binding ErrorMessage}"
+                           IsVisible="{Binding HasError}"
+                           TextColor="{StaticResource ErrorRed}"
+                           FontSize="13"
+                           HorizontalTextAlignment="Center"
+                           Margin="0,0,0,14"/>
+
+                    <!-- Username Field -->
+                    <Label Text="Phone Number or Email"
+                           FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}"
+                           Margin="0,0,0,6"/>
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}"
+                            HeightRequest="50">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Entry Text="{Binding Username}"
+                               Placeholder="Phone Number or Email"
+                               PlaceholderColor="{StaticResource Gray400}"
+                               Keyboard="Email"
+                               ReturnType="Next"
+                               IsEnabled="{Binding IsNotBusy}"
+                               BackgroundColor="Transparent"
+                               TextColor="{StaticResource TextPrimary}"
+                               FontSize="15"
+                               Margin="12,0"/>
+                    </Border>
+
+                    <!-- Password Field -->
+                    <Label Text="Password"
+                           FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}"
+                           Margin="0,16,0,6"/>
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}"
+                            HeightRequest="50">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Entry Grid.Column="0"
+                                   Text="{Binding Password}"
+                                   IsPassword="{Binding IsPasswordHidden}"
+                                   Placeholder="Password"
+                                   PlaceholderColor="{StaticResource Gray400}"
+                                   Keyboard="Plain"
+                                   ReturnType="Done"
+                                   IsEnabled="{Binding IsNotBusy}"
+                                   BackgroundColor="Transparent"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   FontSize="15"
+                                   Margin="12,0,0,0"/>
+                            <Button Grid.Column="1"
+                                    Text="{Binding PasswordVisibilityLabel}"
+                                    Command="{Binding TogglePasswordVisibilityCommand}"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{StaticResource TealPrimary}"
+                                    FontSize="13"
+                                    FontAttributes="Bold"
+                                    Padding="12,0"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Forgot Password -->
+                    <Label Text="Forgot Password?"
+                           FontSize="13"
+                           TextColor="{StaticResource TealPrimary}"
+                           HorizontalOptions="End"
+                           Margin="0,8,2,0">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding ForgotPasswordCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                    <!-- Login Button -->
+                    <Button Text="Login"
+                            Command="{Binding LoginCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="{StaticResource TealPrimary}"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            HeightRequest="50"
+                            CornerRadius="10"
+                            Margin="0,18,0,0"/>
+
+                    <!-- OR Divider -->
+                    <Grid ColumnDefinitions="*,Auto,*"
+                          Margin="0,18,0,0"
+                          VerticalOptions="Center">
+                        <BoxView Grid.Column="0" HeightRequest="1"
+                                 Color="{StaticResource DividerColor}"
+                                 VerticalOptions="Center"/>
+                        <Label Grid.Column="1" Text="or"
+                               TextColor="{StaticResource Gray400}"
+                               FontSize="13"
+                               Margin="14,0"/>
+                        <BoxView Grid.Column="2" HeightRequest="1"
+                                 Color="{StaticResource DividerColor}"
+                                 VerticalOptions="Center"/>
+                    </Grid>
+
+                    <!-- Secondary Options -->
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10" Margin="0,18,0,0">
+
+                        <Button Grid.Column="0"
+                                Text="Login with Google"
+                                Command="{Binding GoogleLoginCommand}"
+                                IsEnabled="{Binding IsNotBusy}"
+                                BackgroundColor="{StaticResource InputBg}"
+                                TextColor="{StaticResource TextPrimary}"
+                                FontSize="13"
+                                HeightRequest="46"
+                                CornerRadius="10"
+                                BorderColor="{StaticResource InputStroke}"
+                                BorderWidth="1"/>
+
+                        <Button Grid.Column="1"
+                                Text="🔐"
+                                Command="{Binding DeviceLockCommand}"
+                                IsEnabled="{Binding IsNotBusy}"
+                                BackgroundColor="{StaticResource TealLight}"
+                                TextColor="{StaticResource TealPrimary}"
+                                FontSize="22"
+                                HeightRequest="46"
+                                WidthRequest="52"
+                                CornerRadius="10"/>
+                    </Grid>
+
+                    <!-- Sign Up Footer -->
+                    <Label Margin="0,22,0,0"
+                           FontSize="14"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center">
+                        <Label.FormattedText>
+                            <FormattedString>
+                                <Span Text="Don't have an account? "
+                                      TextColor="{StaticResource TextSecondary}"/>
+                                <Span Text="Sign Up"
+                                      TextColor="{StaticResource TealPrimary}"
+                                      FontAttributes="Bold"/>
+                            </FormattedString>
+                        </Label.FormattedText>
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding NavigateToRegisterCommand}"/>
+                        </Label.GestureRecognizers>
+                    </Label>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Version Footer -->
+            <Label Text="DigiPasal v1.2, © 2026"
+                   FontSize="12"
+                   TextColor="{StaticResource Gray300}"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,30"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

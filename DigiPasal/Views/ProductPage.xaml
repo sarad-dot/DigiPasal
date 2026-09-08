@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiPasal.Views.ProductPage"
+             Title="Products"
+             Shell.TabBarIsVisible="False">
+
+    <VerticalStackLayout
+        Padding="24"
+        Spacing="16"
+        VerticalOptions="Center">
+
+        <Label
+            Text="Products"
+            Style="{StaticResource Headline}" />
+
+        <Label
+            Text="Product and inventory management is coming soon. You will be able to add, edit, and track stock levels from here."
+            TextColor="{StaticResource Gray500}"
+            HorizontalTextAlignment="Center" />
+    </VerticalStackLayout>
+
+</ContentPage>

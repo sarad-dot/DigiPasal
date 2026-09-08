@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="DigiPasal.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:DigiPasal"
+    xmlns:views="clr-namespace:DigiPasal.Views"
+    Title="DigiPasal"
+    Shell.FlyoutBehavior="Disabled">
+
+    <ShellContent
+        Title="DigiPasal"
+        ContentTemplate="{DataTemplate local:MainPage}"
+        Route="Main" />
+
+    <ShellContent
+        Title="Sign In"
+        ContentTemplate="{DataTemplate views:LoginPage}"
+        Route="Login" />
+
+    <ShellContent
+        Title="Register"
+        ContentTemplate="{DataTemplate views:RegisterPage}"
+        Route="Register" />
+
+    <ShellContent
+        Title="Dashboard"
+        ContentTemplate="{DataTemplate views:DashboardPage}"
+        Route="Dashboard" />
+
+</Shell>
