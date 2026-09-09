@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             xmlns:services="clr-namespace:DigiPasal.Services"
+             x:Class="DigiPasal.Views.SettingsPage"
+             x:DataType="vm:SettingsViewModel"
+             Title="Settings"
+             BackgroundColor="{StaticResource AppBackground}"
+             Shell.TabBarIsVisible="False"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource AppBackground}">
+
+<!-- ====== HEADER ====== -->
+            <Grid Grid.Row="0"
+                  ColumnDefinitions="Auto,*,Auto"
+                  Padding="16,52,16,12"
+                  BackgroundColor="{StaticResource TealPrimary}">
+
+                <Grid Grid.Column="0"
+                      ColumnDefinitions="Auto,Auto"
+                      ColumnSpacing="6"
+                      VerticalOptions="Center">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBackTapped"/>
+                    </Grid.GestureRecognizers>
+
+                    <Label Text="◀"
+                           FontSize="20"
+                           TextColor="White"
+                           VerticalOptions="Center"/>
+
+                    <Label Text="⚙️"
+                           Grid.Column="1"
+                           FontSize="22"
+                           TextColor="White"
+                           VerticalOptions="Center"/>
+                </Grid>
+
+                <Label Grid.Column="1"
+                       Text="Settings"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       VerticalOptions="Center"/>
+
+                <Button Grid.Column="2"
+                        Text="Refresh"
+                        Command="{Binding RefreshCommand}"
+                        IsEnabled="{Binding IsNotBusy}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource SecondaryGold}"
+                        FontSize="13"
+                        FontAttributes="Bold"
+                        Padding="4"
+                        VerticalOptions="Center"/>
+            </Grid>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="16">
+
+                <!-- ====== BACKUP CARD ====== -->
+                <Border BackgroundColor="{StaticResource CardBackground}"
+                        StrokeThickness="0"
+                        Padding="16">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12"/>
+                    </Border.StrokeShape>
+                    <VerticalStackLayout Spacing="12">
+
+                        <Label Text="Backup"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}"/>
+
+                        <Label Text="Keeps up to 3 automatic copies of your shop data. Always make a backup before resting or updating the app."
+                               FontSize="13"
+                               TextColor="{StaticResource TextSecondary}"/>
+
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                            <Label Text="Last backup:"
+                                   FontSize="13"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   VerticalOptions="Center"/>
+
+                            <Label Grid.Column="1"
+                                   Text="{Binding LastBackupTime}"
+                                   FontSize="13"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TealPrimary}"
+                                   VerticalOptions="Center"/>
+                        </Grid>
+
+                        <Button Text="Create Backup Now"
+                                Command="{Binding BackupNowCommand}"
+                                IsEnabled="{Binding IsNotBusy}"
+                                BackgroundColor="{StaticResource TealPrimary}"
+                                TextColor="White"
+                                FontSize="15"
+                                FontAttributes="Bold"
+                                HeightRequest="48"
+                                CornerRadius="10"/>
+
+                        <Label Text="{Binding StatusMessage}"
+                               IsVisible="{Binding HasStatusMessage}"
+                               TextColor="{StaticResource SuccessGreen}"
+                               FontSize="13"
+                               HorizontalTextAlignment="Center"/>
+
+                        <Label Text="{Binding ErrorMessage}"
+                               IsVisible="{Binding HasError}"
+                               TextColor="{StaticResource ErrorRed}"
+                               FontSize="13"
+                               HorizontalTextAlignment="Center"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   Color="{StaticResource TealPrimary}"/>
+
+                <!-- ====== AVAILABLE BACKUPS ====== -->
+                <Border BackgroundColor="{StaticResource CardBackground}"
+                        StrokeThickness="0"
+                        Padding="16">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12"/>
+                    </Border.StrokeShape>
+
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Available Backups"
+                               FontSize="16"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}"/>
+
+                        <Label Text="No backups found."
+                               IsVisible="{Binding HasNoBackups}"
+                               FontSize="13"
+                               TextColor="{StaticResource TextSecondary}"/>
+
+                        <CollectionView ItemsSource="{Binding Backups}"
+                                        SelectionMode="None">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="services:BackupInfo">
+                                    <Grid ColumnDefinitions="*,Auto"
+                                          RowDefinitions="Auto,Auto"
+                                          RowSpacing="2"
+                                          Padding="0,8"
+                                          ColumnSpacing="12">
+
+                                        <Label Grid.Row="0" Grid.Column="0"
+                                               Text="{Binding FileName}"
+                                               FontSize="13"
+                                               FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimary}"/>
+
+                                        <Label Grid.Row="1" Grid.Column="0"
+                                               Text="{Binding CreatedAtDisplay}"
+                                               FontSize="12"
+                                               TextColor="{StaticResource TextSecondary}"/>
+
+                                        <Label Grid.Row="1" Grid.Column="1"
+                                               Text="{Binding SizeDisplay}"
+                                               FontSize="12"
+                                               TextColor="{StaticResource TealPrimary}"
+                                               VerticalOptions="Center"
+                                               HorizontalOptions="End"/>
+
+                                        <Button Grid.Row="0" Grid.Column="1"
+                                                Grid.RowSpan="2"
+                                                Text="Restore"
+                                                BackgroundColor="{StaticResource InputBg}"
+                                                TextColor="{StaticResource DangerRed}"
+                                                FontSize="13"
+                                                FontAttributes="Bold"
+                                                HeightRequest="34"
+                                                Padding="12,0"
+                                                CornerRadius="8"
+                                                BorderColor="{StaticResource DangerRed}"
+                                                BorderWidth="1"
+                                                VerticalOptions="Center"
+                                                Clicked="OnRestoreClicked"
+                                                CommandParameter="{Binding .}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="DigiPasal v1.2, © 2026"
+                       FontSize="12"
+                       TextColor="{StaticResource Gray300}"
+                       HorizontalOptions="Center"
+                       Margin="0,8,0,20"/>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

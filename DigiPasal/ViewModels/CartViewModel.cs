@@ -1,0 +1,302 @@
+using System.Collections.ObjectModel;
+using System.Windows.Input;
+using DigiPasal.Models;
+using DigiPasal.Services;
+
+namespace DigiPasal.ViewModels;
+
+public class CartViewModel : BaseViewModel
+{
+    private readonly SaleService _saleService;
+    private readonly CustomerService _customerService;
+    private readonly ReceiptService _receiptService;
+    private readonly CartState _cartState;
+
+    private Customer? _selectedCustomer;
+    private bool _isCreditSale;
+    private string _amountPaid = string.Empty;
+    private string _notes = string.Empty;
+    private decimal _discountAmount;
+    private decimal _taxRate;
+    private decimal _subtotal;
+    private decimal _taxAmount;
+    private decimal _grandTotal;
+
+    public ObservableCollection<CartLine> CartItems => _cartState.Items;
+
+    public Customer? SelectedCustomer
+    {
+        get => _selectedCustomer;
+        set
+        {
+            SetProperty(ref _selectedCustomer, value);
+            OnPropertyChanged(nameof(SelectedCustomerDisplay));
+            OnPropertyChanged(nameof(HasCustomer));
+            OnPropertyChanged(nameof(IsCreditEnabled));
+        }
+    }
+
+    public bool IsCreditSale
+    {
+        get => _isCreditSale;
+        set
+        {
+            SetProperty(ref _isCreditSale, value);
+            OnPropertyChanged(nameof(IsCreditEnabled));
+            CalculateTotals();
+        }
+    }
+
+    public string AmountPaid
+    {
+        get => _amountPaid;
+        set
+        {
+            SetProperty(ref _amountPaid, value);
+            CalculateTotals();
+        }
+    }
+
+    public string Notes
+    {
+        get => _notes;
+        set => SetProperty(ref _notes, value);
+    }
+
+    public decimal DiscountAmount
+    {
+        get => _discountAmount;
+        set
+        {
+            SetProperty(ref _discountAmount, value);
+            CalculateTotals();
+        }
+    }
+
+    public decimal Subtotal
+    {
+        get => _subtotal;
+        set => SetProperty(ref _subtotal, value);
+    }
+
+    public decimal TaxAmount
+    {
+        get => _taxAmount;
+        set => SetProperty(ref _taxAmount, value);
+    }
+
+    public decimal GrandTotal
+    {
+        get => _grandTotal;
+        set => SetProperty(ref _grandTotal, value);
+    }
+
+    public decimal CreditAmount => IsCreditSale && decimal.TryParse(AmountPaid, out var paid)
+        ? Math.Max(0, GrandTotal - paid) : 0;
+
+    public string SelectedCustomerDisplay => SelectedCustomer != null
+        ? $"{SelectedCustomer.Name} (Balance: {CurrencyFormatter.Format(SelectedCustomer.CurrentBalance)})"
+        : "Walk-in (Cash)";
+
+    public bool HasItems => CartItems.Count > 0;
+    public int ItemCount => CartItems.Count;
+    public bool HasCustomer => SelectedCustomer != null;
+    public bool IsCreditEnabled => IsCreditSale && HasCustomer;
+
+    public string SubtotalDisplay => CurrencyFormatter.Format(Subtotal);
+    public string DiscountDisplay => DiscountAmount > 0 ? $"-{CurrencyFormatter.Format(DiscountAmount)}" : "";
+    public string TaxDisplay => TaxAmount > 0 ? CurrencyFormatter.Format(TaxAmount) : "";
+    public string GrandTotalDisplay => CurrencyFormatter.Format(GrandTotal);
+    public string CreditDisplay => IsCreditSale ? CurrencyFormatter.Format(CreditAmount) : "";
+
+    public ICommand SelectCustomerCommand { get; }
+    public ICommand RemoveItemCommand { get; }
+    public ICommand UpdateQuantityCommand { get; }
+    public ICommand CheckoutCommand { get; }
+    public ICommand ClearCartCommand { get; }
+
+    public CartViewModel()
+    {
+        _saleService = SaleService.Instance;
+        _customerService = CustomerService.Instance;
+        _receiptService = ReceiptService.Instance;
+        _cartState = CartState.Instance;
+        Title = "Cart";
+
+        _cartState.CartChanged += OnCartChanged;
+
+        SelectCustomerCommand = new Command(async () => await SelectCustomerAsync());
+        RemoveItemCommand = new Command<CartLine>(RemoveItem);
+        UpdateQuantityCommand = new Command<CartLine>(UpdateQuantity);
+        CheckoutCommand = new Command(async () => await CheckoutAsync());
+        ClearCartCommand = new Command(ClearCart);
+    }
+
+    private void OnCartChanged()
+    {
+        OnPropertyChanged(nameof(HasItems));
+        OnPropertyChanged(nameof(ItemCount));
+        CalculateTotals();
+    }
+
+    private async Task SelectCustomerAsync()
+    {
+        try
+        {
+            var customers = await _customerService.GetActiveCustomersAsync();
+
+            var options = new List<string> { "Walk-in (Cash)" };
+            options.AddRange(customers.Select(c => $"{c.Name} ({CurrencyFormatter.Format(c.CurrentBalance)} due)"));
+
+            var action = await Shell.Current.DisplayActionSheet(
+                "Select Customer",
+                null,
+                "Cancel",
+                options.ToArray());
+
+            if (action == null || action == "Cancel")
+                return;
+
+            if (action == "Walk-in (Cash)")
+            {
+                SelectedCustomer = null;
+                IsCreditSale = false;
+                AmountPaid = string.Empty;
+            }
+            else
+            {
+                var parenIndex = action.LastIndexOf(" (");
+                var selectedName = parenIndex > 0 ? action[..parenIndex] : action;
+                SelectedCustomer = customers.FirstOrDefault(c => c.Name == selectedName);
+            }
+
+            CalculateTotals();
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Error", $"Failed to load customers: {ex.Message}", "OK");
+        }
+    }
+
+    private void RemoveItem(CartLine? item)
+    {
+        if (item == null) return;
+        _cartState.RemoveItem(item);
+    }
+
+    private void UpdateQuantity(CartLine? item)
+    {
+        if (item == null) return;
+        if (item.Quantity <= 0)
+        {
+            _cartState.RemoveItem(item);
+            return;
+        }
+        CalculateTotals();
+    }
+
+    private void ClearCart()
+    {
+        _cartState.Clear();
+        SelectedCustomer = null;
+        IsCreditSale = false;
+        AmountPaid = string.Empty;
+        Notes = string.Empty;
+        DiscountAmount = 0;
+    }
+
+    private void CalculateTotals()
+    {
+        Subtotal = CartItems.Sum(c => c.LineTotal);
+
+        var afterDiscount = Subtotal - DiscountAmount;
+        TaxAmount = afterDiscount * _taxRate / 100m;
+        GrandTotal = afterDiscount + TaxAmount;
+
+        OnPropertyChanged(nameof(SubtotalDisplay));
+        OnPropertyChanged(nameof(DiscountDisplay));
+        OnPropertyChanged(nameof(TaxDisplay));
+        OnPropertyChanged(nameof(GrandTotalDisplay));
+        OnPropertyChanged(nameof(CreditAmount));
+        OnPropertyChanged(nameof(CreditDisplay));
+        OnPropertyChanged(nameof(HasItems));
+        OnPropertyChanged(nameof(ItemCount));
+    }
+
+    public async Task LoadTaxRateAsync()
+    {
+        var taxStr = await DatabaseService.Instance.GetSettingAsync("tax_rate");
+        if (decimal.TryParse(taxStr, System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.InvariantCulture, out var rate))
+        {
+            _taxRate = rate;
+            CalculateTotals();
+        }
+    }
+
+    private async Task CheckoutAsync()
+    {
+        if (!HasItems)
+        {
+            await Shell.Current.DisplayAlert("Empty Cart", "Add products to the cart before checkout.", "OK");
+            return;
+        }
+
+        if (IsCreditSale && !HasCustomer)
+        {
+            await Shell.Current.DisplayAlert("Credit Sale", "Please select a customer for credit sales.", "OK");
+            return;
+        }
+
+        var paidAmount = IsCreditSale && decimal.TryParse(AmountPaid, System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.InvariantCulture, out var p) ? p : GrandTotal;
+
+        if (IsCreditSale && paidAmount >= GrandTotal)
+        {
+            await Shell.Current.DisplayAlert("Credit Sale", "Amount paid equals or exceeds total. Use cash payment instead.", "OK");
+            return;
+        }
+
+        var user = await AuthService.Instance.GetCurrentUserAsync();
+
+        var sale = new Sale
+        {
+            Subtotal = Subtotal,
+            DiscountAmount = DiscountAmount,
+            TaxAmount = TaxAmount,
+            TotalAmount = Subtotal - DiscountAmount,
+            GrandTotal = GrandTotal,
+            AmountPaid = paidAmount,
+            CreditAmount = GrandTotal - paidAmount,
+            PaymentMethod = IsCreditSale ? "Credit" : "Cash",
+            IsCredit = IsCreditSale,
+            CustomerId = SelectedCustomer?.Id,
+            CustomerName = SelectedCustomer?.Name ?? "Walk-in",
+            UserId = user?.Id ?? 0,
+            Notes = Notes
+        };
+
+        var items = CartItems.Select(c => new SaleItem
+        {
+            ProductId = c.ProductId,
+            ProductName = c.ProductName ?? string.Empty,
+            Unit = c.Unit ?? "pcs",
+            UnitPrice = c.UnitPrice,
+            Quantity = c.Quantity,
+            LineTotal = c.LineTotal
+        }).ToList();
+
+        try
+        {
+            var createdSale = await _saleService.CreateSaleAsync(sale, items);
+
+            ClearCart();
+
+            await Shell.Current.GoToAsync($"SaleSuccess?id={createdSale.Id}");
+        }
+        catch (Exception ex)
+        {
+            await Shell.Current.DisplayAlert("Error", $"Failed to complete sale: {ex.Message}", "OK");
+        }
+    }
+}

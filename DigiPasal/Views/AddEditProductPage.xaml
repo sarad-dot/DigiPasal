@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             x:Class="DigiPasal.Views.AddEditProductPage"
+             Title="{Binding Title}"
+             Shell.TabBarIsVisible="False"
+             x:DataType="vm:AddEditProductViewModel">
+
+    <ScrollView Padding="16">
+        <VerticalStackLayout Spacing="16">
+
+            <Label Text="Product Name *" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
+            <Entry Text="{Binding Name}" Placeholder="e.g. Tata Salt 1kg"
+                   Keyboard="Text" MaxLength="200" />
+
+            <Label Text="Category" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
+            <Picker ItemsSource="{Binding Categories}"
+                    SelectedItem="{Binding Category}"
+                    Title="Select category" />
+
+            <Label Text="Selling Price (रु) *" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
+            <Entry Text="{Binding SellingPrice}" Placeholder="0.00"
+                   Keyboard="Numeric" MaxLength="10" />
+
+            <Label Text="Cost Price (रु)" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
+            <Entry Text="{Binding CostPrice}" Placeholder="0.00"
+                   Keyboard="Numeric" MaxLength="10" />
+
+            <Label Text="Unit" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
+            <Picker ItemsSource="{Binding Units}"
+                    SelectedItem="{Binding Unit}"
+                    Title="Select unit" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                    <Label Text="Stock Quantity" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
+                    <Entry Text="{Binding StockQuantity}" Placeholder="0"
+                           Keyboard="Numeric" MaxLength="10" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                    <Label Text="Low Stock Alert" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
+                    <Entry Text="{Binding LowStockThreshold}" Placeholder="10"
+                           Keyboard="Numeric" MaxLength="10" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <Label Text="Barcode" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
+            <HorizontalStackLayout Spacing="8">
+                <Entry Text="{Binding Barcode}" Placeholder="Enter barcode"
+                       Keyboard="Text" MaxLength="50" HorizontalOptions="FillAndExpand" />
+                <Button Text="Scan" WidthRequest="70"
+                        Command="{Binding ScanBarcodeCommand}"
+                        BackgroundColor="{StaticResource Gray200}"
+                        TextColor="{StaticResource Gray600}" />
+            </HorizontalStackLayout>
+
+            <Label Text="SKU" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
+            <Entry Text="{Binding SKU}" Placeholder="Internal stock code"
+                   Keyboard="Text" MaxLength="50" />
+
+            <Label Text="Description" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
+            <Editor Text="{Binding Description}" Placeholder="Optional product notes"
+                    HeightRequest="80" MaxLength="500" />
+
+            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
+                <Label Text="Active" FontSize="14" VerticalTextAlignment="Center" />
+                <Switch IsToggled="{Binding IsActive}" />
+            </HorizontalStackLayout>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,8,0,24">
+                <Button Grid.Column="0" Text="Cancel"
+                        Command="{Binding CancelCommand}"
+                        BackgroundColor="{StaticResource Gray200}"
+                        TextColor="{StaticResource Gray600}"
+                        HeightRequest="48" />
+                <Button Grid.Column="1" Text="Save"
+                        Command="{Binding SaveCommand}"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        HeightRequest="48" />
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

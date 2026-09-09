@@ -20,9 +20,7 @@ public class AuthService
     private static readonly TimeSpan LockoutDuration = TimeSpan.FromSeconds(30);
     private const string SessionKey = "auth_username";
 
-    private readonly SQLiteAsyncConnection _database;
-    private readonly SemaphoreSlim _initLock = new(1, 1);
-    private bool _databaseInitialized;
+    private readonly DatabaseService _dbService;
     private int _failedAttempts;
     private DateTime _lockoutUntil;
     private User? _currentUser;
@@ -39,29 +37,10 @@ public class AuthService
 
     private AuthService()
     {
-        string dbPath = Path.Combine(FileSystem.AppDataDirectory, "digipasal.db");
-        _database = new SQLiteAsyncConnection(dbPath);
+        _dbService = DatabaseService.Instance;
     }
 
-    private async Task EnsureInitializedAsync()
-    {
-        if (_databaseInitialized)
-            return;
-
-        await _initLock.WaitAsync();
-        try
-        {
-            if (_databaseInitialized)
-                return;
-
-            await _database.CreateTableAsync<User>();
-            _databaseInitialized = true;
-        }
-        finally
-        {
-            _initLock.Release();
-        }
-    }
+    private SQLiteAsyncConnection Database => _dbService.Database;
 
     private static string HashPassword(string password)
     {
@@ -125,17 +104,15 @@ public class AuthService
 
     public async Task<bool> HasAnyUserAsync()
     {
-        await EnsureInitializedAsync();
-        var count = await _database.Table<User>().CountAsync();
+        var count = await Database.Table<User>().CountAsync();
         return count > 0;
     }
 
     public async Task<User?> GetUserByUsernameAsync(string username)
     {
-        await EnsureInitializedAsync();
         username = username?.Trim() ?? string.Empty;
-        return await _database.Table<User>()
-            .Where(u => u.Username.ToLower() == username.ToLower())
+        return await Database.Table<User>()
+            .Where(u => u.Username.ToLowerInvariant() == username.ToLowerInvariant())
             .FirstOrDefaultAsync();
     }
 
@@ -144,8 +121,7 @@ public class AuthService
         if (_currentUser != null)
             return _currentUser;
 
-        await EnsureInitializedAsync();
-        return await _database.Table<User>().FirstOrDefaultAsync();
+        return await Database.Table<User>().FirstOrDefaultAsync();
     }
 
     public async Task RegisterUserAsync(string username, string password, string fullName, string shopName)
@@ -162,8 +138,6 @@ public class AuthService
             throw new ArgumentException("Full name is required.");
         if (string.IsNullOrWhiteSpace(shopName))
             throw new ArgumentException("Shop name is required.");
-
-        await EnsureInitializedAsync();
 
         var existing = await GetUserByUsernameAsync(username);
         if (existing != null)
@@ -182,13 +156,11 @@ public class AuthService
             CreatedAt = DateTime.UtcNow
         };
 
-        await _database.InsertAsync(user);
+        await Database.InsertAsync(user);
     }
 
     public async Task<User?> LoginAsync(string username, string password)
     {
-        await EnsureInitializedAsync();
-
         if (IsLockedOut)
             return null;
 
@@ -204,11 +176,11 @@ public class AuthService
         if (RequiresPasswordUpgrade(user.PasswordHash))
         {
             user.PasswordHash = HashPassword(password);
-            await _database.UpdateAsync(user);
+            await Database.UpdateAsync(user);
         }
 
         user.LastLogin = DateTime.UtcNow;
-        await _database.UpdateAsync(user);
+        await Database.UpdateAsync(user);
 
         await SetAuthenticatedAsync(user);
         return user;
@@ -232,7 +204,6 @@ public class AuthService
 
     public async Task RestoreSessionAsync()
     {
-        await EnsureInitializedAsync();
 
         var savedUsername = Preferences.Default.Get(SessionKey, string.Empty);
         if (string.IsNullOrEmpty(savedUsername))
@@ -270,14 +241,13 @@ public class AuthService
         if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < MinPasswordLength)
             return false;
 
-        await EnsureInitializedAsync();
 
         var user = await GetUserByUsernameAsync(username);
         if (user == null)
             return false;
 
         user.PasswordHash = HashPassword(newPassword);
-        await _database.UpdateAsync(user);
+        await Database.UpdateAsync(user);
         return true;
     }
 
@@ -286,7 +256,6 @@ public class AuthService
         if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < MinPasswordLength)
             return false;
 
-        await EnsureInitializedAsync();
 
         var user = await GetUserByUsernameAsync(username);
         if (user == null)
@@ -296,7 +265,7 @@ public class AuthService
             return false;
 
         user.PasswordHash = HashPassword(newPassword);
-        await _database.UpdateAsync(user);
+        await Database.UpdateAsync(user);
         return true;
     }
 
@@ -310,7 +279,6 @@ public class AuthService
         if (string.IsNullOrWhiteSpace(shopName))
             throw new ArgumentException("Shop name is required.");
 
-        await EnsureInitializedAsync();
 
         var user = await GetUserByUsernameAsync(username);
         if (user == null)
@@ -318,7 +286,7 @@ public class AuthService
 
         user.FullName = fullName;
         user.ShopName = shopName;
-        await _database.UpdateAsync(user);
+        await Database.UpdateAsync(user);
 
         if (_currentUser?.Id == user.Id)
             _currentUser = user;
@@ -328,7 +296,6 @@ public class AuthService
 
     public async Task<bool> DeleteAccountAsync(string username, string password)
     {
-        await EnsureInitializedAsync();
 
         var user = await GetUserByUsernameAsync(username);
         if (user == null)
@@ -337,7 +304,7 @@ public class AuthService
         if (!VerifyPassword(password, user.PasswordHash))
             return false;
 
-        await _database.DeleteAsync(user);
+        await Database.DeleteAsync(user);
         IsAuthenticated = false;
         _currentUser = null;
         Preferences.Default.Remove(SessionKey);

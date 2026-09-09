@@ -24,6 +24,7 @@ public partial class MainPage : ContentPage
 
         try
         {
+            await App.StartupInitialization;
             await _authService.RestoreSessionAsync();
 
             if (_authService.IsAuthenticated)

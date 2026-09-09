@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             x:Class="DigiPasal.Views.SaleSuccessPage"
+             Title="Sale Complete"
+             Shell.TabBarIsVisible="False"
+             Shell.NavBarIsVisible="False"
+             x:DataType="vm:SaleSuccessViewModel">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="20">
+
+            <!-- Success Icon -->
+            <VerticalStackLayout HorizontalOptions="Center" Spacing="8" Padding="0,20">
+                <Label Text="&#x2705;" FontSize="64" HorizontalTextAlignment="Center" />
+                <Label Text="Sale Complete!" FontSize="24" FontAttributes="Bold"
+                       HorizontalTextAlignment="Center" TextColor="{StaticResource Primary}" />
+                <Label Text="{Binding Sale.ReceiptNumber}" FontSize="14"
+                       HorizontalTextAlignment="Center" TextColor="{StaticResource Gray500}" />
+            </VerticalStackLayout>
+
+            <!-- Credit Warning -->
+            <Border IsVisible="{Binding IsCreditSale}"
+                    Padding="16" StrokeShape="RoundRectangle 8"
+                    BackgroundColor="#FFF3CD" Stroke="#FFC107">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Credit Sale" FontSize="14" FontAttributes="Bold" TextColor="#856404" />
+                    <Label Text="{Binding CreditInfo}" FontSize="13" TextColor="#856404" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Receipt Preview -->
+            <Border Padding="16"
+                    StrokeShape="RoundRectangle 8"
+                    Stroke="{StaticResource Gray300}"
+                    BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
+                <VerticalStackLayout Spacing="0">
+                    <Label Text="Receipt" FontSize="16" FontAttributes="Bold" Margin="0,0,0,8" />
+                    <Editor Text="{Binding ReceiptText}"
+                            IsReadOnly="True"
+                            FontFamily="CourierNew"
+                            FontSize="11"
+                            HeightRequest="400"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray50}, Dark={StaticResource Gray800}}"
+                            TextColor="{AppThemeBinding Light={StaticResource Gray900}, Dark={StaticResource Gray100}}" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Action Buttons -->
+            <VerticalStackLayout Spacing="10">
+                <Button Text="Share Receipt"
+                        Command="{Binding ShareReceiptCommand}"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        FontSize="16"
+                        HeightRequest="50" />
+
+                <Button Text="New Sale"
+                        Command="{Binding NewSaleCommand}"
+                        BackgroundColor="{StaticResource Gray200}"
+                        TextColor="{StaticResource Gray600}"
+                        FontSize="15"
+                        HeightRequest="48" />
+
+                <Button Text="View Sales History"
+                        Command="{Binding ViewHistoryCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource Primary}"
+                        FontSize="14"
+                        HeightRequest="44" />
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

@@ -236,9 +236,6 @@ public partial class DashboardPage : ContentPage
         object? sender,
         TappedEventArgs e)
     {
-        await DisplayAlertAsync(
-            "Settings",
-            "Settings screen coming soon.",
-            "OK");
+        await Shell.Current.GoToAsync("Settings");
     }
 }

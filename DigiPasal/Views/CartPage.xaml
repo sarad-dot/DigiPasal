@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             xmlns:models="clr-namespace:DigiPasal.Models"
+             x:Class="DigiPasal.Views.CartPage"
+             Title="Cart"
+             Shell.TabBarIsVisible="False"
+             x:DataType="vm:CartViewModel">
+
+    <Grid RowDefinitions="*,Auto" RowSpacing="0">
+
+        <CollectionView Grid.Row="0"
+                        ItemsSource="{Binding CartItems}"
+                        SelectionMode="None">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="0,60" HorizontalOptions="Center" Spacing="12">
+                    <Label Text="Cart is empty" FontSize="18" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" TextColor="{StaticResource Gray500}" />
+                    <Label Text="Go to Sale tab to add products."
+                           FontSize="14" HorizontalTextAlignment="Center"
+                           TextColor="{StaticResource Gray500}" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            <CollectionView.Header>
+                <VerticalStackLayout Padding="16,12" Spacing="8">
+                    <Label Text="Cart Items" FontSize="18" FontAttributes="Bold" />
+                </VerticalStackLayout>
+            </CollectionView.Header>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:CartLine">
+                    <Border Padding="12" Margin="8,4"
+                            StrokeShape="RoundRectangle 8"
+                            Stroke="{StaticResource Gray200}">
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="{Binding ProductName}" FontSize="15" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding UnitPrice, StringFormat='रु {0:N2} each'}" FontSize="12" TextColor="{StaticResource Gray500}" />
+                            </VerticalStackLayout>
+                            <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                                <Button Text="-" WidthRequest="32" HeightRequest="32"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CartViewModel}}, Path=UpdateQuantityCommand}"
+                                        CommandParameter="{Binding .}"
+                                        FontAttributes="Bold" FontSize="16"
+                                        BackgroundColor="{StaticResource Gray200}" />
+                                <Label Text="{Binding QuantityDisplay}" FontSize="16" FontAttributes="Bold"
+                                       VerticalTextAlignment="Center" WidthRequest="40" HorizontalTextAlignment="Center" />
+                                <Button Text="+" WidthRequest="32" HeightRequest="32"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CartViewModel}}, Path=UpdateQuantityCommand}"
+                                        CommandParameter="{Binding .}"
+                                        FontAttributes="Bold" FontSize="16"
+                                        BackgroundColor="{StaticResource Gray200}" />
+                            </HorizontalStackLayout>
+                            <VerticalStackLayout Grid.Column="2" VerticalOptions="Center" Spacing="4">
+                                <Label Text="{Binding LineTotalDisplay}" FontSize="15" FontAttributes="Bold"
+                                       HorizontalTextAlignment="End" />
+                                <Button Text="Remove" FontSize="11"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CartViewModel}}, Path=RemoveItemCommand}"
+                                        CommandParameter="{Binding .}"
+                                        TextColor="Red" BackgroundColor="Transparent"
+                                        Padding="0" HeightRequest="24" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Bottom Checkout Panel -->
+        <Border Grid.Row="1"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                StrokeShape="RoundRectangle 16,16,0,0"
+                Stroke="{StaticResource Gray200}"
+                Padding="16,12">
+            <VerticalStackLayout Spacing="8">
+
+                <!-- Customer Selection -->
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Label Grid.Column="0" Text="{Binding SelectedCustomerDisplay}"
+                           FontSize="13" VerticalTextAlignment="Center"
+                           TextColor="{StaticResource Gray600}" LineBreakMode="TailTruncation" />
+                    <Button Grid.Column="1" Text="Select"
+                            Command="{Binding SelectCustomerCommand}"
+                            BackgroundColor="{StaticResource Gray200}"
+                            TextColor="{StaticResource Gray600}"
+                            FontSize="12" HeightRequest="32" />
+                </Grid>
+
+                <!-- Credit Toggle -->
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Label Grid.Column="0" Text="Credit Sale" FontSize="14"
+                           VerticalTextAlignment="Center" />
+                    <Switch Grid.Column="1" IsToggled="{Binding IsCreditSale}"
+                            IsEnabled="{Binding HasCustomer}" />
+                </Grid>
+
+                <!-- Amount Paid (visible for credit) -->
+                <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsCreditSale}">
+                    <Label Text="Amount Paid:" FontSize="14" VerticalTextAlignment="Center" />
+                    <Entry Text="{Binding AmountPaid}" Placeholder="0.00"
+                           Keyboard="Numeric" WidthRequest="120" HorizontalOptions="End" />
+                </HorizontalStackLayout>
+
+                <!-- Notes -->
+                <Entry Text="{Binding Notes}" Placeholder="Sale notes (optional)"
+                       FontSize="13" MaxLength="200" />
+
+                <!-- Totals -->
+                <BoxView HeightRequest="1" Color="{StaticResource Gray200}" />
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="Subtotal" FontSize="14" TextColor="{StaticResource Gray600}" />
+                    <Label Grid.Column="1" Text="{Binding SubtotalDisplay}" FontSize="14" />
+                </Grid>
+
+                <Grid ColumnDefinitions="*,Auto" IsVisible="False">
+                    <Label Grid.Column="0" Text="Discount" FontSize="14" TextColor="{StaticResource Gray600}" />
+                    <Label Grid.Column="1" Text="{Binding DiscountDisplay}" FontSize="14" TextColor="Red" />
+                </Grid>
+
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Grid.Column="0" Text="TOTAL" FontSize="18" FontAttributes="Bold" />
+                    <Label Grid.Column="1" Text="{Binding GrandTotalDisplay}" FontSize="18" FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}" />
+                </Grid>
+
+                <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsCreditSale}">
+                    <Label Grid.Column="0" Text="Due" FontSize="14" TextColor="Red" FontAttributes="Bold" />
+                    <Label Grid.Column="1" Text="{Binding CreditDisplay}" FontSize="14" TextColor="Red" FontAttributes="Bold" />
+                </Grid>
+
+                <!-- Checkout Button -->
+                <Button Text="Complete Sale"
+                        Command="{Binding CheckoutCommand}"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        FontSize="16"
+                        HeightRequest="50"
+                        Margin="0,4,0,0" />
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+
+</ContentPage>

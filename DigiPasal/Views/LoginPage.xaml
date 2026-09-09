@@ -17,8 +17,6 @@
                   Padding="24,38,24,28"
                   ColumnDefinitions="Auto,*"
                   ColumnSpacing="14">
-                <RoundRectangle CornerRadius="12"/>
-
                 <Border Grid.Column="0"
                         BackgroundColor="Teal"
                         StrokeThickness="0"

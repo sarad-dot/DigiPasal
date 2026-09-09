@@ -42,6 +42,8 @@ public static class MauiProgram
 
     private static void RegisterServices(IServiceCollection services)
     {
+        services.AddSingleton<DatabaseService>(_ => DatabaseService.Instance);
+        services.AddSingleton<BackupService>(_ => BackupService.Instance);
         services.AddSingleton<AuthService>(_ => AuthService.Instance);
 
         services.AddTransient<MainPage>();
@@ -50,10 +52,16 @@ public static class MauiProgram
         services.AddTransient<ForgetPasswordPage>();
         services.AddTransient<DashboardPage>();
         services.AddTransient<SalePage>();
+        services.AddTransient<CartPage>();
+        services.AddTransient<SaleSuccessPage>();
+        services.AddTransient<SalesHistoryPage>();
+        services.AddTransient<SaleDetailPage>();
         services.AddTransient<ProductPage>();
+        services.AddTransient<AddEditProductPage>();
         services.AddTransient<CreditPage>();
         services.AddTransient<ProfilePage>();
         services.AddTransient<ChangePasswordPage>();
+        services.AddTransient<SettingsPage>();
 
         services.AddTransient<LoginViewModel>();
         services.AddTransient<RegisterViewModel>();
@@ -61,5 +69,6 @@ public static class MauiProgram
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<ProfileViewModel>();
         services.AddTransient<ChangePasswordViewModel>();
+        services.AddTransient<SettingsViewModel>();
     }
 }

@@ -326,7 +326,7 @@
                                 Style="{StaticResource MetricTitleStyle}" />
 
                             <Label
-                                Text="₹70,335"
+                                Text="रु 70,335"
                                 Style="{StaticResource MetricValueStyle}" />
 
                             <Label
@@ -353,7 +353,7 @@
                                 Style="{StaticResource MetricTitleStyle}" />
 
                             <Label
-                                Text="₹12,730"
+                                Text="रु 12,730"
                                 Style="{StaticResource MetricValueStyle}" />
 
                             <Label
@@ -427,7 +427,7 @@
                             Style="{StaticResource MetricTitleStyle}" />
 
                         <Label
-                            Text="₹34,045"
+                            Text="रु 34,045"
                             FontSize="24"
                             FontAttributes="Bold"
                             TextColor="{StaticResource TealPrimary}" />

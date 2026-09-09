@@ -1,23 +1,142 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             xmlns:models="clr-namespace:DigiPasal.Models"
              x:Class="DigiPasal.Views.ProductPage"
-             Title="Products"
-             Shell.TabBarIsVisible="False">
+             Title="{Binding Title}"
+             Shell.TabBarIsVisible="False"
+             x:DataType="vm:ProductListViewModel">
 
-    <VerticalStackLayout
-        Padding="24"
-        Spacing="16"
-        VerticalOptions="Center">
+    <Grid RowDefinitions="*,Auto" RowSpacing="0">
 
-        <Label
-            Text="Products"
-            Style="{StaticResource Headline}" />
+        <ScrollView Grid.Row="0" Padding="16">
+            <VerticalStackLayout Spacing="12">
 
-        <Label
-            Text="Product and inventory management is coming soon. You will be able to add, edit, and track stock levels from here."
-            TextColor="{StaticResource Gray500}"
-            HorizontalTextAlignment="Center" />
-    </VerticalStackLayout>
+                <!-- Search Bar -->
+                <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsSearchVisible}">
+                    <SearchBar
+                        Placeholder="Search products or scan barcode..."
+                        Text="{Binding SearchQuery}"
+                        HorizontalOptions="FillAndExpand"
+                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
+                        CancelButtonColor="{StaticResource Primary}" />
+                    <Button
+                        Text="&#x1f50d;"
+                        WidthRequest="44"
+                        HeightRequest="44"
+                        Command="{Binding ToggleSearchCommand}"
+                        BackgroundColor="Transparent"
+                        FontSize="20" />
+                </HorizontalStackLayout>
+
+                <!-- Category Chips -->
+                <CollectionView ItemsSource="{Binding Categories}"
+                                SelectionMode="Single"
+                                HeightRequest="40">
+                    <CollectionView.ItemsLayout>
+                        <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <Border
+                                Padding="12,6"
+                                StrokeShape="RoundRectangle 16"
+                                Stroke="{StaticResource Gray300}"
+                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ProductListViewModel}}, Path=SelectCategoryCommand}"
+                                                          CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+                                <Label Text="{Binding .}" FontSize="13" VerticalTextAlignment="Center" />
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Product List -->
+                <CollectionView ItemsSource="{Binding FilteredProducts}"
+                                SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout Padding="0,40" HorizontalOptions="Center" Spacing="12">
+                            <Label Text="No products yet." FontSize="18" FontAttributes="Bold"
+                                   HorizontalTextAlignment="Center" TextColor="{StaticResource Gray500}" />
+                            <Label Text="Tap the + button to add your first product."
+                                   FontSize="14" HorizontalTextAlignment="Center"
+                                   TextColor="{StaticResource Gray500}" />
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:Product">
+                            <SwipeView>
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItem Text="Edit"
+                                                   BackgroundColor="{StaticResource Primary}"
+                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ProductListViewModel}}, Path=EditProductCommand}"
+                                                   CommandParameter="{Binding .}" />
+                                        <SwipeItem Text="Delete"
+                                                   BackgroundColor="Red"
+                                                   Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ProductListViewModel}}, Path=DeleteProductCommand}"
+                                                   CommandParameter="{Binding .}" />
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+                                <Border Padding="12" Margin="0,4"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="{StaticResource Gray200}"
+                                        BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
+                                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                            <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                                            <HorizontalStackLayout Spacing="8">
+                                                <Border Padding="4,2" StrokeShape="RoundRectangle 4"
+                                                        BackgroundColor="{StaticResource Gray100}">
+                                                    <Label Text="{Binding Category}" FontSize="11" TextColor="{StaticResource Gray600}" />
+                                                </Border>
+                                                <Label Text="{Binding Unit}" FontSize="12" TextColor="{StaticResource Gray500}" VerticalTextAlignment="Center" />
+                                                <Label Text="{Binding Barcode}" FontSize="12" TextColor="{StaticResource Gray500}" VerticalTextAlignment="Center">
+                                                    <Label.Triggers>
+                                                        <DataTrigger TargetType="Label" Binding="{Binding Barcode}" Value="">
+                                                            <Setter Property="IsVisible" Value="False" />
+                                                        </DataTrigger>
+                                                    </Label.Triggers>
+                                                </Label>
+                                            </HorizontalStackLayout>
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                            <Label Text="{Binding SellingPrice, StringFormat='रु {0:N2}'}" FontSize="16" FontAttributes="Bold"
+                                                   HorizontalTextAlignment="End" TextColor="{StaticResource Primary}" />
+                                            <Label Text="{Binding StockQuantity, StringFormat='Stock: {0:0.##}'}"
+                                                   FontSize="12" HorizontalTextAlignment="End" TextColor="Green">
+                                                <Label.Triggers>
+                                                    <DataTrigger TargetType="Label" Binding="{Binding StockQuantity}" Value="0">
+                                                        <Setter Property="TextColor" Value="Red" />
+                                                    </DataTrigger>
+                                                </Label.Triggers>
+                                            </Label>
+                                        </VerticalStackLayout>
+                                    </Grid>
+                                </Border>
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- FAB - Add Product -->
+        <Button Grid.Row="0"
+                Text="+"
+                WidthRequest="56" HeightRequest="56"
+                CornerRadius="28"
+                FontSize="28"
+                FontAttributes="Bold"
+                TextColor="White"
+                BackgroundColor="{StaticResource Primary}"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="0,0,20,20"
+                Command="{Binding AddProductCommand}" />
+    </Grid>
 
 </ContentPage>

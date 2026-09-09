@@ -1,23 +1,127 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             xmlns:models="clr-namespace:DigiPasal.Models"
              x:Class="DigiPasal.Views.SalePage"
-             Title="Sales"
-             Shell.TabBarIsVisible="False">
+             Title="New Sale"
+             Shell.TabBarIsVisible="False"
+             x:DataType="vm:SaleViewModel">
 
-    <VerticalStackLayout
-        Padding="24"
-        Spacing="16"
-        VerticalOptions="Center">
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="0">
 
-        <Label
-            Text="Sales"
-            Style="{StaticResource Headline}" />
+        <!-- Search Bar -->
+        <Border Grid.Row="0" Padding="12,8"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                StrokeShape="RoundRectangle 0"
+                Stroke="{StaticResource Gray200}">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <SearchBar Grid.Column="0"
+                           Placeholder="Search products or type barcode..."
+                           Text="{Binding SearchQuery}"
+                           CancelButtonColor="{StaticResource Primary}"
+                           BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}" />
+                <Button Grid.Column="1" Text="&#x1f4f7;" WidthRequest="44" HeightRequest="44"
+                        Command="{Binding ScanBarcodeCommand}"
+                        BackgroundColor="Transparent" FontSize="20" />
+            </Grid>
+        </Border>
 
-        <Label
-            Text="Sales recording is coming soon. You will be able to record and manage every sale from here."
-            TextColor="{StaticResource Gray500}"
-            HorizontalTextAlignment="Center" />
-    </VerticalStackLayout>
+        <!-- Category Chips -->
+        <CollectionView Grid.Row="1" ItemsSource="{Binding Categories}"
+                        SelectionMode="Single" HeightRequest="44">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="x:String">
+                    <Border Padding="14,6"
+                            StrokeShape="RoundRectangle 16"
+                            Stroke="{StaticResource Gray300}"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SaleViewModel}}, Path=SelectCategoryCommand}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Label Text="{Binding .}" FontSize="13" VerticalTextAlignment="Center" />
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Product Grid -->
+        <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding FilteredProducts}"
+                        SelectionMode="None">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="0,40" HorizontalOptions="Center" Spacing="12">
+                    <Label Text="No products available." FontSize="18" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" TextColor="{StaticResource Gray500}" />
+                    <Label Text="Add products from the Stock tab first."
+                           FontSize="14" HorizontalTextAlignment="Center"
+                           TextColor="{StaticResource Gray500}" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" SnapPointsAlignment="Start" SnapPointsType="Mandatory" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Product">
+                    <Border Padding="14,10" Margin="8,3"
+                            StrokeShape="RoundRectangle 10"
+                            Stroke="{StaticResource Gray200}"
+                            BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold"
+                                       LineBreakMode="TailTruncation" />
+                                <HorizontalStackLayout Spacing="6">
+                                    <Border Padding="4,2" StrokeShape="RoundRectangle 4"
+                                            BackgroundColor="{StaticResource Gray100}">
+                                        <Label Text="{Binding Category}" FontSize="11" TextColor="{StaticResource Gray600}" />
+                                    </Border>
+                                    <Label Text="{Binding StockQuantity, StringFormat='Stock: {0:0.##}'}"
+                                           FontSize="12" TextColor="{StaticResource Gray500}" VerticalTextAlignment="Center" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                <Label Text="{Binding SellingPrice, StringFormat='रु {0:N2}'}"
+                                       FontSize="16" FontAttributes="Bold"
+                                       HorizontalTextAlignment="End" TextColor="{StaticResource Primary}" />
+                                <Button Text="+ Add" FontSize="13"
+                                        Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SaleViewModel}}, Path=AddToCartCommand}"
+                                        CommandParameter="{Binding .}"
+                                        BackgroundColor="{StaticResource Primary}"
+                                        TextColor="White"
+                                        HeightRequest="32" WidthRequest="70"
+                                        Padding="0" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Bottom Cart Bar -->
+        <Border Grid.Row="3"
+                Padding="16,10"
+                BackgroundColor="{StaticResource Primary}"
+                StrokeShape="RoundRectangle 0">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <Border Grid.Column="0" BackgroundColor="#33FFFFFF"
+                        StrokeShape="RoundRectangle 16" Padding="10,6">
+                    <Label Text="{Binding CartCount, StringFormat='{0} items'}"
+                           TextColor="White" FontSize="14" FontAttributes="Bold"
+                           VerticalTextAlignment="Center" />
+                </Border>
+                <Button Grid.Column="1" Text="View Cart"
+                        Command="{Binding GoToCartCommand}"
+                        BackgroundColor="White"
+                        TextColor="{StaticResource Primary}"
+                        FontAttributes="Bold" HeightRequest="40"
+                        HorizontalOptions="FillAndExpand" />
+            </Grid>
+        </Border>
+    </Grid>
 
 </ContentPage>

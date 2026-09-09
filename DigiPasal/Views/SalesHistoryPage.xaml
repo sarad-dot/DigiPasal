@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             xmlns:models="clr-namespace:DigiPasal.Models"
+             x:Class="DigiPasal.Views.SalesHistoryPage"
+             Title="Sales History"
+             Shell.TabBarIsVisible="False"
+             x:DataType="vm:SalesHistoryViewModel">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="0">
+
+        <!-- Date Range -->
+        <Border Grid.Row="0" Padding="16,12"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                Stroke="{StaticResource Gray200}">
+            <VerticalStackLayout Spacing="8">
+                <Grid ColumnDefinitions="*,Auto,*,Auto" ColumnSpacing="8">
+                    <DatePicker Grid.Column="0" Date="{Binding DateFrom}" Format="dd MMM yyyy" />
+                    <Label Grid.Column="1" Text="to" VerticalTextAlignment="Center"
+                           FontSize="14" TextColor="{StaticResource Gray500}" />
+                    <DatePicker Grid.Column="2" Date="{Binding DateTo}" Format="dd MMM yyyy" />
+                    <Button Grid.Column="3" Text="Go" WidthRequest="50"
+                            Command="{Binding LoadSalesCommand}"
+                            BackgroundColor="{StaticResource Primary}" TextColor="White" />
+                </Grid>
+                <HorizontalStackLayout Spacing="8">
+                    <Button Text="Today" Command="{Binding SetTodayCommand}"
+                            BackgroundColor="{StaticResource Gray200}" TextColor="{StaticResource Gray600}" FontSize="12" HeightRequest="30" />
+                    <Button Text="This Week" Command="{Binding SetWeekCommand}"
+                            BackgroundColor="{StaticResource Gray200}" TextColor="{StaticResource Gray600}" FontSize="12" HeightRequest="30" />
+                    <Button Text="This Month" Command="{Binding SetMonthCommand}"
+                            BackgroundColor="{StaticResource Gray200}" TextColor="{StaticResource Gray600}" FontSize="12" HeightRequest="30" />
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Summary Stats Row -->
+        <Border Grid.Row="1" Padding="16,8"
+                BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}"
+                Stroke="{StaticResource Gray200}">
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                    <Label Text="Total" FontSize="11" TextColor="{StaticResource Gray500}" HorizontalTextAlignment="Center" />
+                    <Label Text="{Binding TotalSalesDisplay}" FontSize="14" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" TextColor="{StaticResource Primary}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                    <Label Text="Cash" FontSize="11" TextColor="{StaticResource Gray500}" HorizontalTextAlignment="Center" />
+                    <Label Text="{Binding CashSalesDisplay}" FontSize="14" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" TextColor="Green" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="2" Spacing="2">
+                    <Label Text="Credit" FontSize="11" TextColor="{StaticResource Gray500}" HorizontalTextAlignment="Center" />
+                    <Label Text="{Binding CreditSalesDisplay}" FontSize="14" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" TextColor="Orange" />
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <!-- Sales List -->
+        <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding Sales}"
+                        SelectionMode="None">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="0,40" HorizontalOptions="Center" Spacing="12">
+                    <Label Text="No sales recorded." FontSize="18" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" TextColor="{StaticResource Gray500}" />
+                    <Label Text="Complete a sale to see it here."
+                           FontSize="14" HorizontalTextAlignment="Center"
+                           TextColor="{StaticResource Gray500}" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            <CollectionView.Header>
+                <Grid Padding="16,8" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
+                    <Label Text="Receipt" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource Gray500}" />
+                    <Label Grid.Column="1" Text="Items" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource Gray500}" />
+                    <Label Grid.Column="2" Text="Total" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource Gray500}" />
+                    <Label Grid.Column="3" Text="Type" FontSize="12" FontAttributes="Bold" TextColor="{StaticResource Gray500}" />
+                </Grid>
+            </CollectionView.Header>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:Sale">
+                    <Border Padding="16,10" Margin="8,2"
+                            StrokeShape="RoundRectangle 8"
+                            Stroke="{StaticResource Gray200}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SalesHistoryViewModel}}, Path=ViewSaleCommand}"
+                                                  CommandParameter="{Binding .}" />
+                        </Border.GestureRecognizers>
+                        <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12">
+                            <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                <Label Text="{Binding ReceiptNumber}" FontSize="14" FontAttributes="Bold" />
+                                <Label Text="{Binding CreatedAt, StringFormat='{0:dd MMM yyyy HH:mm}'}"
+                                       FontSize="11" TextColor="{StaticResource Gray500}" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="{Binding CustomerName}" FontSize="12"
+                                   VerticalTextAlignment="Center" TextColor="{StaticResource Gray600}" />
+                            <Label Grid.Column="2" Text="{Binding GrandTotal, StringFormat='रु {0:N2}'}"
+                                   FontSize="14" FontAttributes="Bold" VerticalTextAlignment="Center" />
+                            <Border Grid.Column="3" Padding="8,4"
+                                    StrokeShape="RoundRectangle 12"
+                                    BackgroundColor="Green">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsCredit}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="Orange" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <Label FontSize="11" FontAttributes="Bold" TextColor="White" Text="Cash">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding IsCredit}" Value="True">
+                                            <Setter Property="Text" Value="Credit" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Border>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+
+</ContentPage>
