@@ -34,7 +34,7 @@
                     <Label Text="DigiPasal"
                            FontSize="24" FontAttributes="Bold"
                            TextColor="White"/>
-                    <Label Text="Nepal Retail Management"
+                    <Label Text="नेपाली खुदूरा पसल"
                            FontSize="13"
                            TextColor="#CCFFFFFF"/>
                 </VerticalStackLayout>
@@ -55,7 +55,7 @@
                 <VerticalStackLayout Spacing="0">
 
                     <!-- Subheader -->
-                    <Label Text="Secure Login"
+                    <Label Text="Login"
                            FontSize="18" FontAttributes="Bold"
                            TextColor="{StaticResource TextPrimary}"
                            HorizontalOptions="Center"
@@ -70,7 +70,7 @@
                            Margin="0,0,0,14"/>
 
                     <!-- Username Field -->
-                    <Label Text="Phone Number or Email"
+                    <Label Text="Username"
                            FontSize="13" FontAttributes="Bold"
                            TextColor="{StaticResource TextSecondary}"
                            Margin="0,0,0,6"/>
@@ -81,7 +81,7 @@
                             <RoundRectangle CornerRadius="10"/>
                         </Border.StrokeShape>
                         <Entry Text="{Binding Username}"
-                               Placeholder="Phone Number or Email"
+                               Placeholder="Username"
                                PlaceholderColor="{StaticResource Gray400}"
                                Keyboard="Email"
                                ReturnType="Next"
@@ -168,29 +168,30 @@
 
                     <!-- Secondary Options -->
                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10" Margin="0,18,0,0">
-
+                    
+                        <!-- <Button Grid.Column="0" -->
+                        <!--         Text="Login with Google" -->
+                        <!--         Command="{Binding GoogleLoginCommand}" -->
+                        <!--         IsEnabled="{Binding IsNotBusy}" -->
+                        <!--         BackgroundColor="{StaticResource InputBg}" -->
+                        <!--         TextColor="{StaticResource TextPrimary}" -->
+                        <!--         FontSize="13" -->
+                        <!--         HeightRequest="46" -->
+                        <!--         CornerRadius="10" -->
+                        <!--         BorderColor="{StaticResource InputStroke}" -->
+                        <!--         BorderWidth="1"/> -->
+                    
                         <Button Grid.Column="0"
-                                Text="Login with Google"
-                                Command="{Binding GoogleLoginCommand}"
-                                IsEnabled="{Binding IsNotBusy}"
-                                BackgroundColor="{StaticResource InputBg}"
-                                TextColor="{StaticResource TextPrimary}"
-                                FontSize="13"
-                                HeightRequest="46"
-                                CornerRadius="10"
-                                BorderColor="{StaticResource InputStroke}"
-                                BorderWidth="1"/>
-
-                        <Button Grid.Column="1"
-                                Text="🔐"
+                                Text="Use Device Password 🔐"
                                 Command="{Binding DeviceLockCommand}"
                                 IsEnabled="{Binding IsNotBusy}"
                                 BackgroundColor="{StaticResource TealLight}"
                                 TextColor="{StaticResource TealPrimary}"
-                                FontSize="22"
+                                FontSize="12"
                                 HeightRequest="46"
-                                WidthRequest="52"
-                                CornerRadius="10"/>
+                                CornerRadius="10"
+                                BorderColor="{StaticResource InputStroke}"
+                                 BorderWidth="1"/>
                     </Grid>
 
                     <!-- Sign Up Footer -->

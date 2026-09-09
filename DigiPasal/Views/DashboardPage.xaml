@@ -20,7 +20,7 @@
                    TargetType="Border">
 
                 <Setter Property="BackgroundColor"
-                        Value="{StaticResource CardBackground}" />
+                        Value="{StaticResource TealLight}" />
 
                 <Setter Property="StrokeThickness"
                         Value="0" />
@@ -204,15 +204,15 @@
                     </Border>
 
 
-                    <!-- Subtitle -->
-                    <Label
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        Grid.ColumnSpan="2"
-                        Text="Manage your kirana business easily"
-                        FontSize="13"
-                        TextColor="{StaticResource TextSecondary}"
-                        Margin="32,2,0,0" />
+                    <!-- ~1~ Subtitle @1@ -->
+                    <!-- <Label -->
+                    <!--     Grid.Row="1" -->
+                    <!--     Grid.Column="0" -->
+                    <!--     Grid.ColumnSpan="2" -->
+                    <!--     Text="Manage your kirana business easily" -->
+                    <!--     FontSize="13" -->
+                    <!--     TextColor="{StaticResource TextSecondary}" -->
+                    <!--     Margin="32,2,0,0" /> -->
 
                 </Grid>
 
@@ -221,30 +221,30 @@
                      TAGLINE BANNER
                      ================================================= -->
 
-                <Border
-                    BackgroundColor="{StaticResource SuccessGreen}"
-                    StrokeThickness="0"
-                    Padding="16"
-                    StrokeShape="RoundRectangle 12">
-
-                    <VerticalStackLayout
-                        Spacing="4">
-
-                        <Label
-                            Text="Manage your business easily"
-                            FontSize="16"
-                            FontAttributes="Bold"
-                            TextColor="White" />
-
-                        <Label
-                            Text="Nepal's trusted Kirana management app"
-                            FontSize="12"
-                            TextColor="White"
-                            Opacity="0.92" />
-
-                    </VerticalStackLayout>
-
-                </Border>
+                <!-- <Border -->
+                <!--     BackgroundColor="{StaticResource SuccessGreen}" -->
+                <!--     StrokeThickness="0" -->
+                <!--     Padding="10" -->
+                <!--     StrokeShape="RoundRectangle 12"> -->
+                <!-- -->
+                <!--     <VerticalStackLayout -->
+                <!--         Spacing="4"> -->
+                <!-- -->
+                <!--         <Label -->
+                <!--             Text="Manage your business easily" -->
+                <!--             FontSize="14" -->
+                <!--             FontAttributes="Bold" -->
+                <!--             TextColor="White" /> -->
+                <!-- -->
+                <!--         <Label -->
+                <!--             Text="Nepal's trusted Kirana management app" -->
+                <!--             FontSize="10" -->
+                <!--             TextColor="White" -->
+                <!--             Opacity="0.92" /> -->
+                <!-- -->
+                <!--     </VerticalStackLayout> -->
+                <!-- -->
+                <!-- </Border> -->
 
 
                 <!-- =================================================
@@ -258,58 +258,58 @@
                     RowSpacing="12">
 
 
-                    <!-- RECEIVABLE -->
-
-                    <Border
-                        Grid.Row="0"
-                        Grid.Column="0"
-                        Style="{StaticResource CardFrameStyle}">
-
-                        <VerticalStackLayout Spacing="8">
-
-                            <Label
-                                Text="Receivable"
-                                Style="{StaticResource MetricTitleStyle}" />
-
-                            <Label
-                                Text="₹80,000"
-                                Style="{StaticResource MetricValueStyle}" />
-
-                            <Label
-                                Text="⬆️ +5%"
-                                Style="{StaticResource TrendStyle}"
-                                TextColor="{StaticResource SuccessGreen}" />
-
-                        </VerticalStackLayout>
-
-                    </Border>
-
-
-                    <!-- PAYABLE -->
-
-                    <Border
-                        Grid.Row="0"
-                        Grid.Column="1"
-                        Style="{StaticResource CardFrameStyle}">
-
-                        <VerticalStackLayout Spacing="8">
-
-                            <Label
-                                Text="Payable"
-                                Style="{StaticResource MetricTitleStyle}" />
-
-                            <Label
-                                Text="₹70,000"
-                                Style="{StaticResource MetricValueStyle}" />
-
-                            <Label
-                                Text="⬇️ -2%"
-                                Style="{StaticResource TrendStyle}"
-                                TextColor="{StaticResource DangerRed}" />
-
-                        </VerticalStackLayout>
-
-                    </Border>
+                    <!-- ~1~ RECEIVABLE @1@ -->
+                    <!-- -->
+                    <!-- <Border -->
+                    <!--     Grid.Row="0" -->
+                    <!--     Grid.Column="0" -->
+                    <!--     Style="{StaticResource CardFrameStyle}"> -->
+                    <!-- -->
+                    <!--     <VerticalStackLayout Spacing="8"> -->
+                    <!-- -->
+                    <!--         <Label -->
+                    <!--             Text="Receivable" -->
+                    <!--             Style="{StaticResource MetricTitleStyle}" /> -->
+                    <!-- -->
+                    <!--         <Label -->
+                    <!--             Text="₹80,000" -->
+                    <!--             Style="{StaticResource MetricValueStyle}" /> -->
+                    <!-- -->
+                    <!--         <Label -->
+                    <!--             Text="⬆️ +5%" -->
+                    <!--             Style="{StaticResource TrendStyle}" -->
+                    <!--             TextColor="{StaticResource SuccessGreen}" /> -->
+                    <!-- -->
+                    <!--     </VerticalStackLayout> -->
+                    <!-- -->
+                    <!-- </Border> -->
+                    <!-- -->
+                    <!-- -->
+                    <!-- ~1~ PAYABLE @1@ -->
+                    <!-- -->
+                    <!-- <Border -->
+                    <!--     Grid.Row="0" -->
+                    <!--     Grid.Column="1" -->
+                    <!--     Style="{StaticResource CardFrameStyle}"> -->
+                    <!-- -->
+                    <!--     <VerticalStackLayout Spacing="8"> -->
+                    <!-- -->
+                    <!--         <Label -->
+                    <!--             Text="Payable" -->
+                    <!--             Style="{StaticResource MetricTitleStyle}" /> -->
+                    <!-- -->
+                    <!--         <Label -->
+                    <!--             Text="₹70,000" -->
+                    <!--             Style="{StaticResource MetricValueStyle}" /> -->
+                    <!-- -->
+                    <!--         <Label -->
+                    <!--             Text="⬇️ -2%" -->
+                    <!--             Style="{StaticResource TrendStyle}" -->
+                    <!--             TextColor="{StaticResource DangerRed}" /> -->
+                    <!-- -->
+                    <!--     </VerticalStackLayout> -->
+                    <!-- -->
+                    <!-- </Border> -->
 
 
                     <!-- SALES -->
@@ -372,44 +372,44 @@
                      EXPENSES CARD
                      ================================================= -->
 
-                <Border
-                    Style="{StaticResource CardFrameStyle}"
-                    Padding="16">
-
-                    <Grid ColumnDefinitions="*,Auto"
-                          RowDefinitions="Auto,Auto"
-                          RowSpacing="6">
-
-                        <Label
-                            Grid.Row="0"
-                            Grid.Column="0"
-                            Text="Expenses"
-                            Style="{StaticResource MetricTitleStyle}" />
-
-                        <Label
-                            Grid.Row="1"
-                            Grid.Column="0"
-                            Text="₹34,045"
-                            FontSize="22"
-                            FontAttributes="Bold"
-                            TextColor="{StaticResource DangerRed}" />
-
-                        <Button
-                            Grid.Row="0"
-                            Grid.RowSpan="2"
-                            Grid.Column="1"
-                            Text="Details →"
-                            BackgroundColor="Transparent"
-                            TextColor="{StaticResource TealPrimary}"
-                            FontSize="13"
-                            FontAttributes="Bold"
-                            Padding="8"
-                            VerticalOptions="Center"
-                            Clicked="ExpensesDetails_Clicked" />
-
-                    </Grid>
-
-                </Border>
+                <!-- <Border -->
+                <!--     Style="{StaticResource CardFrameStyle}" -->
+                <!--     Padding="16"> -->
+                <!-- -->
+                <!--     <Grid ColumnDefinitions="*,Auto" -->
+                <!--           RowDefinitions="Auto,Auto" -->
+                <!--           RowSpacing="6"> -->
+                <!-- -->
+                <!--         <Label -->
+                <!--             Grid.Row="0" -->
+                <!--             Grid.Column="0" -->
+                <!--             Text="Expenses" -->
+                <!--             Style="{StaticResource MetricTitleStyle}" /> -->
+                <!-- -->
+                <!--         <Label -->
+                <!--             Grid.Row="1" -->
+                <!--             Grid.Column="0" -->
+                <!--             Text="₹34,045" -->
+                <!--             FontSize="22" -->
+                <!--             FontAttributes="Bold" -->
+                <!--             TextColor="{StaticResource DangerRed}" /> -->
+                <!-- -->
+                <!--         <Button -->
+                <!--             Grid.Row="0" -->
+                <!--             Grid.RowSpan="2" -->
+                <!--             Grid.Column="1" -->
+                <!--             Text="Details →" -->
+                <!--             BackgroundColor="Transparent" -->
+                <!--             TextColor="{StaticResource TealPrimary}" -->
+                <!--             FontSize="13" -->
+                <!--             FontAttributes="Bold" -->
+                <!--             Padding="8" -->
+                <!--             VerticalOptions="Center" -->
+                <!--             Clicked="ExpensesDetails_Clicked" /> -->
+                <!-- -->
+                <!--     </Grid> -->
+                <!-- -->
+                <!-- </Border> -->
 
 
                 <!-- =================================================
