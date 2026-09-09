@@ -14,12 +14,13 @@
 
             <!-- ====== BRANDED HEADER ====== -->
             <Grid BackgroundColor="{StaticResource TealPrimary}"
-                  Padding="24,48,24,28"
+                  Padding="24,38,24,28"
                   ColumnDefinitions="Auto,*"
                   ColumnSpacing="14">
+                <RoundRectangle CornerRadius="12"/>
 
                 <Border Grid.Column="0"
-                        BackgroundColor="#FFFFFF20"
+                        BackgroundColor="Teal"
                         StrokeThickness="0"
                         WidthRequest="52" HeightRequest="52"
                         VerticalOptions="Center">
@@ -217,7 +218,7 @@
             </Border>
 
             <!-- Version Footer -->
-            <Label Text="DigiPasal v1.2, © 2026"
+            <Label Text="DigiPasal v0.1, © 2026"
                    FontSize="12"
                    TextColor="{StaticResource Gray300}"
                    HorizontalOptions="Center"
