@@ -62,6 +62,7 @@ public static class MauiProgram
         services.AddTransient<ProfilePage>();
         services.AddTransient<ChangePasswordPage>();
         services.AddTransient<SettingsPage>();
+        services.AddTransient<QuickSalePage>();
 
         services.AddTransient<LoginViewModel>();
         services.AddTransient<RegisterViewModel>();

@@ -111,9 +111,11 @@ public class AuthService
     public async Task<User?> GetUserByUsernameAsync(string username)
     {
         username = username?.Trim() ?? string.Empty;
-        return await Database.Table<User>()
-            .Where(u => u.Username.ToLowerInvariant() == username.ToLowerInvariant())
-            .FirstOrDefaultAsync();
+        // Filter in memory: SQLite-net translates ToLowerInvariant() into a SQL
+        // function that SQLite does not provide ("no such function: tolowerinvariant").
+        var users = await Database.Table<User>().ToListAsync();
+        return users.FirstOrDefault(u =>
+            string.Equals(u.Username, username, StringComparison.OrdinalIgnoreCase));
     }
 
     public async Task<User?> GetCurrentUserAsync()

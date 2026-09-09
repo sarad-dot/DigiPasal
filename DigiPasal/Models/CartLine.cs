@@ -16,6 +16,8 @@ public class CartLine : INotifyPropertyChanged
 
     public decimal CostPrice { get; init; }
 
+    public int StockQuantity { get; init; }
+
     private double _quantity;
 
     public double Quantity

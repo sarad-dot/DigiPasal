@@ -5,81 +5,252 @@
              x:Class="DigiPasal.Views.AddEditProductPage"
              Title="{Binding Title}"
              Shell.TabBarIsVisible="False"
-             x:DataType="vm:AddEditProductViewModel">
+             x:DataType="vm:AddEditProductViewModel"
+             BackgroundColor="{StaticResource AppBackground}">
 
     <ScrollView Padding="16">
         <VerticalStackLayout Spacing="16">
 
-            <Label Text="Product Name *" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
-            <Entry Text="{Binding Name}" Placeholder="e.g. Tata Salt 1kg"
-                   Keyboard="Text" MaxLength="200" />
+            <!-- Product Name -->
+            <Border Padding="16"
+                    StrokeShape="RoundRectangle 12"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.06"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Product Name *" FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}" HeightRequest="50">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Entry Text="{Binding Name}" Placeholder="e.g. Tata Salt 1kg"
+                               Keyboard="Text" MaxLength="200"
+                               BackgroundColor="Transparent"
+                               TextColor="{StaticResource TextPrimary}"
+                               PlaceholderColor="{StaticResource Gray400}"
+                               FontSize="15" Margin="12,0" />
+                    </Border>
 
-            <Label Text="Category" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
-            <Picker ItemsSource="{Binding Categories}"
-                    SelectedItem="{Binding Category}"
-                    Title="Select category" />
-
-            <Label Text="Selling Price (रु) *" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
-            <Entry Text="{Binding SellingPrice}" Placeholder="0.00"
-                   Keyboard="Numeric" MaxLength="10" />
-
-            <Label Text="Cost Price (रु)" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
-            <Entry Text="{Binding CostPrice}" Placeholder="0.00"
-                   Keyboard="Numeric" MaxLength="10" />
-
-            <Label Text="Unit" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
-            <Picker ItemsSource="{Binding Units}"
-                    SelectedItem="{Binding Unit}"
-                    Title="Select unit" />
-
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-                <VerticalStackLayout Grid.Column="0" Spacing="4">
-                    <Label Text="Stock Quantity" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
-                    <Entry Text="{Binding StockQuantity}" Placeholder="0"
-                           Keyboard="Numeric" MaxLength="10" />
+                    <Label Text="Category" FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}" HeightRequest="50">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Picker ItemsSource="{Binding Categories}"
+                                SelectedItem="{Binding Category}"
+                                Title="Select category"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource TextPrimary}" />
+                    </Border>
                 </VerticalStackLayout>
-                <VerticalStackLayout Grid.Column="1" Spacing="4">
-                    <Label Text="Low Stock Alert" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
-                    <Entry Text="{Binding LowStockThreshold}" Placeholder="10"
-                           Keyboard="Numeric" MaxLength="10" />
+            </Border>
+
+            <!-- Pricing -->
+            <Border Padding="16"
+                    StrokeShape="RoundRectangle 12"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.06"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Selling Price (रु) *" FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}" HeightRequest="50">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Entry Text="{Binding SellingPrice}" Placeholder="0.00"
+                               Keyboard="Numeric" MaxLength="10"
+                               BackgroundColor="Transparent"
+                               TextColor="{StaticResource TextPrimary}"
+                               PlaceholderColor="{StaticResource Gray400}"
+                               FontSize="15" Margin="12,0" />
+                    </Border>
+
+                    <Label Text="Cost Price (रु)" FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}" HeightRequest="50">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Entry Text="{Binding CostPrice}" Placeholder="0.00"
+                               Keyboard="Numeric" MaxLength="10"
+                               BackgroundColor="Transparent"
+                               TextColor="{StaticResource TextPrimary}"
+                               PlaceholderColor="{StaticResource Gray400}"
+                               FontSize="15" Margin="12,0" />
+                    </Border>
                 </VerticalStackLayout>
-            </Grid>
+            </Border>
 
-            <Label Text="Barcode" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
-            <HorizontalStackLayout Spacing="8">
-                <Entry Text="{Binding Barcode}" Placeholder="Enter barcode"
-                       Keyboard="Text" MaxLength="50" HorizontalOptions="FillAndExpand" />
-                <Button Text="Scan" WidthRequest="70"
-                        Command="{Binding ScanBarcodeCommand}"
-                        BackgroundColor="{StaticResource Gray200}"
-                        TextColor="{StaticResource Gray600}" />
-            </HorizontalStackLayout>
+            <!-- Stock & Unit -->
+            <Border Padding="16"
+                    StrokeShape="RoundRectangle 12"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.06"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Unit" FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}" HeightRequest="50">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Picker ItemsSource="{Binding Units}"
+                                SelectedItem="{Binding Unit}"
+                                Title="Select unit"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource TextPrimary}" />
+                    </Border>
 
-            <Label Text="SKU" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
-            <Entry Text="{Binding SKU}" Placeholder="Internal stock code"
-                   Keyboard="Text" MaxLength="50" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <VerticalStackLayout Grid.Column="0" Spacing="6">
+                            <Label Text="Stock Quantity" FontSize="13" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextSecondary}" />
+                            <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                                    BackgroundColor="{StaticResource InputBg}" HeightRequest="50">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="10"/>
+                                </Border.StrokeShape>
+                                <Entry Text="{Binding StockQuantity}" Placeholder="0"
+                                       Keyboard="Numeric" MaxLength="10"
+                                       BackgroundColor="Transparent"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       PlaceholderColor="{StaticResource Gray400}"
+                                       FontSize="15" Margin="12,0" />
+                            </Border>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="6">
+                            <Label Text="Low Stock Alert" FontSize="13" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextSecondary}" />
+                            <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                                    BackgroundColor="{StaticResource InputBg}" HeightRequest="50">
+                                <Border.StrokeShape>
+                                    <RoundRectangle CornerRadius="10"/>
+                                </Border.StrokeShape>
+                                <Entry Text="{Binding LowStockThreshold}" Placeholder="10"
+                                       Keyboard="Numeric" MaxLength="10"
+                                       BackgroundColor="Transparent"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       PlaceholderColor="{StaticResource Gray400}"
+                                       FontSize="15" Margin="12,0" />
+                            </Border>
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
 
-            <Label Text="Description" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Gray600}" />
-            <Editor Text="{Binding Description}" Placeholder="Optional product notes"
-                    HeightRequest="80" MaxLength="500" />
+            <!-- Barcode & SKU -->
+            <Border Padding="16"
+                    StrokeShape="RoundRectangle 12"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.06"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Barcode" FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Border Grid.Column="0" Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                                BackgroundColor="{StaticResource InputBg}" HeightRequest="50">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+                            <Entry Text="{Binding Barcode}" Placeholder="Enter barcode"
+                                   Keyboard="Text" MaxLength="50"
+                                   BackgroundColor="Transparent"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   PlaceholderColor="{StaticResource Gray400}"
+                                   FontSize="15" Margin="12,0,0,0" />
+                        </Border>
+                        <Button Grid.Column="1" Text="Scan" WidthRequest="70"
+                                Command="{Binding ScanBarcodeCommand}"
+                                BackgroundColor="{StaticResource TealLight}"
+                                TextColor="{StaticResource TealPrimary}"
+                                FontAttributes="Bold"
+                                HeightRequest="50" CornerRadius="10" />
+                    </Grid>
 
-            <HorizontalStackLayout Spacing="8" VerticalOptions="Center">
-                <Label Text="Active" FontSize="14" VerticalTextAlignment="Center" />
-                <Switch IsToggled="{Binding IsActive}" />
-            </HorizontalStackLayout>
+                    <Label Text="SKU" FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}" HeightRequest="50">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Entry Text="{Binding SKU}" Placeholder="Internal stock code"
+                               Keyboard="Text" MaxLength="50"
+                               BackgroundColor="Transparent"
+                               TextColor="{StaticResource TextPrimary}"
+                               PlaceholderColor="{StaticResource Gray400}"
+                               FontSize="15" Margin="12,0" />
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
 
+            <!-- Description -->
+            <Border Padding="16"
+                    StrokeShape="RoundRectangle 12"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.06"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Description" FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="10"/>
+                        </Border.StrokeShape>
+                        <Editor Text="{Binding Description}" Placeholder="Optional product notes"
+                                HeightRequest="80" MaxLength="500"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource TextPrimary}"
+                                PlaceholderColor="{StaticResource Gray400}"
+                                Margin="12,8" />
+                    </Border>
+
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" Margin="0,4,0,0">
+                        <Switch Grid.Column="0" IsToggled="{Binding IsActive}"
+                                ThumbColor="{StaticResource TealPrimary}" />
+                        <Label Grid.Column="1" Text="Active" FontSize="14"
+                               TextColor="{StaticResource TextPrimary}"
+                               VerticalTextAlignment="Center" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Action Buttons -->
             <Grid ColumnDefinitions="*,*" ColumnSpacing="12" Margin="0,8,0,24">
                 <Button Grid.Column="0" Text="Cancel"
                         Command="{Binding CancelCommand}"
-                        BackgroundColor="{StaticResource Gray200}"
-                        TextColor="{StaticResource Gray600}"
-                        HeightRequest="48" />
+                        BackgroundColor="{StaticResource TealLight}"
+                        TextColor="{StaticResource TealPrimary}"
+                        FontAttributes="Bold"
+                        HeightRequest="50"
+                        CornerRadius="12" />
                 <Button Grid.Column="1" Text="Save"
                         Command="{Binding SaveCommand}"
-                        BackgroundColor="{StaticResource Primary}"
+                        BackgroundColor="{StaticResource TealPrimary}"
                         TextColor="White"
                         FontAttributes="Bold"
-                        HeightRequest="48" />
+                        HeightRequest="50"
+                        CornerRadius="12" />
             </Grid>
         </VerticalStackLayout>
     </ScrollView>

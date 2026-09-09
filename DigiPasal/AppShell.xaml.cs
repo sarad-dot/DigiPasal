@@ -19,5 +19,6 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("Profile", typeof(Views.ProfilePage));
         Routing.RegisterRoute("ChangePassword", typeof(Views.ChangePasswordPage));
         Routing.RegisterRoute("Settings", typeof(Views.SettingsPage));
+        Routing.RegisterRoute("QuickSale", typeof(Views.QuickSalePage));
     }
 }

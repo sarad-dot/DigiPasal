@@ -119,7 +119,7 @@ public class AddEditProductViewModel : BaseViewModel, IQueryAttributable
         CancelCommand = new Command(async () => await Shell.Current.GoToAsync(".."));
         ScanBarcodeCommand = new Command(async () =>
         {
-            await Shell.Current.DisplayAlert(
+            await Shell.Current.DisplayAlertAsync(
                 "Coming Soon",
                 "Barcode scanning will be available in a future update.",
                 "OK");
@@ -163,13 +163,13 @@ public class AddEditProductViewModel : BaseViewModel, IQueryAttributable
     {
         if (string.IsNullOrWhiteSpace(Name))
         {
-            await Shell.Current.DisplayAlert("Validation", "Product name is required.", "OK");
+            await Shell.Current.DisplayAlertAsync("Validation", "Product name is required.", "OK");
             return;
         }
 
         if (!decimal.TryParse(SellingPrice, out var sellPrice) || sellPrice < 0)
         {
-            await Shell.Current.DisplayAlert("Validation", "Selling price must be a valid positive number.", "OK");
+            await Shell.Current.DisplayAlertAsync("Validation", "Selling price must be a valid positive number.", "OK");
             return;
         }
 
@@ -196,7 +196,7 @@ public class AddEditProductViewModel : BaseViewModel, IQueryAttributable
         try
         {
             await _productService.SaveProductAsync(product);
-            await Shell.Current.DisplayAlert(
+            await Shell.Current.DisplayAlertAsync(
                 "Success",
                 IsEditMode ? "Product updated successfully." : "Product added successfully.",
                 "OK");
@@ -204,7 +204,7 @@ public class AddEditProductViewModel : BaseViewModel, IQueryAttributable
         }
         catch (Exception ex)
         {
-            await Shell.Current.DisplayAlert("Error", $"Failed to save product: {ex.Message}", "OK");
+            await Shell.Current.DisplayAlertAsync("Error", $"Failed to save product: {ex.Message}", "OK");
         }
     }
 }

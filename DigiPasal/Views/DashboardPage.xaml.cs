@@ -196,6 +196,14 @@ public partial class DashboardPage : ContentPage
     }
 
 
+    private async void QuickSaleAction_Tapped(
+        object? sender,
+        TappedEventArgs e)
+    {
+        await Shell.Current.GoToAsync("QuickSale");
+    }
+
+
     // ============================================================
     // BOTTOM NAVIGATION
     // ============================================================

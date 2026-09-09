@@ -31,6 +31,12 @@ public class ReceiptService
         sb.AppendLine($"{"Item",-20} {"Qty",4} {"Rate",8} {"Total",8}");
         sb.AppendLine(new string('-', 32));
 
+        if (items.Count == 0 && sale.IsQuickSale)
+        {
+            sb.AppendLine($"{"* QUICK SALE *",-20}");
+            sb.AppendLine($"{"(no items listed)",-20}");
+        }
+
         foreach (var item in items)
         {
             var name = (item.ProductName ?? string.Empty);
@@ -132,11 +138,11 @@ public class ReceiptService
         }
         catch (FeatureNotSupportedException)
         {
-            await Shell.Current.DisplayAlert("Not Supported", "Sharing is not supported on this device.", "OK");
+            await Shell.Current.DisplayAlertAsync("Not Supported", "Sharing is not supported on this device.", "OK");
         }
         catch (Exception ex)
         {
-            await Shell.Current.DisplayAlert("Error", $"Failed to share receipt: {ex.Message}", "OK");
+            await Shell.Current.DisplayAlertAsync("Error", $"Failed to share receipt: {ex.Message}", "OK");
         }
     }
 

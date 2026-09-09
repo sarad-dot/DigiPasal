@@ -15,12 +15,18 @@ public class CartState
 
     public event Action? CartChanged;
 
-    public void AddProduct(Product product)
+    public void AddProduct(Product product, double quantity = 1)
     {
+        if (quantity <= 0) quantity = 1;
+
         var existing = Items.FirstOrDefault(c => c.ProductId == product.Id);
         if (existing != null)
         {
-            existing.Quantity += 1;
+            var maxCanAdd = existing.StockQuantity - existing.Quantity;
+            if (maxCanAdd <= 0)
+                return;
+
+            existing.Quantity += Math.Min(quantity, maxCanAdd);
         }
         else
         {
@@ -31,8 +37,33 @@ public class CartState
                 Unit = product.Unit,
                 UnitPrice = product.SellingPrice,
                 CostPrice = product.CostPrice,
-                Quantity = 1
+                StockQuantity = (int)product.StockQuantity,
+                Quantity = Math.Min(quantity, product.StockQuantity)
             });
+        }
+
+        CartChanged?.Invoke();
+    }
+
+    public bool IncrementQuantity(CartLine item)
+    {
+        if (item.Quantity >= item.StockQuantity)
+            return false;
+
+        item.Quantity += 1;
+        CartChanged?.Invoke();
+        return true;
+    }
+
+    public void DecrementQuantity(CartLine item)
+    {
+        if (item.Quantity <= 1)
+        {
+            Items.Remove(item);
+        }
+        else
+        {
+            item.Quantity -= 1;
         }
 
         CartChanged?.Invoke();

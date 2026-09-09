@@ -629,6 +629,49 @@
 
                     </Grid>
 
+                    <!-- Quick Sale (spans 2 columns) -->
+                    <Grid ColumnDefinitions="*,*"
+                          ColumnSpacing="8"
+                          Margin="0,0,0,0">
+                        <Border
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            BackgroundColor="{StaticResource TealPrimary}"
+                            StrokeThickness="0"
+                            Padding="8"
+                            HeightRequest="82">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Tapped="QuickSaleAction_Tapped" />
+                            </Border.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12"
+                                  VerticalOptions="Center" HorizontalOptions="Center">
+                                <Label
+                                    Grid.Column="0"
+                                    Text="&#x26A1;"
+                                    FontSize="25"
+                                    VerticalOptions="Center" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label
+                                        Text="Quick Sale"
+                                        FontSize="14"
+                                        FontAttributes="Bold"
+                                        TextColor="White" />
+                                    <Label
+                                        Text="Fast cash register"
+                                        FontSize="11"
+                                        TextColor="#CCFFFFFF" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </Grid>
+
                 </VerticalStackLayout>
 
 

@@ -111,7 +111,8 @@ public class CartViewModel : BaseViewModel
 
     public ICommand SelectCustomerCommand { get; }
     public ICommand RemoveItemCommand { get; }
-    public ICommand UpdateQuantityCommand { get; }
+    public ICommand IncrementQuantityCommand { get; }
+    public ICommand DecrementQuantityCommand { get; }
     public ICommand CheckoutCommand { get; }
     public ICommand ClearCartCommand { get; }
 
@@ -127,9 +128,15 @@ public class CartViewModel : BaseViewModel
 
         SelectCustomerCommand = new Command(async () => await SelectCustomerAsync());
         RemoveItemCommand = new Command<CartLine>(RemoveItem);
-        UpdateQuantityCommand = new Command<CartLine>(UpdateQuantity);
+        IncrementQuantityCommand = new Command<CartLine>(IncrementQuantity);
+        DecrementQuantityCommand = new Command<CartLine>(DecrementQuantity);
         CheckoutCommand = new Command(async () => await CheckoutAsync());
         ClearCartCommand = new Command(ClearCart);
+    }
+
+    public void Cleanup()
+    {
+        _cartState.CartChanged -= OnCartChanged;
     }
 
     private void OnCartChanged()
@@ -148,7 +155,7 @@ public class CartViewModel : BaseViewModel
             var options = new List<string> { "Walk-in (Cash)" };
             options.AddRange(customers.Select(c => $"{c.Name} ({CurrencyFormatter.Format(c.CurrentBalance)} due)"));
 
-            var action = await Shell.Current.DisplayActionSheet(
+            var action = await Shell.Current.DisplayActionSheetAsync(
                 "Select Customer",
                 null,
                 "Cancel",
@@ -174,7 +181,7 @@ public class CartViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            await Shell.Current.DisplayAlert("Error", $"Failed to load customers: {ex.Message}", "OK");
+            await Shell.Current.DisplayAlertAsync("Error", $"Failed to load customers: {ex.Message}", "OK");
         }
     }
 
@@ -184,15 +191,16 @@ public class CartViewModel : BaseViewModel
         _cartState.RemoveItem(item);
     }
 
-    private void UpdateQuantity(CartLine? item)
+    private void IncrementQuantity(CartLine? item)
     {
         if (item == null) return;
-        if (item.Quantity <= 0)
-        {
-            _cartState.RemoveItem(item);
-            return;
-        }
-        CalculateTotals();
+        _cartState.IncrementQuantity(item);
+    }
+
+    private void DecrementQuantity(CartLine? item)
+    {
+        if (item == null) return;
+        _cartState.DecrementQuantity(item);
     }
 
     private void ClearCart()
@@ -238,13 +246,13 @@ public class CartViewModel : BaseViewModel
     {
         if (!HasItems)
         {
-            await Shell.Current.DisplayAlert("Empty Cart", "Add products to the cart before checkout.", "OK");
+            await Shell.Current.DisplayAlertAsync("Empty Cart", "Add products to the cart before checkout.", "OK");
             return;
         }
 
         if (IsCreditSale && !HasCustomer)
         {
-            await Shell.Current.DisplayAlert("Credit Sale", "Please select a customer for credit sales.", "OK");
+            await Shell.Current.DisplayAlertAsync("Credit Sale", "Please select a customer for credit sales.", "OK");
             return;
         }
 
@@ -253,7 +261,7 @@ public class CartViewModel : BaseViewModel
 
         if (IsCreditSale && paidAmount >= GrandTotal)
         {
-            await Shell.Current.DisplayAlert("Credit Sale", "Amount paid equals or exceeds total. Use cash payment instead.", "OK");
+            await Shell.Current.DisplayAlertAsync("Credit Sale", "Amount paid equals or exceeds total. Use cash payment instead.", "OK");
             return;
         }
 
@@ -296,7 +304,7 @@ public class CartViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            await Shell.Current.DisplayAlert("Error", $"Failed to complete sale: {ex.Message}", "OK");
+            await Shell.Current.DisplayAlertAsync("Error", $"Failed to complete sale: {ex.Message}", "OK");
         }
     }
 }

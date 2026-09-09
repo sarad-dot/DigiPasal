@@ -29,4 +29,10 @@ public partial class CartPage : ContentPage
 
         await _viewModel.LoadTaxRateAsync();
     }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _viewModel.Cleanup();
+    }
 }

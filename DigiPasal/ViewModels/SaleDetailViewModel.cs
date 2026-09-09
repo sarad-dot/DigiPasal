@@ -87,7 +87,7 @@ public class SaleDetailViewModel : BaseViewModel, IQueryAttributable
     {
         if (Sale == null) return;
 
-        var confirmed = await Shell.Current.DisplayAlert(
+        var confirmed = await Shell.Current.DisplayAlertAsync(
             "Void Sale",
             $"Are you sure you want to void sale {Sale.ReceiptNumber}?\nThis will restore stock levels.",
             "Void Sale",
@@ -109,7 +109,7 @@ public class SaleDetailViewModel : BaseViewModel, IQueryAttributable
         if (success)
         {
             await LoadSaleAsync(Sale.Id);
-            await Shell.Current.DisplayAlert("Sale Voided", "Stock has been restored.", "OK");
+            await Shell.Current.DisplayAlertAsync("Sale Voided", "Stock has been restored.", "OK");
         }
     }
 }

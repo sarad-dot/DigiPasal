@@ -209,6 +209,39 @@ public class SaleService
         return true;
     }
 
+    public async Task<Sale> CreateQuickSaleAsync(Sale sale)
+    {
+        if (sale == null)
+            throw new ArgumentNullException(nameof(sale));
+
+        sale.ReceiptNumber = GenerateReceiptNumber();
+        sale.CreatedAt = DateTime.UtcNow;
+        sale.IsQuickSale = true;
+        sale.Subtotal = sale.GrandTotal;
+        sale.TotalAmount = sale.GrandTotal;
+
+        await Database.RunInTransactionAsync(tran =>
+        {
+            tran.Insert(sale);
+
+            if (sale.IsCredit && sale.CustomerId.HasValue && sale.CreditAmount > 0)
+            {
+                var customer = tran.Table<Customer>()
+                    .Where(c => c.Id == sale.CustomerId.Value)
+                    .FirstOrDefault();
+
+                if (customer != null)
+                {
+                    customer.CurrentBalance += sale.CreditAmount;
+                    customer.UpdatedAt = DateTime.UtcNow;
+                    tran.Update(customer);
+                }
+            }
+        });
+
+        return sale;
+    }
+
     private static string GenerateReceiptNumber()
     {
         lock (_receiptLock)

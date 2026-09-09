@@ -40,6 +40,8 @@ public class Sale
 
     public bool IsVoided { get; set; }
 
+    public bool IsQuickSale { get; set; }
+
     [Indexed]
     public DateTime CreatedAt { get; set; }
 }

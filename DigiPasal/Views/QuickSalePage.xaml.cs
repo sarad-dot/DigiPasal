@@ -3,16 +3,16 @@ using DigiPasal.ViewModels;
 
 namespace DigiPasal.Views;
 
-public partial class SalePage : ContentPage
+public partial class QuickSalePage : ContentPage
 {
     private readonly AuthService _authService;
-    private readonly SaleViewModel _viewModel;
+    private readonly QuickSaleViewModel _viewModel;
 
-    public SalePage(AuthService authService)
+    public QuickSalePage(AuthService authService)
     {
         InitializeComponent();
         _authService = authService;
-        _viewModel = new SaleViewModel();
+        _viewModel = new QuickSaleViewModel();
         BindingContext = _viewModel;
     }
 
@@ -23,15 +23,6 @@ public partial class SalePage : ContentPage
         if (!_authService.IsAuthenticated)
         {
             await Shell.Current.GoToAsync("//Login");
-            return;
         }
-
-        await _viewModel.LoadProductsAsync();
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        _viewModel.Cleanup();
     }
 }

@@ -6,7 +6,8 @@
              x:Class="DigiPasal.Views.ProductPage"
              Title="{Binding Title}"
              Shell.TabBarIsVisible="False"
-             x:DataType="vm:ProductListViewModel">
+             x:DataType="vm:ProductListViewModel"
+             BackgroundColor="{StaticResource AppBackground}">
 
     <Grid RowDefinitions="*,Auto" RowSpacing="0">
 
@@ -14,21 +15,31 @@
             <VerticalStackLayout Spacing="12">
 
                 <!-- Search Bar -->
-                <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsSearchVisible}">
-                    <SearchBar
-                        Placeholder="Search products or scan barcode..."
-                        Text="{Binding SearchQuery}"
-                        HorizontalOptions="FillAndExpand"
-                        BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}"
-                        CancelButtonColor="{StaticResource Primary}" />
-                    <Button
-                        Text="&#x1f50d;"
-                        WidthRequest="44"
-                        HeightRequest="44"
-                        Command="{Binding ToggleSearchCommand}"
-                        BackgroundColor="Transparent"
-                        FontSize="20" />
-                </HorizontalStackLayout>
+                <Border IsVisible="{Binding IsSearchVisible}"
+                        Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                        BackgroundColor="{StaticResource InputBg}"
+                        HeightRequest="50"
+                        StrokeShape="RoundRectangle 10">
+                    <Grid ColumnDefinitions="Auto,*">
+                        <Label Grid.Column="0" Text="&#x1f50d;" FontSize="16"
+                               TextColor="{StaticResource TextSecondary}"
+                               VerticalOptions="Center" Margin="12,0,8,0"/>
+                        <SearchBar Grid.Column="1"
+                                   Placeholder="Search products or scan barcode..."
+                                   Text="{Binding SearchQuery}"
+                                   HorizontalOptions="Fill"
+                                   CancelButtonColor="{StaticResource TealPrimary}"
+                                   BackgroundColor="Transparent" />
+                        <Button Grid.Column="1"
+                                Text="&#x1f50d;"
+                                WidthRequest="44"
+                                HeightRequest="44"
+                                Command="{Binding ToggleSearchCommand}"
+                                BackgroundColor="Transparent"
+                                FontSize="20"
+                                HorizontalOptions="End" />
+                    </Grid>
+                </Border>
 
                 <!-- Category Chips -->
                 <CollectionView ItemsSource="{Binding Categories}"
@@ -39,16 +50,17 @@
                     </CollectionView.ItemsLayout>
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="x:String">
-                            <Border
-                                Padding="12,6"
-                                StrokeShape="RoundRectangle 16"
-                                Stroke="{StaticResource Gray300}"
-                                BackgroundColor="{AppThemeBinding Light={StaticResource Gray100}, Dark={StaticResource Gray800}}">
+                            <Border Padding="14,7"
+                                    StrokeShape="RoundRectangle 16"
+                                    Stroke="{StaticResource InputStroke}"
+                                    BackgroundColor="{StaticResource InputBg}">
                                 <Border.GestureRecognizers>
                                     <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ProductListViewModel}}, Path=SelectCategoryCommand}"
                                                           CommandParameter="{Binding .}" />
                                 </Border.GestureRecognizers>
-                                <Label Text="{Binding .}" FontSize="13" VerticalTextAlignment="Center" />
+                                <Label Text="{Binding .}" FontSize="13"
+                                       TextColor="{StaticResource TextSecondary}"
+                                       VerticalTextAlignment="Center" />
                             </Border>
                         </DataTemplate>
                     </CollectionView.ItemTemplate>
@@ -60,10 +72,10 @@
                     <CollectionView.EmptyView>
                         <VerticalStackLayout Padding="0,40" HorizontalOptions="Center" Spacing="12">
                             <Label Text="No products yet." FontSize="18" FontAttributes="Bold"
-                                   HorizontalTextAlignment="Center" TextColor="{StaticResource Gray500}" />
+                                   HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
                             <Label Text="Tap the + button to add your first product."
                                    FontSize="14" HorizontalTextAlignment="Center"
-                                   TextColor="{StaticResource Gray500}" />
+                                   TextColor="{StaticResource TextSecondary}" />
                         </VerticalStackLayout>
                     </CollectionView.EmptyView>
                     <CollectionView.ItemTemplate>
@@ -72,29 +84,39 @@
                                 <SwipeView.RightItems>
                                     <SwipeItems>
                                         <SwipeItem Text="Edit"
-                                                   BackgroundColor="{StaticResource Primary}"
+                                                   BackgroundColor="{StaticResource TealPrimary}"
                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ProductListViewModel}}, Path=EditProductCommand}"
                                                    CommandParameter="{Binding .}" />
                                         <SwipeItem Text="Delete"
-                                                   BackgroundColor="Red"
+                                                   BackgroundColor="{StaticResource ErrorRed}"
                                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ProductListViewModel}}, Path=DeleteProductCommand}"
                                                    CommandParameter="{Binding .}" />
                                     </SwipeItems>
                                 </SwipeView.RightItems>
-                                <Border Padding="12" Margin="0,4"
-                                        StrokeShape="RoundRectangle 8"
-                                        Stroke="{StaticResource Gray200}"
-                                        BackgroundColor="{AppThemeBinding Light={StaticResource White}, Dark={StaticResource Gray900}}">
+                                <Border Padding="14,12" Margin="0,4"
+                                        StrokeShape="RoundRectangle 12"
+                                        StrokeThickness="0"
+                                        BackgroundColor="{StaticResource CardBackground}">
+                                    <Border.Shadow>
+                                        <Shadow Brush="Black" Offset="0,1" Radius="6" Opacity="0.05"/>
+                                    </Border.Shadow>
                                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                                        <VerticalStackLayout Grid.Column="0" Spacing="2">
-                                            <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold" LineBreakMode="TailTruncation" />
+                                        <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                            <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold"
+                                                   TextColor="{StaticResource TextPrimary}"
+                                                   LineBreakMode="TailTruncation" />
                                             <HorizontalStackLayout Spacing="8">
-                                                <Border Padding="4,2" StrokeShape="RoundRectangle 4"
-                                                        BackgroundColor="{StaticResource Gray100}">
-                                                    <Label Text="{Binding Category}" FontSize="11" TextColor="{StaticResource Gray600}" />
+                                                <Border Padding="5,3" StrokeShape="RoundRectangle 6"
+                                                        BackgroundColor="{StaticResource TealLight}">
+                                                    <Label Text="{Binding Category}" FontSize="11"
+                                                           TextColor="{StaticResource TealPrimary}" FontAttributes="Bold" />
                                                 </Border>
-                                                <Label Text="{Binding Unit}" FontSize="12" TextColor="{StaticResource Gray500}" VerticalTextAlignment="Center" />
-                                                <Label Text="{Binding Barcode}" FontSize="12" TextColor="{StaticResource Gray500}" VerticalTextAlignment="Center">
+                                                <Label Text="{Binding Unit}" FontSize="12"
+                                                       TextColor="{StaticResource TextSecondary}"
+                                                       VerticalTextAlignment="Center" />
+                                                <Label Text="{Binding Barcode}" FontSize="12"
+                                                       TextColor="{StaticResource TextSecondary}"
+                                                       VerticalTextAlignment="Center">
                                                     <Label.Triggers>
                                                         <DataTrigger TargetType="Label" Binding="{Binding Barcode}" Value="">
                                                             <Setter Property="IsVisible" Value="False" />
@@ -103,14 +125,16 @@
                                                 </Label>
                                             </HorizontalStackLayout>
                                         </VerticalStackLayout>
-                                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
-                                            <Label Text="{Binding SellingPrice, StringFormat='रु {0:N2}'}" FontSize="16" FontAttributes="Bold"
-                                                   HorizontalTextAlignment="End" TextColor="{StaticResource Primary}" />
+                                        <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                                            <Label Text="{Binding SellingPrice, StringFormat='रु {0:N2}'}" FontSize="16"
+                                                   FontAttributes="Bold"
+                                                   HorizontalTextAlignment="End" TextColor="{StaticResource TealPrimary}" />
                                             <Label Text="{Binding StockQuantity, StringFormat='Stock: {0:0.##}'}"
-                                                   FontSize="12" HorizontalTextAlignment="End" TextColor="Green">
+                                                   FontSize="12" HorizontalTextAlignment="End"
+                                                   TextColor="{StaticResource SuccessGreen}">
                                                 <Label.Triggers>
                                                     <DataTrigger TargetType="Label" Binding="{Binding StockQuantity}" Value="0">
-                                                        <Setter Property="TextColor" Value="Red" />
+                                                        <Setter Property="TextColor" Value="{StaticResource ErrorRed}" />
                                                     </DataTrigger>
                                                 </Label.Triggers>
                                             </Label>
@@ -132,11 +156,15 @@
                 FontSize="28"
                 FontAttributes="Bold"
                 TextColor="White"
-                BackgroundColor="{StaticResource Primary}"
+                BackgroundColor="{StaticResource TealPrimary}"
                 HorizontalOptions="End"
                 VerticalOptions="End"
                 Margin="0,0,20,20"
-                Command="{Binding AddProductCommand}" />
+                Command="{Binding AddProductCommand}">
+            <Button.Shadow>
+                <Shadow Brush="Black" Offset="0,4" Radius="12" Opacity="0.2"/>
+            </Button.Shadow>
+        </Button>
     </Grid>
 
 </ContentPage>

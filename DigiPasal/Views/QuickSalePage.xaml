@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             x:Class="DigiPasal.Views.QuickSalePage"
+             Title="Quick Sale"
+             Shell.TabBarIsVisible="False"
+             x:DataType="vm:QuickSaleViewModel"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="20">
+
+            <!-- Amount Input -->
+            <Border Padding="24,20"
+                    StrokeShape="RoundRectangle 16"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="12" Opacity="0.08"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="8" HorizontalOptions="Center">
+                    <Label Text="Sale Amount" FontSize="14"
+                           TextColor="{StaticResource TextSecondary}"
+                           HorizontalOptions="Center" />
+                    <Label Text="रु" FontSize="20" FontAttributes="Bold"
+                           TextColor="{StaticResource TealPrimary}"
+                           HorizontalOptions="Center" />
+                    <Entry Text="{Binding AmountText}"
+                           Placeholder="0.00"
+                           Keyboard="Numeric"
+                           FontSize="36" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"
+                           TextColor="{StaticResource TextPrimary}"
+                           PlaceholderColor="{StaticResource Gray400}"
+                           BackgroundColor="Transparent" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Quick Amount Presets -->
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Quick Amounts" FontSize="13" FontAttributes="Bold"
+                       TextColor="{StaticResource TextSecondary}" />
+                <Grid ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8">
+                    <Button Grid.Row="0" Grid.Column="0" Text="रु 100"
+                            Command="{Binding SetQuickAmountCommand}" CommandParameter="100"
+                            BackgroundColor="{StaticResource TealLight}"
+                            TextColor="{StaticResource TealPrimary}"
+                            FontAttributes="Bold" HeightRequest="44" CornerRadius="10" />
+                    <Button Grid.Row="0" Grid.Column="1" Text="रु 200"
+                            Command="{Binding SetQuickAmountCommand}" CommandParameter="200"
+                            BackgroundColor="{StaticResource TealLight}"
+                            TextColor="{StaticResource TealPrimary}"
+                            FontAttributes="Bold" HeightRequest="44" CornerRadius="10" />
+                    <Button Grid.Row="0" Grid.Column="2" Text="रु 500"
+                            Command="{Binding SetQuickAmountCommand}" CommandParameter="500"
+                            BackgroundColor="{StaticResource TealLight}"
+                            TextColor="{StaticResource TealPrimary}"
+                            FontAttributes="Bold" HeightRequest="44" CornerRadius="10" />
+                    <Button Grid.Row="1" Grid.Column="0" Text="रु 1000"
+                            Command="{Binding SetQuickAmountCommand}" CommandParameter="1000"
+                            BackgroundColor="{StaticResource TealLight}"
+                            TextColor="{StaticResource TealPrimary}"
+                            FontAttributes="Bold" HeightRequest="44" CornerRadius="10" />
+                    <Button Grid.Row="1" Grid.Column="1" Text="रु 2000"
+                            Command="{Binding SetQuickAmountCommand}" CommandParameter="2000"
+                            BackgroundColor="{StaticResource TealLight}"
+                            TextColor="{StaticResource TealPrimary}"
+                            FontAttributes="Bold" HeightRequest="44" CornerRadius="10" />
+                    <Button Grid.Row="1" Grid.Column="2" Text="रु 5000"
+                            Command="{Binding SetQuickAmountCommand}" CommandParameter="5000"
+                            BackgroundColor="{StaticResource TealLight}"
+                            TextColor="{StaticResource TealPrimary}"
+                            FontAttributes="Bold" HeightRequest="44" CornerRadius="10" />
+                </Grid>
+            </VerticalStackLayout>
+
+            <!-- Customer & Payment -->
+            <Border Padding="16"
+                    StrokeShape="RoundRectangle 12"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.06"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="12">
+                    <!-- Customer Selection -->
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Border Grid.Column="0" Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                                BackgroundColor="{StaticResource InputBg}" HeightRequest="46">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+                            <Label Text="{Binding SelectedCustomerDisplay}"
+                                   FontSize="13" VerticalTextAlignment="Center"
+                                   TextColor="{StaticResource TextSecondary}" Margin="12,0"
+                                   LineBreakMode="TailTruncation" />
+                        </Border>
+                        <Button Grid.Column="1" Text="Select"
+                                Command="{Binding SelectCustomerCommand}"
+                                BackgroundColor="{StaticResource TealLight}"
+                                TextColor="{StaticResource TealPrimary}"
+                                FontSize="12" HeightRequest="46" CornerRadius="10" />
+                    </Grid>
+
+                    <!-- Credit Toggle -->
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="Credit Sale" FontSize="14"
+                               TextColor="{StaticResource TextPrimary}"
+                               VerticalTextAlignment="Center" />
+                        <Switch Grid.Column="1" IsToggled="{Binding IsCreditSale}"
+                                IsEnabled="{Binding HasCustomer}"
+                                ThumbColor="{StaticResource TealPrimary}" />
+                    </Grid>
+
+                    <!-- Amount Paid (visible for credit) -->
+                    <VerticalStackLayout Spacing="6" IsVisible="{Binding IsCreditSale}">
+                        <Label Text="Amount Paid" FontSize="13" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" />
+                        <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                                BackgroundColor="{StaticResource InputBg}" HeightRequest="50">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+                            <Entry Text="{Binding AmountPaid}" Placeholder="0.00"
+                                   Keyboard="Numeric"
+                                   FontSize="15"
+                                   BackgroundColor="Transparent"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   PlaceholderColor="{StaticResource Gray400}"
+                                   Margin="12,0" />
+                        </Border>
+                        <Label Text="{Binding CreditDisplay, StringFormat='Due: {0}'}" FontSize="13"
+                               TextColor="{StaticResource ErrorRed}" FontAttributes="Bold" />
+                    </VerticalStackLayout>
+
+                    <!-- Notes -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Notes (optional)" FontSize="13" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" />
+                        <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                                BackgroundColor="{StaticResource InputBg}" HeightRequest="46">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10"/>
+                            </Border.StrokeShape>
+                            <Entry Text="{Binding Notes}" Placeholder="Optional note"
+                                   FontSize="13" MaxLength="200"
+                                   BackgroundColor="Transparent"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   PlaceholderColor="{StaticResource Gray400}"
+                                   Margin="12,0" />
+                        </Border>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Complete Sale Button -->
+            <Button Text="{Binding AmountDisplay, StringFormat='Complete Sale — {0}'}"
+                    Command="{Binding CompleteSaleCommand}"
+                    IsEnabled="{Binding CanComplete}"
+                    BackgroundColor="{StaticResource TealPrimary}"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    FontSize="16"
+                    HeightRequest="54"
+                    CornerRadius="12" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

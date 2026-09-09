@@ -139,7 +139,7 @@ public class ProductListViewModel : BaseViewModel
         if (product == null)
             return;
 
-        var confirmed = await Shell.Current.DisplayAlert(
+        var confirmed = await Shell.Current.DisplayAlertAsync(
             "Delete Product",
             $"Are you sure you want to delete \"{product.Name}\"?",
             "Delete",

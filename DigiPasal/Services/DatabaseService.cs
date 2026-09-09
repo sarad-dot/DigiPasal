@@ -86,7 +86,8 @@ public class DatabaseService
         {
             { 1, Migration_V1_InitialSchema },
             { 2, Migration_V2_ProductsCustomersSettings },
-            { 3, Migration_V3_SalesSaleItems }
+            { 3, Migration_V3_SalesSaleItems },
+            { 4, Migration_V4_QuickSale }
         };
 
         int currentVersion = await GetCurrentVersionAsync();
@@ -147,6 +148,20 @@ public class DatabaseService
     {
         await _database!.CreateTableAsync<Sale>();
         await _database!.CreateTableAsync<SaleItem>();
+    }
+
+    private async Task Migration_V4_QuickSale()
+    {
+        var columns = await _database!.QueryAsync<ColumnInfo>("PRAGMA table_info(Sales)");
+        if (!columns.Any(c => string.Equals(c.Name, "IsQuickSale", StringComparison.OrdinalIgnoreCase)))
+        {
+            await _database!.ExecuteAsync("ALTER TABLE Sales ADD COLUMN IsQuickSale INTEGER NOT NULL DEFAULT 0");
+        }
+    }
+
+    private class ColumnInfo
+    {
+        public string Name { get; set; } = string.Empty;
     }
 
     public async Task<string?> GetSettingAsync(string key)
