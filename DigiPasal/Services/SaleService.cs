@@ -162,6 +162,66 @@ public class SaleService
         };
     }
 
+    public async Task<List<DailySalesSummary>> GetDailySalesReportAsync(DateTime? from = null, DateTime? to = null)
+    {
+        var rows = await Database.QueryAsync<SalesDayRow>(
+            "SELECT date(CreatedAt) AS DayKey, " +
+            "SUM(GrandTotal) AS TotalSales, " +
+            "SUM(CASE WHEN IsCredit = 0 THEN GrandTotal ELSE 0 END) AS CashSales, " +
+            "SUM(CASE WHEN IsCredit = 1 THEN CreditAmount ELSE 0 END) AS CreditSales, " +
+            "COUNT(*) AS SalesCount, " +
+            "0 AS ItemsSold " +
+            "FROM Sales WHERE IsVoided = 0 " +
+            $"AND date(CreatedAt) >= date('{(from ?? DateTime.Today):yyyy-MM-dd}') " +
+            $"AND date(CreatedAt) <= date('{(to ?? DateTime.Today):yyyy-MM-dd}') " +
+            "GROUP BY date(CreatedAt) ORDER BY date(CreatedAt) DESC");
+
+        var dayKeys = rows.Select(r => r.DayKey).ToList();
+        if (dayKeys.Count == 0)
+            return new List<DailySalesSummary>();
+
+        var clauses = string.Join(",", dayKeys.Select(k => $"'{k}'"));
+        var items = await Database.QueryAsync<ItemsDayRow>(
+            "SELECT date(S.CreatedAt) AS DayKey, SUM(SI.Quantity) AS ItemsSold " +
+            "FROM Sales S INNER JOIN SaleItems SI ON SI.SaleId = S.Id " +
+            "WHERE S.IsVoided = 0 AND date(S.CreatedAt) IN (" + clauses + ") " +
+            "GROUP BY date(S.CreatedAt)");
+
+        var itemsByDay = items.ToDictionary(i => i.DayKey, i => (int)i.ItemsSold);
+
+        var result = new List<DailySalesSummary>(rows.Count);
+        foreach (var row in rows)
+        {
+            result.Add(new DailySalesSummary
+            {
+                Date = DateTime.Parse(row.DayKey).Date,
+                TotalSales = row.TotalSales,
+                CashSales = row.CashSales,
+                CreditSales = row.CreditSales,
+                SalesCount = row.SalesCount,
+                ItemsSold = itemsByDay.TryGetValue(row.DayKey, out var sold) ? sold : 0
+            });
+        }
+
+        return result;
+    }
+
+    public async Task<List<ProfitDayRow>> GetProfitReportAsync(DateTime? from = null, DateTime? to = null)
+    {
+        return await Database.QueryAsync<ProfitDayRow>(
+            "SELECT date(S.CreatedAt) AS DayKey, " +
+            "SUM(S.GrandTotal) AS Revenue, " +
+            "COALESCE(SUM(SI.Quantity * COALESCE(P.CostPrice, 0)), 0) AS CostOfGoods, " +
+            "COUNT(DISTINCT S.Id) AS SalesCount " +
+            "FROM Sales S " +
+            "LEFT JOIN SaleItems SI ON SI.SaleId = S.Id " +
+            "LEFT JOIN Products P ON P.Id = SI.ProductId " +
+            "WHERE S.IsVoided = 0 " +
+            $"AND date(S.CreatedAt) >= date('{(from ?? DateTime.Today):yyyy-MM-dd}') " +
+            $"AND date(S.CreatedAt) <= date('{(to ?? DateTime.Today):yyyy-MM-dd}') " +
+            "GROUP BY date(S.CreatedAt) ORDER BY date(S.CreatedAt) DESC");
+    }
+
     public async Task<bool> VoidSaleAsync(int saleId, string reason)
     {
         var sale = await Database.Table<Sale>()
@@ -318,4 +378,29 @@ public class DailySalesSummary
     public decimal CreditSales { get; set; }
     public int SalesCount { get; set; }
     public int ItemsSold { get; set; }
+}
+
+public class SalesDayRow
+{
+    public string DayKey { get; set; } = string.Empty;
+    public decimal TotalSales { get; set; }
+    public decimal CashSales { get; set; }
+    public decimal CreditSales { get; set; }
+    public int SalesCount { get; set; }
+    public double ItemsSold { get; set; }
+}
+
+public class ItemsDayRow
+{
+    public string DayKey { get; set; } = string.Empty;
+    public double ItemsSold { get; set; }
+}
+
+public class ProfitDayRow
+{
+    public string DayKey { get; set; } = string.Empty;
+    public decimal Revenue { get; set; }
+    public decimal CostOfGoods { get; set; }
+    public int SalesCount { get; set; }
+    public decimal Profit => Revenue - CostOfGoods;
 }

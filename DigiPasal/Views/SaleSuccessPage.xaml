@@ -9,87 +9,125 @@
              x:DataType="vm:SaleSuccessViewModel"
              BackgroundColor="{StaticResource AppBackground}">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="24" Spacing="20">
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource AppBackground}">
 
-            <!-- Success Icon -->
-            <VerticalStackLayout HorizontalOptions="Center" Spacing="8" Padding="0,20">
-                <Border BackgroundColor="{StaticResource TealLight}"
-                        StrokeShape="RoundRectangle 32"
-                        WidthRequest="80" HeightRequest="80"
-                        StrokeThickness="0"
-                        HorizontalOptions="Center">
-                    <Label Text="&#x2705;" FontSize="42"
-                           HorizontalOptions="Center" VerticalOptions="Center" />
+        <!-- Header -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="*,Auto"
+              Padding="16,52,16,12"
+              BackgroundColor="{StaticResource TealPrimary}">
+
+            <HorizontalStackLayout Grid.Column="0"
+                                   Spacing="8"
+                                   VerticalOptions="Center">
+
+                <Label Text="✅"
+                       FontSize="20"
+                       TextColor="White"
+                       VerticalOptions="Center"/>
+
+                <Label Text="Sale Complete"
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       VerticalOptions="Center"/>
+            </HorizontalStackLayout>
+
+            <Button Grid.Column="1"
+                    Text="🏠 Home"
+                    Command="{Binding GoHomeCommand}"
+                    BackgroundColor="Transparent"
+                    TextColor="White"
+                    FontSize="13"
+                    FontAttributes="Bold"
+                    Padding="8,4"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center"/>
+        </Grid>
+
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24" Spacing="20">
+
+                <!-- Success Icon -->
+                <VerticalStackLayout HorizontalOptions="Center" Spacing="8" Padding="0,20">
+                    <Border BackgroundColor="{StaticResource TealLight}"
+                            StrokeShape="RoundRectangle 32"
+                            WidthRequest="80" HeightRequest="80"
+                            StrokeThickness="0"
+                            HorizontalOptions="Center">
+                        <Label Text="&#x2705;" FontSize="42"
+                               HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <Label Text="Sale Complete!" FontSize="24" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" TextColor="{StaticResource TealPrimary}" />
+                    <Label Text="{Binding Sale.ReceiptNumber}" FontSize="14"
+                           HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                </VerticalStackLayout>
+
+                <!-- Credit Warning -->
+                <Border IsVisible="{Binding IsCreditSale}"
+                        Padding="16" StrokeShape="RoundRectangle 12"
+                        BackgroundColor="#FFF3CD" StrokeThickness="0">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Offset="0,1" Radius="6" Opacity="0.05"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Credit Sale" FontSize="14" FontAttributes="Bold" TextColor="#856404" />
+                        <Label Text="{Binding CreditInfo}" FontSize="13" TextColor="#856404" />
+                    </VerticalStackLayout>
                 </Border>
-                <Label Text="Sale Complete!" FontSize="24" FontAttributes="Bold"
-                       HorizontalTextAlignment="Center" TextColor="{StaticResource TealPrimary}" />
-                <Label Text="{Binding Sale.ReceiptNumber}" FontSize="14"
-                       HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
-            </VerticalStackLayout>
 
-            <!-- Credit Warning -->
-            <Border IsVisible="{Binding IsCreditSale}"
-                    Padding="16" StrokeShape="RoundRectangle 12"
-                    BackgroundColor="#FFF3CD" StrokeThickness="0">
-                <Border.Shadow>
-                    <Shadow Brush="Black" Offset="0,1" Radius="6" Opacity="0.05"/>
-                </Border.Shadow>
-                <VerticalStackLayout Spacing="4">
-                    <Label Text="Credit Sale" FontSize="14" FontAttributes="Bold" TextColor="#856404" />
-                    <Label Text="{Binding CreditInfo}" FontSize="13" TextColor="#856404" />
+                <!-- Receipt Preview -->
+                <Border Padding="16"
+                        StrokeShape="RoundRectangle 12"
+                        StrokeThickness="0"
+                        BackgroundColor="{StaticResource CardBackground}">
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.06"/>
+                    </Border.Shadow>
+                    <VerticalStackLayout Spacing="0">
+                        <Label Text="Receipt" FontSize="16" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" Margin="0,0,0,8" />
+                        <Editor Text="{Binding ReceiptText}"
+                                IsReadOnly="True"
+                                FontFamily="CourierNew"
+                                FontSize="11"
+                                HeightRequest="400"
+                                BackgroundColor="{StaticResource InputBg}"
+                                TextColor="{StaticResource TextPrimary}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Action Buttons -->
+                <VerticalStackLayout Spacing="10">
+                    <Button Text="Share Receipt"
+                            Command="{Binding ShareReceiptCommand}"
+                            BackgroundColor="{StaticResource TealPrimary}"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            FontSize="16"
+                            HeightRequest="50"
+                            CornerRadius="12" />
+
+                    <Button Text="New Sale"
+                            Command="{Binding NewSaleCommand}"
+                            BackgroundColor="{StaticResource TealLight}"
+                            TextColor="{StaticResource TealPrimary}"
+                            FontSize="15"
+                            HeightRequest="48"
+                            CornerRadius="12" />
+
+                    <Button Text="View Sales History"
+                            Command="{Binding ViewHistoryCommand}"
+                            BackgroundColor="Transparent"
+                            TextColor="{StaticResource TealPrimary}"
+                            FontSize="14"
+                            HeightRequest="44"
+                            CornerRadius="12" />
                 </VerticalStackLayout>
-            </Border>
-
-            <!-- Receipt Preview -->
-            <Border Padding="16"
-                    StrokeShape="RoundRectangle 12"
-                    StrokeThickness="0"
-                    BackgroundColor="{StaticResource CardBackground}">
-                <Border.Shadow>
-                    <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.06"/>
-                </Border.Shadow>
-                <VerticalStackLayout Spacing="0">
-                    <Label Text="Receipt" FontSize="16" FontAttributes="Bold"
-                           TextColor="{StaticResource TextPrimary}" Margin="0,0,0,8" />
-                    <Editor Text="{Binding ReceiptText}"
-                            IsReadOnly="True"
-                            FontFamily="CourierNew"
-                            FontSize="11"
-                            HeightRequest="400"
-                            BackgroundColor="{StaticResource InputBg}"
-                            TextColor="{StaticResource TextPrimary}" />
-                </VerticalStackLayout>
-            </Border>
-
-            <!-- Action Buttons -->
-            <VerticalStackLayout Spacing="10">
-                <Button Text="Share Receipt"
-                        Command="{Binding ShareReceiptCommand}"
-                        BackgroundColor="{StaticResource TealPrimary}"
-                        TextColor="White"
-                        FontAttributes="Bold"
-                        FontSize="16"
-                        HeightRequest="50"
-                        CornerRadius="12" />
-
-                <Button Text="New Sale"
-                        Command="{Binding NewSaleCommand}"
-                        BackgroundColor="{StaticResource TealLight}"
-                        TextColor="{StaticResource TealPrimary}"
-                        FontSize="15"
-                        HeightRequest="48"
-                        CornerRadius="12" />
-
-                <Button Text="View Sales History"
-                        Command="{Binding ViewHistoryCommand}"
-                        BackgroundColor="Transparent"
-                        TextColor="{StaticResource TealPrimary}"
-                        FontSize="14"
-                        HeightRequest="44"
-                        CornerRadius="12" />
             </VerticalStackLayout>
-        </VerticalStackLayout>
-    </ScrollView>
+        </ScrollView>
+
+    </Grid>
 
 </ContentPage>

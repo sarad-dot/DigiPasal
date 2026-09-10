@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             x:Class="DigiPasal.Views.RecordPaymentPage"
+             Title="Record Payment"
+             Shell.TabBarIsVisible="False"
+             Shell.NavBarIsVisible="True"
+             x:DataType="vm:RecordPaymentViewModel"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+
+            <!-- Customer context -->
+            <Border StrokeShape="RoundRectangle 12"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}"
+                    Padding="16">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.06"/>
+                </Border.Shadow>
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                        <Label Text="{Binding CustomerName}" FontSize="18" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <Label Text="{Binding BookName, StringFormat='{0} book'}" FontSize="12"
+                               TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="End">
+                        <Label Text="Outstanding" FontSize="11"
+                               TextColor="{StaticResource TextSecondary}"
+                               HorizontalTextAlignment="End" />
+                        <Label Text="{Binding OutstandingDisplay}" FontSize="18" FontAttributes="Bold"
+                               TextColor="{StaticResource ErrorRed}"
+                               HorizontalTextAlignment="End" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Amount -->
+            <Border StrokeShape="RoundRectangle 12"
+                    StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}"
+                    Padding="16"
+                    IsVisible="{Binding IsNotBusy}">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,1" Radius="6" Opacity="0.05"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Payment Amount" FontSize="12"
+                           TextColor="{StaticResource TextSecondary}" />
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}"
+                            StrokeShape="RoundRectangle 10">
+                        <Entry Text="{Binding AmountText}"
+                               Keyboard="Numeric"
+                               FontSize="22" FontAttributes="Bold"
+                               Placeholder="0.00"
+                               PlaceholderColor="{StaticResource TextSecondary}"
+                               TextColor="{StaticResource TextPrimary}"
+                               HeightRequest="52"
+                               Margin="0"
+                               HorizontalTextAlignment="End" />
+                    </Border>
+
+                    <!-- Error message -->
+                    <Label Text="{Binding ErrorText}"
+                           FontSize="12"
+                           TextColor="{StaticResource ErrorRed}"
+                           IsVisible="{Binding HasValidationError}" />
+
+                    <!-- Notes -->
+                    <Label Text="Notes (optional)" FontSize="12" Margin="0,8,0,0"
+                           TextColor="{StaticResource TextSecondary}" />
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}"
+                            StrokeShape="RoundRectangle 10">
+                        <Editor Text="{Binding Notes}"
+                                Placeholder="e.g. received cash"
+                                PlaceholderColor="{StaticResource TextSecondary}"
+                                TextColor="{StaticResource TextPrimary}"
+                                HeightRequest="80"
+                                AutoSize="TextChanges" />
+                    </Border>
+
+                    <Button Text="Record Payment"
+                            Command="{Binding SaveCommand}"
+                            IsEnabled="{Binding CanSave}"
+                            BackgroundColor="{StaticResource TealPrimary}"
+                            TextColor="White"
+                            FontAttributes="Bold"
+                            FontSize="15"
+                            HeightRequest="50"
+                            Margin="0,12,0,0"
+                            CornerRadius="12" />
+                </VerticalStackLayout>
+            </Border>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               Color="{StaticResource TealPrimary}" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

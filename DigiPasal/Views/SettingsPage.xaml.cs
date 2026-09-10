@@ -35,6 +35,30 @@ public partial class SettingsPage : ContentPage
         await Shell.Current.GoToAsync("..");
     }
 
+    private async void ShopSettings_Tapped(object? sender, TappedEventArgs e)
+        => await Shell.Current.GoToAsync("ShopSettings");
+
+    private async void Reports_Tapped(object? sender, TappedEventArgs e)
+        => await Shell.Current.GoToAsync("Reports");
+
+    private async void SalesReport_Tapped(object? sender, TappedEventArgs e)
+        => await Shell.Current.GoToAsync("SalesReport");
+
+    private async void StockReport_Tapped(object? sender, TappedEventArgs e)
+        => await Shell.Current.GoToAsync("StockReport");
+
+    private async void ProfitReport_Tapped(object? sender, TappedEventArgs e)
+        => await Shell.Current.GoToAsync("ProfitReport");
+
+    private async void CreditReport_Tapped(object? sender, TappedEventArgs e)
+        => await Shell.Current.GoToAsync("CreditReports");
+
+    private async void Profile_Tapped(object? sender, TappedEventArgs e)
+        => await Shell.Current.GoToAsync("Profile");
+
+    private async void ChangePassword_Tapped(object? sender, TappedEventArgs e)
+        => await Shell.Current.GoToAsync("ChangePassword");
+
     private async void OnRestoreClicked(object? sender, EventArgs e)
     {
         if (sender is not Button button || button.CommandParameter is not BackupInfo backup)

@@ -12,4 +12,12 @@ public partial class SaleSuccessPage : ContentPage
         _viewModel = new SaleSuccessViewModel();
         BindingContext = _viewModel;
     }
+
+    protected override bool OnBackButtonPressed()
+    {
+#if ANDROID
+        Microsoft.Maui.Controls.Shell.Current.GoToAsync("//Dashboard");
+#endif
+        return true;
+    }
 }

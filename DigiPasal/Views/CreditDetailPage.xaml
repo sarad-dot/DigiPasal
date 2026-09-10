@@ -9,7 +9,7 @@
              x:DataType="vm:CreditDetailViewModel"
              BackgroundColor="{StaticResource AppBackground}">
 
-    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="0">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="0">
 
         <!-- Customer header -->
         <Border Grid.Row="0" Padding="16,14,16,12" Margin="16,16,16,0"
@@ -37,8 +37,40 @@
             </Grid>
         </Border>
 
+        <!-- Summary stats -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*" ColumnSpacing="8"
+              Padding="16,12,16,0">
+            <Border Grid.Column="0" StrokeShape="RoundRectangle 10"
+                    BackgroundColor="{StaticResource TealLight}" Padding="10,8">
+                <VerticalStackLayout Spacing="1">
+                    <Label Text="Credit Given" FontSize="10" TextColor="{StaticResource TealPrimary}" />
+                    <Label Text="{Binding TotalSalesDisplay}" FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource TealPrimary}" />
+                </VerticalStackLayout>
+            </Border>
+            <Border Grid.Column="1" StrokeShape="RoundRectangle 10"
+                    BackgroundColor="{StaticResource MoneyGreen}" Padding="10,8">
+                <VerticalStackLayout Spacing="1">
+                    <Label Text="Paid" FontSize="10" TextColor="{StaticResource MoneyGreenText}" />
+                    <Label Text="{Binding TotalPaymentsDisplay}" FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource MoneyGreenText}" />
+                </VerticalStackLayout>
+            </Border>
+            <Border Grid.Column="2" StrokeShape="RoundRectangle 10"
+                    BackgroundColor="{StaticResource CardBackground}" Padding="10,8">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,1" Radius="4" Opacity="0.04"/>
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="1">
+                    <Label Text="Transactions" FontSize="10" TextColor="{StaticResource TextSecondary}" />
+                    <Label Text="{Binding TransactionCountDisplay}" FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}" />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
         <!-- Record payment -->
-        <Border Grid.Row="1" Padding="16,12" Margin="16,12,16,0"
+        <Border Grid.Row="2" Padding="16,12" Margin="16,12,16,0"
                 StrokeShape="RoundRectangle 12"
                 StrokeThickness="0"
                 BackgroundColor="{StaticResource CardBackground}">
@@ -57,7 +89,7 @@
         </Border>
 
         <!-- History -->
-        <CollectionView Grid.Row="2"
+        <CollectionView Grid.Row="3"
                         ItemsSource="{Binding History}"
                         SelectionMode="None"
                         Margin="16,12,16,0"

@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             x:Class="DigiPasal.Views.ShopSettingsPage"
+             Title="Shop Settings"
+             Shell.TabBarIsVisible="False"
+             x:DataType="vm:ShopSettingsViewModel"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <Grid RowDefinitions="*,Auto" RowSpacing="0">
+
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Padding="16" Spacing="14">
+
+                <Label Text="Shop Information" FontSize="14" FontAttributes="Bold"
+                       TextColor="{StaticResource TextSecondary}" Margin="4,4,0,0" />
+
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Shop Name" FontSize="13" TextColor="{StaticResource TextPrimary}" />
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                        <Entry Text="{Binding ShopName}" Placeholder="e.g. DigiPasal Store"
+                               BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}"
+                               PlaceholderColor="{StaticResource TextSecondary}"
+                               Margin="12,4" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Address" FontSize="13" TextColor="{StaticResource TextPrimary}" />
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                        <Entry Text="{Binding ShopAddress}" Placeholder="Shop address"
+                               BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}"
+                               PlaceholderColor="{StaticResource TextSecondary}"
+                               Margin="12,4" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Phone" FontSize="13" TextColor="{StaticResource TextPrimary}" />
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                        <Entry Text="{Binding ShopPhone}" Keyboard="Telephone" Placeholder="Phone"
+                               BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}"
+                               PlaceholderColor="{StaticResource TextSecondary}"
+                               Margin="12,4" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <Label Text="Defaults" FontSize="14" FontAttributes="Bold"
+                       TextColor="{StaticResource TextSecondary}" Margin="4,12,0,0" />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <VerticalStackLayout Grid.Column="0" Spacing="8">
+                        <Label Text="Currency Symbol" FontSize="13" TextColor="{StaticResource TextPrimary}" />
+                        <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                                BackgroundColor="{StaticResource InputBg}" HeightRequest="44">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Entry Text="{Binding CurrencySymbol}" MaxLength="3"
+                                   HorizontalTextAlignment="Center" FontSize="18"
+                                   BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}"
+                                   Margin="12,4" />
+                        </Border>
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Grid.Column="1" Spacing="8">
+                        <Label Text="Tax Rate (%)" FontSize="13" TextColor="{StaticResource TextPrimary}" />
+                        <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                                BackgroundColor="{StaticResource InputBg}" HeightRequest="44">
+                            <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                            <Entry Text="{Binding TaxRate}" Keyboard="Numeric"
+                                   HorizontalTextAlignment="Center" FontSize="18"
+                                   BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}"
+                                   Margin="12,4" />
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Low Stock Alert Threshold" FontSize="13"
+                           TextColor="{StaticResource TextPrimary}" />
+                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                            BackgroundColor="{StaticResource InputBg}" HeightRequest="44">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                        <Entry Text="{Binding LowStockDefault}" Keyboard="Numeric"
+                               HorizontalTextAlignment="Center" FontSize="18"
+                               BackgroundColor="Transparent" TextColor="{StaticResource TextPrimary}"
+                               Margin="12,4" />
+                    </Border>
+                </VerticalStackLayout>
+
+                <Label Text="The low stock threshold is the default used for products added later."
+                       FontSize="12" TextColor="{StaticResource TextSecondary}" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Save -->
+        <Border Grid.Row="1" Padding="16,10,16,24"
+                BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                StrokeShape="RoundRectangle 16,16,0,0">
+            <Button Text="Save Settings" Command="{Binding SaveCommand}"
+                    IsEnabled="{Binding IsNotBusyAndNotSaving}"
+                    BackgroundColor="{StaticResource TealPrimary}" TextColor="White"
+                    FontSize="15" FontAttributes="Bold" HeightRequest="48" CornerRadius="10" />
+        </Border>
+    </Grid>
+</ContentPage>

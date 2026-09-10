@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Windows.Input;
 using DigiPasal.Models;
 using DigiPasal.Services;
@@ -15,7 +14,9 @@ public class CreditDetailViewModel : BaseViewModel
     private CreditBookType _bookType = CreditBookType.Daily;
     private Customer? _customer;
     private decimal _balance;
-    private bool _isRecording;
+    private decimal _totalSales;
+    private decimal _totalPayments;
+    private int _transactionCount;
 
     public ObservableCollection<CreditHistoryEntry> History { get; } = new();
 
@@ -71,7 +72,29 @@ public class CreditDetailViewModel : BaseViewModel
 
     public bool HasHistory => History.Count > 0;
 
-    public bool CanRecordPayment => !_isRecording && Balance > 0;
+    public bool CanRecordPayment => Balance > 0;
+
+    public decimal TotalSales
+    {
+        get => _totalSales;
+        set { SetProperty(ref _totalSales, value); OnPropertyChanged(nameof(TotalSalesDisplay)); }
+    }
+
+    public decimal TotalPayments
+    {
+        get => _totalPayments;
+        set { SetProperty(ref _totalPayments, value); OnPropertyChanged(nameof(TotalPaymentsDisplay)); }
+    }
+
+    public int TransactionCount
+    {
+        get => _transactionCount;
+        set { SetProperty(ref _transactionCount, value); OnPropertyChanged(nameof(TransactionCountDisplay)); }
+    }
+
+    public string TotalSalesDisplay => CurrencyFormatter.Format(TotalSales);
+    public string TotalPaymentsDisplay => CurrencyFormatter.Format(TotalPayments);
+    public string TransactionCountDisplay => $"{TransactionCount} transactions";
 
     public ICommand RecordPaymentCommand { get; }
 
@@ -98,6 +121,10 @@ public class CreditDetailViewModel : BaseViewModel
             foreach (var entry in entries)
                 History.Add(entry);
 
+            TotalSales = entries.Where(e => e.IsSale).Sum(e => e.Amount);
+            TotalPayments = entries.Where(e => e.IsPayment).Sum(e => e.Amount);
+            TransactionCount = entries.Count;
+
             OnPropertyChanged(nameof(HasHistory));
             OnPropertyChanged(nameof(CanRecordPayment));
         }
@@ -115,48 +142,6 @@ public class CreditDetailViewModel : BaseViewModel
             return;
         }
 
-        var amountStr = await Shell.Current.DisplayPromptAsync(
-            "Record Payment",
-            $"Enter payment amount towards {CustomerName}'s {BookNameDisplay} balance.",
-            "Next",
-            "Cancel",
-            "0.00",
-            12,
-            Keyboard.Numeric);
-
-        if (string.IsNullOrWhiteSpace(amountStr))
-            return;
-
-        if (!decimal.TryParse(amountStr, NumberStyles.Any, CultureInfo.InvariantCulture, out var amount) || amount <= 0)
-        {
-            await Shell.Current.DisplayAlertAsync("Invalid Amount", "Enter a valid amount greater than zero.", "OK");
-            return;
-        }
-
-        var confirm = await Shell.Current.DisplayAlertAsync(
-            "Confirm Payment",
-            $"Record {CurrencyFormatter.Format(amount)} from {CustomerName} ({BookNameDisplay} book)?",
-            "Record",
-            "Cancel");
-
-        if (!confirm)
-            return;
-
-        _isRecording = true;
-        OnPropertyChanged(nameof(CanRecordPayment));
-        try
-        {
-            await _creditService.RecordPaymentAsync(_customerId, amount, _bookType);
-            await LoadAsync();
-        }
-        catch (Exception ex)
-        {
-            await Shell.Current.DisplayAlertAsync("Error", $"Failed to record payment: {ex.Message}", "OK");
-        }
-        finally
-        {
-            _isRecording = false;
-            OnPropertyChanged(nameof(CanRecordPayment));
-        }
+        await Shell.Current.GoToAsync($"RecordPayment?customerId={_customerId}&book={(int)_bookType}");
     }
 }

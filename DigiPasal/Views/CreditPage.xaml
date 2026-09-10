@@ -6,42 +6,70 @@
              x:Class="DigiPasal.Views.CreditPage"
              Title="Credit"
              Shell.TabBarIsVisible="False"
+             Shell.NavBarIsVisible="True"
              x:DataType="vm:CreditViewModel"
              BackgroundColor="{StaticResource AppBackground}">
 
-    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="0">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto" RowSpacing="0">
 
-        <!-- Tab buttons -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,*" Padding="16,12" ColumnSpacing="8"
+        <!-- Tab buttons + Reports -->
+        <Grid Grid.Row="0" Padding="16,12" ColumnDefinitions="*,Auto" ColumnSpacing="8"
               BackgroundColor="{StaticResource CardBackground}">
-            <Button Grid.Column="0" Text="Daily" FontAttributes="Bold" FontSize="14"
-                    HeightRequest="42" CornerRadius="10"
-                    Command="{Binding SwitchToDailyCommand}"
-                    BackgroundColor="{StaticResource TealLight}"
-                    TextColor="{StaticResource TealPrimary}">
-                <Button.Triggers>
-                    <DataTrigger TargetType="Button" Binding="{Binding IsDailyTab}" Value="True">
-                        <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
-                        <Setter Property="TextColor" Value="White" />
-                    </DataTrigger>
-                </Button.Triggers>
-            </Button>
-            <Button Grid.Column="1" Text="Partners" FontAttributes="Bold" FontSize="14"
-                    HeightRequest="42" CornerRadius="10"
-                    Command="{Binding SwitchToPartnerCommand}"
-                    BackgroundColor="{StaticResource TealLight}"
-                    TextColor="{StaticResource TealPrimary}">
-                <Button.Triggers>
-                    <DataTrigger TargetType="Button" Binding="{Binding IsDailyTab}" Value="False">
-                        <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
-                        <Setter Property="TextColor" Value="White" />
-                    </DataTrigger>
-                </Button.Triggers>
-            </Button>
+            <Grid Grid.Column="0" ColumnDefinitions="*,*" ColumnSpacing="8">
+                <Button Grid.Column="0" Text="Daily" FontAttributes="Bold" FontSize="14"
+                        HeightRequest="42" CornerRadius="10"
+                        Command="{Binding SwitchToDailyCommand}"
+                        BackgroundColor="{StaticResource TealLight}"
+                        TextColor="{StaticResource TealPrimary}">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding IsDailyTab}" Value="True">
+                            <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                            <Setter Property="TextColor" Value="White" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+                <Button Grid.Column="1" Text="Partners" FontAttributes="Bold" FontSize="14"
+                        HeightRequest="42" CornerRadius="10"
+                        Command="{Binding SwitchToPartnerCommand}"
+                        BackgroundColor="{StaticResource TealLight}"
+                        TextColor="{StaticResource TealPrimary}">
+                    <Button.Triggers>
+                        <DataTrigger TargetType="Button" Binding="{Binding IsDailyTab}" Value="False">
+                            <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                            <Setter Property="TextColor" Value="White" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </Grid>
+            <Button Grid.Column="1" Text="Reports" FontSize="12" FontAttributes="Bold"
+                    HeightRequest="42" CornerRadius="10" Padding="14,0"
+                    Command="{Binding OpenReportsCommand}"
+                    BackgroundColor="{StaticResource SaleBlue}"
+                    TextColor="{StaticResource SaleBlueText}" />
         </Grid>
 
+        <!-- Search bar -->
+        <Border Grid.Row="1" Padding="16,0" StrokeThickness="0"
+                BackgroundColor="{StaticResource CardBackground}">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                <SearchBar Grid.Column="0"
+                           Placeholder="Search by name..."
+                           Text="{Binding SearchText}"
+                           BackgroundColor="{StaticResource InputBg}"
+                           CancelButtonColor="{StaticResource TealPrimary}"
+                           FontSize="14"
+                           HeightRequest="40" />
+                <Button Grid.Column="1" Text="&#x2715;" FontSize="14"
+                        WidthRequest="40" HeightRequest="40"
+                        Command="{Binding ClearSearchCommand}"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource TextSecondary}"
+                        IsVisible="{Binding HasSearchResults}" />
+            </Grid>
+        </Border>
+
         <!-- Summary card -->
-        <Border Grid.Row="1" Padding="16,12,16,0" StrokeThickness="0">
+        <Border Grid.Row="2" Padding="16,10,16,0" StrokeThickness="0">
             <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
                 <Border Grid.Column="0" StrokeShape="RoundRectangle 12"
                         BackgroundColor="{StaticResource TealLight}" Padding="12,10">
@@ -76,13 +104,24 @@
             </Grid>
         </Border>
 
-        <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="0"
+        <!-- Search filter info -->
+        <Border Grid.Row="3" Padding="16,6" StrokeThickness="0"
+                IsVisible="{Binding HasSearchResults}"
+                BackgroundColor="{StaticResource TealLight}">
+            <Label Text="{Binding SearchResultInfo}" FontSize="12" FontAttributes="Bold"
+                   TextColor="{StaticResource TealPrimary}" />
+        </Border>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- DAILY TAB                                               -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="4" RowDefinitions="Auto,*" RowSpacing="0"
               IsVisible="{Binding IsDailyTab}">
 
             <!-- Date navigation -->
-            <Grid Grid.Row="0" Padding="16,12" ColumnDefinitions="Auto,*,Auto,Auto,Auto"
+            <Grid Grid.Row="0" Padding="16,10" ColumnDefinitions="Auto,*,Auto,Auto,Auto"
                   ColumnSpacing="8">
-                <Button Grid.Column="0" Text="◀" WidthRequest="40" HeightRequest="36"
+                <Button Grid.Column="0" Text="&#x25C0;" WidthRequest="40" HeightRequest="36"
                         Command="{Binding PreviousDayCommand}"
                         BackgroundColor="{StaticResource TealLight}"
                         TextColor="{StaticResource TealPrimary}"
@@ -96,7 +135,7 @@
                            VerticalTextAlignment="Center" HorizontalTextAlignment="Center"
                            TextColor="{StaticResource TextPrimary}" />
                 </Border>
-                <Button Grid.Column="2" Text="▶" WidthRequest="40" HeightRequest="36"
+                <Button Grid.Column="2" Text="&#x25B6;" WidthRequest="40" HeightRequest="36"
                         Command="{Binding NextDayCommand}"
                         BackgroundColor="{StaticResource TealLight}"
                         TextColor="{StaticResource TealPrimary}"
@@ -143,8 +182,7 @@
                                 StrokeThickness="1"
                                 BackgroundColor="{StaticResource CardBackground}">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CreditViewModel}}, Path=ViewCustomerCommand}"
-                                                      CommandParameter="{Binding .}" />
+                                <TapGestureRecognizer Tapped="DailyEntry_Tapped" />
                             </Border.GestureRecognizers>
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                                 <VerticalStackLayout Grid.Column="0" Spacing="4">
@@ -170,10 +208,12 @@
             </CollectionView>
         </Grid>
 
-        <!-- Partners list -->
-        <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="0"
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- PARTNER TAB                                             -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="4" RowDefinitions="Auto,*" RowSpacing="0"
               IsVisible="{Binding IsPartnerTab}">
-            <Grid Grid.Row="0" Padding="16,12,16,4">
+            <Grid Grid.Row="0" Padding="16,10,16,4">
                 <Grid ColumnDefinitions="*,Auto">
                     <Label Text="Partners Book — Long-term Balances" FontSize="12" FontAttributes="Bold"
                            TextColor="{StaticResource TextSecondary}" />
@@ -201,8 +241,7 @@
                                 StrokeThickness="1"
                                 BackgroundColor="{StaticResource CardBackground}">
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CreditViewModel}}, Path=ViewCustomerCommand}"
-                                                      CommandParameter="{Binding .}" />
+                                <TapGestureRecognizer Tapped="PartnerItem_Tapped" />
                             </Border.GestureRecognizers>
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                                 <VerticalStackLayout Grid.Column="0" Spacing="3">
@@ -220,6 +259,13 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
+
+        <!-- Loading indicator -->
+        <ActivityIndicator Grid.Row="5" IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           Color="{StaticResource TealPrimary}"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+
     </Grid>
 
 </ContentPage>

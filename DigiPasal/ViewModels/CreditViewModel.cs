@@ -16,6 +16,10 @@ public class CreditViewModel : BaseViewModel
     private bool _isClosing;
     private decimal _dailyOutstanding;
     private decimal _partnerOutstanding;
+    private string _searchText = string.Empty;
+
+    private List<DailyBookEntry> _allDailyEntries = new();
+    private List<PartnerCreditItem> _allPartnerItems = new();
 
     public ObservableCollection<DailyBookEntry> DailyEntries { get; } = new();
     public ObservableCollection<PartnerCreditItem> PartnerItems { get; } = new();
@@ -32,7 +36,9 @@ public class CreditViewModel : BaseViewModel
         PreviousDayCommand = new Command(async () => { if (SelectedDate > DateTime.MinValue) { SelectedDate = SelectedDate.AddDays(-1); await LoadDailyAsync(); } });
         NextDayCommand = new Command(async () => { if (SelectedDate.Date < DateTime.Today) { SelectedDate = SelectedDate.AddDays(1); await LoadDailyAsync(); } });
         TodayCommand = new Command(async () => { SelectedDate = DateTime.Today; await LoadDailyAsync(); });
-        ViewCustomerCommand = new Command<object>(async (item) => await ViewCustomerAsync(item));
+        OpenReportsCommand = new Command(async () => await Shell.Current.GoToAsync("CreditReports"));
+        SearchCommand = new Command(() => ApplySearchFilter());
+        ClearSearchCommand = new Command(async () => { SearchText = string.Empty; ApplySearchFilter(); });
     }
 
     public bool IsDailyTab
@@ -106,13 +112,30 @@ public class CreditViewModel : BaseViewModel
         ? "No credit sales recorded for this day."
         : "No credit sales yet today. Credit sales during the day appear here.";
 
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (SetProperty(ref _searchText, value))
+                ApplySearchFilter();
+        }
+    }
+
+    public bool HasSearchResults => !string.IsNullOrWhiteSpace(SearchText);
+    public string SearchResultInfo => IsDailyTab
+        ? $"{DailyEntries.Count} of {_allDailyEntries.Count} daily entries match"
+        : $"{PartnerItems.Count} of {_allPartnerItems.Count} partners match";
+
     public ICommand SwitchToDailyCommand { get; }
     public ICommand SwitchToPartnerCommand { get; }
     public ICommand CloseDailyBookCommand { get; }
     public ICommand PreviousDayCommand { get; }
     public ICommand NextDayCommand { get; }
     public ICommand TodayCommand { get; }
-    public ICommand ViewCustomerCommand { get; }
+    public ICommand OpenReportsCommand { get; }
+    public ICommand SearchCommand { get; }
+    public ICommand ClearSearchCommand { get; }
 
     public async Task LoadAsync()
     {
@@ -151,9 +174,8 @@ public class CreditViewModel : BaseViewModel
             IsBookClosed = report.IsClosed;
             DailyOutstanding = report.OutstandingTotal;
 
-            DailyEntries.Clear();
-            foreach (var entry in report.Entries)
-                DailyEntries.Add(entry);
+            _allDailyEntries = report.Entries.ToList();
+            ApplyDailyFilter();
 
             OnPropertyChanged(nameof(HasDailyEntries));
             OnPropertyChanged(nameof(DailyEmptyMessage));
@@ -172,9 +194,8 @@ public class CreditViewModel : BaseViewModel
             var customers = await _creditService.GetPartnerCustomersAsync();
             PartnerOutstanding = customers.Sum(c => c.PartnerBalance);
 
-            PartnerItems.Clear();
-            foreach (var customer in customers)
-                PartnerItems.Add(new PartnerCreditItem(customer));
+            _allPartnerItems = customers.Select(c => new PartnerCreditItem(c)).ToList();
+            ApplyPartnerFilter();
 
             OnPropertyChanged(nameof(HasPartnerItems));
         }
@@ -182,6 +203,49 @@ public class CreditViewModel : BaseViewModel
         {
             await Shell.Current.DisplayAlertAsync("Error", $"Failed to load partners book: {ex.Message}", "OK");
         }
+    }
+
+    private void ApplySearchFilter()
+    {
+        if (IsDailyTab)
+            ApplyDailyFilter();
+        else
+            ApplyPartnerFilter();
+
+        OnPropertyChanged(nameof(HasSearchResults));
+        OnPropertyChanged(nameof(SearchResultInfo));
+    }
+
+    private void ApplyDailyFilter()
+    {
+        DailyEntries.Clear();
+        var filtered = string.IsNullOrWhiteSpace(SearchText)
+            ? _allDailyEntries
+            : _allDailyEntries.Where(e =>
+                e.CustomerName.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+        foreach (var entry in filtered)
+            DailyEntries.Add(entry);
+
+        OnPropertyChanged(nameof(HasDailyEntries));
+        OnPropertyChanged(nameof(DailyEmptyMessage));
+    }
+
+    private void ApplyPartnerFilter()
+    {
+        PartnerItems.Clear();
+        var filtered = string.IsNullOrWhiteSpace(SearchText)
+            ? _allPartnerItems
+            : _allPartnerItems.Where(p =>
+                p.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase) ||
+                (p.Phone != null && p.Phone.Contains(SearchText, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+        foreach (var item in filtered)
+            PartnerItems.Add(item);
+
+        OnPropertyChanged(nameof(HasPartnerItems));
     }
 
     private async Task CloseDailyBookAsync()
@@ -224,13 +288,13 @@ public class CreditViewModel : BaseViewModel
         }
     }
 
-    private async Task ViewCustomerAsync(object? item)
+    public async Task NavigateToCustomerAsync(DailyBookEntry? dailyEntry, PartnerCreditItem? partner)
     {
-        if (item is DailyBookEntry dailyEntry)
+        if (dailyEntry != null)
         {
             await Shell.Current.GoToAsync($"CreditDetail?customerId={dailyEntry.CustomerIdValue}&book={(int)CreditBookType.Daily}");
         }
-        else if (item is PartnerCreditItem partner)
+        else if (partner != null)
         {
             await Shell.Current.GoToAsync($"CreditDetail?customerId={partner.CustomerId}&book={(int)CreditBookType.Partner}");
         }

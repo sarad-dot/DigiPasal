@@ -17,6 +17,7 @@ public class QuickSaleViewModel : BaseViewModel
     private string _creditCustomerName = string.Empty;
     private string _amountPaid = string.Empty;
     private bool _entryJustAdded;
+    private bool _isCompleting;
 
     public decimal Sum
     {
@@ -65,6 +66,20 @@ public class QuickSaleViewModel : BaseViewModel
         }
     }
 
+    public bool HasSum => Sum > 0;
+
+    public bool IsCompleting
+    {
+        get => _isCompleting;
+        private set
+        {
+            if (SetProperty(ref _isCompleting, value))
+                OnPropertyChanged(nameof(IsNotCompleting));
+        }
+    }
+
+    public bool IsNotCompleting => !_isCompleting;
+
     public Customer? SelectedCustomer
     {
         get => _selectedCustomer;
@@ -83,7 +98,8 @@ public class QuickSaleViewModel : BaseViewModel
         get => _isCreditSale;
         set
         {
-            SetProperty(ref _isCreditSale, value);
+            if (SetProperty(ref _isCreditSale, value) && value)
+                AmountPaid = "0";
             OnPropertyChanged(nameof(ShowCreditNameField));
             OnPropertyChanged(nameof(CanComplete));
             OnPropertyChanged(nameof(CreditAmount));
@@ -121,9 +137,9 @@ public class QuickSaleViewModel : BaseViewModel
         ? $"{SelectedCustomer.Name} (Balance: {CurrencyFormatter.Format(SelectedCustomer.CurrentBalance)})"
         : "Walk-in (Cash)";
 
-    public decimal CreditAmount => IsCreditSale && decimal.TryParse(AmountPaid, NumberStyles.Any,
-        CultureInfo.InvariantCulture, out var paid)
-        ? Math.Max(0, Amount - paid)
+    public decimal CreditAmount => IsCreditSale
+        ? Math.Max(0, Amount - (decimal.TryParse(AmountPaid, NumberStyles.Any,
+            CultureInfo.InvariantCulture, out var paid) ? paid : 0))
         : 0;
 
     public string CreditDisplay => IsCreditSale ? CurrencyFormatter.Format(CreditAmount) : "";
@@ -157,6 +173,7 @@ public class QuickSaleViewModel : BaseViewModel
         OnPropertyChanged(nameof(AmountDisplay));
         OnPropertyChanged(nameof(SumDisplay));
         OnPropertyChanged(nameof(ExpressionHint));
+        OnPropertyChanged(nameof(HasSum));
         OnPropertyChanged(nameof(CanComplete));
         OnPropertyChanged(nameof(CreditAmount));
         OnPropertyChanged(nameof(CreditDisplay));
@@ -187,6 +204,8 @@ public class QuickSaleViewModel : BaseViewModel
             CurrentEntry = digit;
         else if (CurrentEntry.Length < 12)
             CurrentEntry += digit;
+
+        TapFeedback();
     }
 
     private void AppendDecimal()
@@ -195,13 +214,24 @@ public class QuickSaleViewModel : BaseViewModel
         {
             CurrentEntry = "0.";
             _entryJustAdded = false;
+            TapFeedback();
             return;
         }
 
+        var changed = false;
         if (string.IsNullOrEmpty(CurrentEntry))
+        {
             CurrentEntry = "0.";
+            changed = true;
+        }
         else if (!CurrentEntry.Contains('.'))
+        {
             CurrentEntry += ".";
+            changed = true;
+        }
+
+        if (changed)
+            TapFeedback();
     }
 
     private void Backspace()
@@ -213,13 +243,20 @@ public class QuickSaleViewModel : BaseViewModel
         CurrentEntry = CurrentEntry.Length == 1
             ? string.Empty
             : CurrentEntry[..^1];
+
+        TapFeedback();
     }
 
     private void ClearAll()
     {
+        if (Sum == 0 && string.IsNullOrEmpty(CurrentEntry))
+            return;
+
         Sum = 0;
         CurrentEntry = string.Empty;
         _entryJustAdded = false;
+
+        TapFeedback();
     }
 
     private void AddToSum()
@@ -231,6 +268,20 @@ public class QuickSaleViewModel : BaseViewModel
         Sum += entry;
         CurrentEntry = string.Empty;
         _entryJustAdded = true;
+
+        TapFeedback();
+    }
+
+    private static void TapFeedback()
+    {
+        try
+        {
+            HapticFeedback.Default.Perform(HapticFeedbackType.Click);
+        }
+        catch
+        {
+            // Haptics are best-effort; ignore device/emulator failures.
+        }
     }
 
     private void ResetCalculator()
@@ -283,64 +334,69 @@ public class QuickSaleViewModel : BaseViewModel
 
     private async Task CompleteSaleAsync()
     {
-        // Fold any pending entry into the sum before charging
-        var pending = ParseEntry();
-        if (pending > 0)
-        {
-            Sum += pending;
-            CurrentEntry = string.Empty;
-            _entryJustAdded = true;
-        }
-
-        if (Amount <= 0)
-        {
-            await Shell.Current.DisplayAlertAsync("Invalid Amount", "Add at least one amount before completing the sale.", "OK");
+        if (IsCompleting)
             return;
-        }
 
-        var saleAmount = Amount;
-        var paidAmount = IsCreditSale && decimal.TryParse(AmountPaid, NumberStyles.Any,
-            CultureInfo.InvariantCulture, out var p) ? p : saleAmount;
-
-        if (IsCreditSale && paidAmount >= saleAmount)
-        {
-            await Shell.Current.DisplayAlertAsync("Credit Sale", "Amount paid equals or exceeds total. Use cash payment instead.", "OK");
-            return;
-        }
-
-        var user = await AuthService.Instance.GetCurrentUserAsync();
-
-        int? creditCustomerId = null;
-        string creditCustomerName = "Walk-in";
-
-        if (IsCreditSale)
-        {
-            var resolved = await ResolveCreditCustomerAsync();
-            creditCustomerId = resolved.customerId;
-            creditCustomerName = resolved.customerName;
-        }
-
-        var sale = new Sale
-        {
-            Subtotal = saleAmount,
-            DiscountAmount = 0,
-            TaxAmount = 0,
-            TotalAmount = saleAmount,
-            GrandTotal = saleAmount,
-            AmountPaid = paidAmount,
-            CreditAmount = saleAmount - paidAmount,
-            PaymentMethod = IsCreditSale ? "Credit" : "Cash",
-            IsCredit = IsCreditSale,
-            IsQuickSale = true,
-            CreditBookType = (int)CreditBookType.Daily,
-            CustomerId = IsCreditSale ? creditCustomerId : null,
-            CustomerName = IsCreditSale ? creditCustomerName : "Walk-in",
-            UserId = user?.Id ?? 0,
-            Notes = string.Empty
-        };
-
+        IsCompleting = true;
         try
         {
+            // Fold any pending entry into the sum before charging
+            var pending = ParseEntry();
+            if (pending > 0)
+            {
+                Sum += pending;
+                CurrentEntry = string.Empty;
+                _entryJustAdded = true;
+            }
+
+            if (Amount <= 0)
+            {
+                await Shell.Current.DisplayAlertAsync("Invalid Amount", "Add at least one amount before completing the sale.", "OK");
+                return;
+            }
+
+            var saleAmount = Amount;
+            var paidAmount = decimal.TryParse(AmountPaid, NumberStyles.Any,
+                CultureInfo.InvariantCulture, out var p) ? p
+                : IsCreditSale ? 0 : saleAmount;
+
+            if (IsCreditSale && paidAmount >= saleAmount)
+            {
+                await Shell.Current.DisplayAlertAsync("Credit Sale", "Amount paid equals or exceeds total. Use cash payment instead.", "OK");
+                return;
+            }
+
+            var user = await AuthService.Instance.GetCurrentUserAsync();
+
+            int? creditCustomerId = null;
+            string creditCustomerName = "Walk-in";
+
+            if (IsCreditSale)
+            {
+                var resolved = await ResolveCreditCustomerAsync();
+                creditCustomerId = resolved.customerId;
+                creditCustomerName = resolved.customerName;
+            }
+
+            var sale = new Sale
+            {
+                Subtotal = saleAmount,
+                DiscountAmount = 0,
+                TaxAmount = 0,
+                TotalAmount = saleAmount,
+                GrandTotal = saleAmount,
+                AmountPaid = paidAmount,
+                CreditAmount = saleAmount - paidAmount,
+                PaymentMethod = IsCreditSale ? "Credit" : "Cash",
+                IsCredit = IsCreditSale,
+                IsQuickSale = true,
+                CreditBookType = (int)CreditBookType.Daily,
+                CustomerId = IsCreditSale ? creditCustomerId : null,
+                CustomerName = IsCreditSale ? creditCustomerName : "Walk-in",
+                UserId = user?.Id ?? 0,
+                Notes = string.Empty
+            };
+
             var createdSale = await _saleService.CreateQuickSaleAsync(sale);
             ResetCalculator();
             await Shell.Current.GoToAsync($"SaleSuccess?id={createdSale.Id}");
@@ -348,6 +404,10 @@ public class QuickSaleViewModel : BaseViewModel
         catch (Exception ex)
         {
             await Shell.Current.DisplayAlertAsync("Error", $"Failed to complete sale: {ex.Message}", "OK");
+        }
+        finally
+        {
+            IsCompleting = false;
         }
     }
 

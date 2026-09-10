@@ -155,6 +155,8 @@ public class CreditService
         foreach (var t in transfers) customerIds.Add(t.CustomerId);
 
         var customers = await Database.Table<Customer>().ToListAsync();
+        var customerById = new Dictionary<int, Customer>(customers.Count);
+        foreach (var c in customers) customerById[c.Id] = c;
 
         var entries = new List<DailyBookEntry>();
         foreach (var id in customerIds)
@@ -163,7 +165,7 @@ public class CreditService
             var customerPayments = payments.Where(p => p.CustomerId == id).ToList();
             var customerTransfers = transfers.Where(t => t.CustomerId == id).ToList();
 
-            var customer = customers.FirstOrDefault(c => c.Id == id);
+            customerById.TryGetValue(id, out var customer);
             var name = customer?.Name
                        ?? customerSales.FirstOrDefault()?.CustomerName
                        ?? (id == 0 ? "Walk-in" : string.Empty);
@@ -259,6 +261,231 @@ public class CreditService
 
         return book == CreditBookType.Partner ? customer.PartnerBalance : customer.DailyBalance;
     }
+
+    // ── Report: Daily Credit Summary (date range) ────────────────
+    public async Task<List<DailyCreditSummaryRow>> GetDailyCreditSummaryAsync(DateTime from, DateTime to)
+    {
+        var startUtc = from.Date.ToUniversalTime();
+        var endUtc = to.Date.AddDays(1).AddTicks(-1).ToUniversalTime();
+
+        var sales = await Database.Table<Sale>()
+            .Where(s => s.IsCredit && !s.IsVoided && s.CreatedAt >= startUtc && s.CreatedAt <= endUtc)
+            .ToListAsync();
+
+        var payments = await Database.Table<CreditPayment>()
+            .Where(p => !p.IsTransfer && p.PaymentDate >= startUtc && p.PaymentDate <= endUtc)
+            .ToListAsync();
+
+        var grouped = new Dictionary<string, DailyCreditSummaryRow>();
+
+        foreach (var s in sales)
+        {
+            var key = s.CreatedAt.ToLocalTime().Date.ToString("yyyy-MM-dd");
+            if (!grouped.TryGetValue(key, out var row))
+            {
+                row = new DailyCreditSummaryRow { Date = s.CreatedAt.ToLocalTime().Date };
+                grouped[key] = row;
+            }
+            row.CreditSales += s.CreditAmount;
+        }
+
+        foreach (var p in payments)
+        {
+            var key = p.PaymentDate.ToLocalTime().Date.ToString("yyyy-MM-dd");
+            if (!grouped.TryGetValue(key, out var row))
+            {
+                row = new DailyCreditSummaryRow { Date = p.PaymentDate.ToLocalTime().Date };
+                grouped[key] = row;
+            }
+            row.PaymentsCollected += p.Amount;
+        }
+
+        return grouped.Values
+            .OrderByDescending(r => r.Date)
+            .ToList();
+    }
+
+    // ── Report: Credit Aging ──────────────────────────────────────
+    public async Task<List<CreditAgingRow>> GetCreditAgingAsync()
+    {
+        var customers = await Database.Table<Customer>()
+            .Where(c => c.IsActive && c.CurrentBalance > 0)
+            .OrderByDescending(c => c.CurrentBalance)
+            .ToListAsync();
+
+        if (customers.Count == 0)
+            return new List<CreditAgingRow>();
+
+        // One grouped query instead of one query per customer (N+1)
+        var lastPayments = await Database.QueryAsync<CustomerLastPayment>(
+            "SELECT CustomerId, MAX(PaymentDate) AS LastPaymentDate " +
+            "FROM CreditPayments WHERE IsTransfer = 0 GROUP BY CustomerId");
+
+        var lastPaymentByCustomer = new Dictionary<int, DateTime>(lastPayments.Count);
+        foreach (var lp in lastPayments)
+            lastPaymentByCustomer[lp.CustomerId] = lp.LastPaymentDate;
+
+        var result = new List<CreditAgingRow>(customers.Count);
+        var today = DateTime.Today;
+
+        foreach (var c in customers)
+        {
+            DateTime lastPaymentDate = lastPaymentByCustomer.TryGetValue(c.Id, out var last)
+                ? last.ToLocalTime().Date
+                : c.CreatedAt.ToLocalTime().Date;
+
+            var daysSinceLastPayment = (today - lastPaymentDate).Days;
+            var bucket = daysSinceLastPayment switch
+            {
+                <= 7 => "0-7 days",
+                <= 30 => "8-30 days",
+                <= 60 => "31-60 days",
+                <= 90 => "61-90 days",
+                _ => "90+ days"
+            };
+
+            result.Add(new CreditAgingRow
+            {
+                CustomerId = c.Id,
+                CustomerName = c.Name,
+                Phone = c.Phone,
+                TotalBalance = c.CurrentBalance,
+                DailyBalance = c.DailyBalance,
+                PartnerBalance = c.PartnerBalance,
+                DaysSinceLastPayment = daysSinceLastPayment,
+                LastPaymentDate = lastPaymentByCustomer.ContainsKey(c.Id) ? lastPaymentDate : (DateTime?)null,
+                AgingBucket = bucket
+            });
+        }
+
+        return result;
+    }
+
+    // ── Report: Payment History ───────────────────────────────────
+    public async Task<List<PaymentHistoryRow>> GetPaymentHistoryAsync(
+        DateTime? from = null, DateTime? to = null, int? customerId = null)
+    {
+        var query = Database.Table<CreditPayment>()
+            .Where(p => !p.IsTransfer);
+
+        if (from.HasValue)
+        {
+            var startUtc = from.Value.Date.ToUniversalTime();
+            query = query.Where(p => p.PaymentDate >= startUtc);
+        }
+
+        if (to.HasValue)
+        {
+            var endUtc = to.Value.Date.AddDays(1).AddTicks(-1).ToUniversalTime();
+            query = query.Where(p => p.PaymentDate <= endUtc);
+        }
+
+        if (customerId.HasValue)
+            query = query.Where(p => p.CustomerId == customerId.Value);
+
+        var payments = await query.OrderByDescending(p => p.PaymentDate).ToListAsync();
+
+        var customerIds = payments.Select(p => p.CustomerId).Distinct().ToList();
+        var customers = await Database.Table<Customer>()
+            .Where(c => customerIds.Contains(c.Id))
+            .ToListAsync();
+        var customerMap = customers.ToDictionary(c => c.Id);
+
+        var sales = await Database.Table<Sale>()
+            .Where(s => customerIds.Contains(s.CustomerId ?? 0) && s.IsCredit && !s.IsVoided)
+            .ToListAsync();
+        var saleMap = sales.ToDictionary(s => s.Id);
+
+        return payments.Select(p =>
+        {
+            customerMap.TryGetValue(p.CustomerId, out var cust);
+            var bookName = p.CreditBookType == (int)CreditBookType.Partner ? "Partner" : "Daily";
+            var saleInfo = p.SaleId.HasValue && saleMap.TryGetValue(p.SaleId.Value, out var sale)
+                ? $" ({sale.ReceiptNumber})"
+                : string.Empty;
+
+            return new PaymentHistoryRow
+            {
+                PaymentId = p.Id,
+                CustomerId = p.CustomerId,
+                CustomerName = cust?.Name ?? "Unknown",
+                Amount = p.Amount,
+                PaymentDate = p.PaymentDate.ToLocalTime(),
+                BookType = bookName,
+                Notes = p.Notes,
+                SaleInfo = saleInfo
+            };
+        }).ToList();
+    }
+
+    // ── Report: Credit Trend (daily totals for chart) ────────────
+    public async Task<List<CreditTrendPoint>> GetCreditTrendAsync(int days = 30)
+    {
+        var from = DateTime.Today.AddDays(-days);
+        var startUtc = from.ToUniversalTime();
+        var endUtc = DateTime.Today.AddDays(1).AddTicks(-1).ToUniversalTime();
+
+        var sales = await Database.Table<Sale>()
+            .Where(s => s.IsCredit && !s.IsVoided && s.CreatedAt >= startUtc && s.CreatedAt <= endUtc)
+            .ToListAsync();
+
+        var payments = await Database.Table<CreditPayment>()
+            .Where(p => !p.IsTransfer && p.PaymentDate >= startUtc && p.PaymentDate <= endUtc)
+            .ToListAsync();
+
+        var points = new Dictionary<string, CreditTrendPoint>();
+        for (var d = from; d <= DateTime.Today; d = d.AddDays(1))
+        {
+            var key = d.ToString("yyyy-MM-dd");
+            points[key] = new CreditTrendPoint { Date = d };
+        }
+
+        foreach (var s in sales)
+        {
+            var key = s.CreatedAt.ToLocalTime().Date.ToString("yyyy-MM-dd");
+            if (points.TryGetValue(key, out var pt))
+                pt.NewCredit += s.CreditAmount;
+        }
+
+        foreach (var p in payments)
+        {
+            var key = p.PaymentDate.ToLocalTime().Date.ToString("yyyy-MM-dd");
+            if (points.TryGetValue(key, out var pt))
+                pt.Payments += p.Amount;
+        }
+
+        return points.Values.OrderBy(p => p.Date).ToList();
+    }
+
+    // ── Report: All customers with any credit balance ────────────
+    public async Task<List<Customer>> GetAllCustomersWithCreditAsync()
+    {
+        return await Database.Table<Customer>()
+            .Where(c => c.IsActive && c.CurrentBalance > 0)
+            .OrderByDescending(c => c.CurrentBalance)
+            .ToListAsync();
+    }
+
+    // ── Aggregates (single-row SUM queries, no materialization) ──
+    public Task<decimal> GetTotalPaymentsCollectedAsync()
+    {
+        return Database.ExecuteScalarAsync<decimal>(
+            "SELECT COALESCE(SUM(Amount), 0) FROM CreditPayments WHERE IsTransfer = 0");
+    }
+
+    public Task<decimal> GetCreditIssuedTotalAsync(DateTime from)
+    {
+        var fromUtc = from.ToUniversalTime();
+        return Database.ExecuteScalarAsync<decimal>(
+            "SELECT COALESCE(SUM(CreditAmount), 0) FROM Sales " +
+            "WHERE IsCredit = 1 AND IsVoided = 0 AND CreatedAt >= ?", fromUtc);
+    }
+}
+
+public class CustomerLastPayment
+{
+    public int CustomerId { get; set; }
+    public DateTime LastPaymentDate { get; set; }
 }
 
 public class DailyBookReport
@@ -312,4 +539,63 @@ public class CreditHistoryEntry
     public string TypeDisplay => IsTransfer ? "Transfer" : IsSale ? "Credit Sale" : "Payment";
     public string DateDisplay => Date.ToString("dd MMM yyyy, HH:mm");
     public string AmountDisplay => CurrencyFormatter.Format(Amount);
+}
+
+public class DailyCreditSummaryRow
+{
+    public DateTime Date { get; set; }
+    public decimal CreditSales { get; set; }
+    public decimal PaymentsCollected { get; set; }
+    public decimal NetOutstanding => CreditSales - PaymentsCollected;
+
+    public string DateDisplay => Date.ToString("dd MMM yyyy");
+    public string CreditSalesDisplay => CurrencyFormatter.Format(CreditSales);
+    public string PaymentsDisplay => CurrencyFormatter.Format(PaymentsCollected);
+    public string NetDisplay => CurrencyFormatter.Format(NetOutstanding);
+    public bool HasOutstanding => NetOutstanding > 0;
+}
+
+public class CreditAgingRow
+{
+    public int CustomerId { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
+    public decimal TotalBalance { get; set; }
+    public decimal DailyBalance { get; set; }
+    public decimal PartnerBalance { get; set; }
+    public int DaysSinceLastPayment { get; set; }
+    public DateTime? LastPaymentDate { get; set; }
+    public string AgingBucket { get; set; } = string.Empty;
+
+    public string BalanceDisplay => CurrencyFormatter.Format(TotalBalance);
+    public string LastPaymentDisplay => LastPaymentDate?.ToString("dd MMM yyyy") ?? "Never";
+    public string DaysDisplay => DaysSinceLastPayment == 0 ? "Today" : $"{DaysSinceLastPayment}d ago";
+    public bool IsCritical => DaysSinceLastPayment > 90;
+    public bool IsWarning => DaysSinceLastPayment > 30 && DaysSinceLastPayment <= 90;
+}
+
+public class PaymentHistoryRow
+{
+    public int PaymentId { get; set; }
+    public int CustomerId { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
+    public decimal Amount { get; set; }
+    public DateTime PaymentDate { get; set; }
+    public string BookType { get; set; } = string.Empty;
+    public string Notes { get; set; } = string.Empty;
+    public string SaleInfo { get; set; } = string.Empty;
+
+    public string AmountDisplay => CurrencyFormatter.Format(Amount);
+    public string DateDisplay => PaymentDate.ToString("dd MMM yyyy");
+    public string DetailDisplay => $"{BookType} book{SaleInfo}";
+}
+
+public class CreditTrendPoint
+{
+    public DateTime Date { get; set; }
+    public decimal NewCredit { get; set; }
+    public decimal Payments { get; set; }
+
+    public string DateLabel => Date.ToString("dd MMM");
+    public decimal Outstanding => NewCredit - Payments;
 }

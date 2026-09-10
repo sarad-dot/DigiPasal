@@ -326,11 +326,11 @@
                                 Style="{StaticResource MetricTitleStyle}" />
 
                             <Label
-                                Text="रु 70,335"
+                                Text="{Binding TodaySalesDisplay}"
                                 Style="{StaticResource MetricValueStyle}" />
 
                             <Label
-                                Text="⬆️ +12%"
+                                Text="{Binding TodaySalesCountDisplay}"
                                 Style="{StaticResource TrendStyle}"
                                 TextColor="{StaticResource SuccessGreen}" />
 
@@ -456,7 +456,7 @@
 
 
                     <Grid
-                        ColumnDefinitions="*,*,*,*"
+                        ColumnDefinitions="*,*"
                         ColumnSpacing="8">
 
 
@@ -502,9 +502,117 @@
                         </Border>
 
 
-                        <!-- BUY -->
+                        <!-- QUICK SALE -->
 
                         <Border
+                            Grid.Column="1"
+                            BackgroundColor="{StaticResource TealPrimary}"
+                            StrokeThickness="0"
+                            Padding="8"
+                            HeightRequest="82">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+
+                            <Border.GestureRecognizers>
+
+                                <TapGestureRecognizer
+                                    Tapped="QuickSaleAction_Tapped" />
+
+                            </Border.GestureRecognizers>
+
+                            <Grid
+                                ColumnDefinitions="Auto,*"
+                                ColumnSpacing="10"
+                                VerticalOptions="Center"
+                                HorizontalOptions="Center">
+
+                                <Label
+                                    Grid.Column="0"
+                                    Text="&#x26A1;"
+                                    FontSize="25"
+                                    VerticalOptions="Center" />
+
+                                <VerticalStackLayout Grid.Column="1" Spacing="1">
+                                    <Label
+                                        Text="Quick Sale"
+                                        FontSize="14"
+                                        FontAttributes="Bold"
+                                        TextColor="White" />
+                                    <Label
+                                        Text="Fast cash register"
+                                        FontSize="11"
+                                        TextColor="#CCFFFFFF" />
+                                </VerticalStackLayout>
+                            </Grid>
+
+                        </Border>
+
+                    </Grid>
+
+
+                    <Label
+                        Text="Reports"
+                        FontSize="14"
+                        FontAttributes="Bold"
+                        TextColor="{StaticResource TextPrimary}"
+                        Margin="0,6,0,0" />
+
+
+                    <Grid
+                        ColumnDefinitions="*,*"
+                        ColumnSpacing="8"
+                        RowSpacing="8">
+
+
+                        <!-- SALES REPORT -->
+
+                        <Border
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            BackgroundColor="{StaticResource SaleBlue}"
+                            StrokeThickness="0"
+                            Padding="8"
+                            HeightRequest="82">
+
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="12"/>
+                            </Border.StrokeShape>
+
+                            <Border.GestureRecognizers>
+
+                                <TapGestureRecognizer
+                                    Tapped="SalesReport_Tapped" />
+
+                            </Border.GestureRecognizers>
+
+                            <VerticalStackLayout
+                                Spacing="5"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center">
+
+                                <Label
+                                    Text="📄"
+                                    FontSize="25"
+                                    HorizontalTextAlignment="Center" />
+
+                                <Label
+                                    Text="Sales"
+                                    FontSize="12"
+                                    FontAttributes="Bold"
+                                    TextColor="{StaticResource SaleBlueText}"
+                                    HorizontalTextAlignment="Center" />
+
+                            </VerticalStackLayout>
+
+                        </Border>
+
+
+                        <!-- STOCK REPORT -->
+
+                        <Border
+                            Grid.Row="0"
                             Grid.Column="1"
                             BackgroundColor="{StaticResource BuyOrange}"
                             StrokeThickness="0"
@@ -518,7 +626,7 @@
                             <Border.GestureRecognizers>
 
                                 <TapGestureRecognizer
-                                    Tapped="BuyAction_Tapped" />
+                                    Tapped="StockReport_Tapped" />
 
                             </Border.GestureRecognizers>
 
@@ -533,7 +641,7 @@
                                     HorizontalTextAlignment="Center" />
 
                                 <Label
-                                    Text="Buy"
+                                    Text="Stock"
                                     FontSize="12"
                                     FontAttributes="Bold"
                                     TextColor="{StaticResource BuyOrangeText}"
@@ -544,10 +652,11 @@
                         </Border>
 
 
-                        <!-- MONEY IN -->
+                        <!-- PROFIT REPORT -->
 
                         <Border
-                            Grid.Column="2"
+                            Grid.Row="1"
+                            Grid.Column="0"
                             BackgroundColor="{StaticResource MoneyGreen}"
                             StrokeThickness="0"
                             Padding="8"
@@ -560,7 +669,7 @@
                             <Border.GestureRecognizers>
 
                                 <TapGestureRecognizer
-                                    Tapped="MoneyIn_Tapped" />
+                                    Tapped="ProfitReport_Tapped" />
 
                             </Border.GestureRecognizers>
 
@@ -570,12 +679,12 @@
                                 VerticalOptions="Center">
 
                                 <Label
-                                    Text="💰"
+                                    Text="📈"
                                     FontSize="25"
                                     HorizontalTextAlignment="Center" />
 
                                 <Label
-                                    Text="In"
+                                    Text="Profit"
                                     FontSize="12"
                                     FontAttributes="Bold"
                                     TextColor="{StaticResource MoneyGreenText}"
@@ -586,10 +695,11 @@
                         </Border>
 
 
-                        <!-- MONEY OUT -->
+                        <!-- CREDIT REPORT -->
 
                         <Border
-                            Grid.Column="3"
+                            Grid.Row="1"
+                            Grid.Column="1"
                             BackgroundColor="{StaticResource MoneyTeal}"
                             StrokeThickness="0"
                             Padding="8"
@@ -602,7 +712,7 @@
                             <Border.GestureRecognizers>
 
                                 <TapGestureRecognizer
-                                    Tapped="MoneyOut_Tapped" />
+                                    Tapped="CreditReport_Tapped" />
 
                             </Border.GestureRecognizers>
 
@@ -612,12 +722,12 @@
                                 VerticalOptions="Center">
 
                                 <Label
-                                    Text="💸"
+                                    Text="📊"
                                     FontSize="25"
                                     HorizontalTextAlignment="Center" />
 
                                 <Label
-                                    Text="Out"
+                                    Text="Credit"
                                     FontSize="12"
                                     FontAttributes="Bold"
                                     TextColor="{StaticResource MoneyTealText}"
@@ -629,48 +739,36 @@
 
                     </Grid>
 
-                    <!-- Quick Sale (spans 2 columns) -->
-                    <Grid ColumnDefinitions="*,*"
-                          ColumnSpacing="8"
-                          Margin="0,0,0,0">
-                        <Border
-                            Grid.Column="0"
-                            Grid.ColumnSpan="2"
-                            BackgroundColor="{StaticResource TealPrimary}"
-                            StrokeThickness="0"
-                            Padding="8"
-                            HeightRequest="82">
 
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="12"/>
-                            </Border.StrokeShape>
+                    <!-- ALL REPORTS -->
 
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer
-                                    Tapped="QuickSaleAction_Tapped" />
-                            </Border.GestureRecognizers>
+                    <Border
+                        BackgroundColor="{StaticResource CardBackground}"
+                        StrokeThickness="0"
+                        Padding="14"
+                        HeightRequest="48">
 
-                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12"
-                                  VerticalOptions="Center" HorizontalOptions="Center">
-                                <Label
-                                    Grid.Column="0"
-                                    Text="&#x26A1;"
-                                    FontSize="25"
-                                    VerticalOptions="Center" />
-                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
-                                    <Label
-                                        Text="Quick Sale"
-                                        FontSize="14"
-                                        FontAttributes="Bold"
-                                        TextColor="White" />
-                                    <Label
-                                        Text="Fast cash register"
-                                        FontSize="11"
-                                        TextColor="#CCFFFFFF" />
-                                </VerticalStackLayout>
-                            </Grid>
-                        </Border>
-                    </Grid>
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="12"/>
+                        </Border.StrokeShape>
+
+                        <Border.GestureRecognizers>
+
+                            <TapGestureRecognizer
+                                Tapped="Reports_Tapped" />
+
+                        </Border.GestureRecognizers>
+
+                        <Grid ColumnDefinitions="*,Auto" VerticalOptions="Center">
+                            <Label Text="All Reports" FontSize="14" FontAttributes="Bold"
+                                   TextColor="{StaticResource TealPrimary}" VerticalOptions="Center" />
+                            <Label Grid.Column="1" Text="›" FontSize="20"
+                                   TextColor="{StaticResource TealPrimary}" VerticalOptions="Center" />
+                        </Grid>
+
+                    </Border>
+
+                    
 
                 </VerticalStackLayout>
 

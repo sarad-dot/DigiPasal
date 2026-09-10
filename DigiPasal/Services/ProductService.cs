@@ -121,6 +121,28 @@ public class ProductService
             .ToListAsync();
     }
 
+    public async Task<List<StockRow>> GetStockValuationAsync(string? category = null)
+    {
+        var rows = await Database.QueryAsync<StockRow>(
+            "SELECT Id, Name, Category, Unit, StockQuantity, LowStockThreshold, " +
+            "SellingPrice, CostPrice, " +
+            "(StockQuantity * CostPrice) AS CostValue, " +
+            "(StockQuantity * SellingPrice) AS SellValue " +
+            "FROM Products WHERE IsActive = 1 " +
+            (string.IsNullOrWhiteSpace(category) || category == "All"
+                ? ""
+                : $"AND Category = ? ") +
+            "ORDER BY Name COLLATE NOCASE", category);
+
+        foreach (var row in rows)
+        {
+            row.IsLowStock = row.StockQuantity <= row.LowStockThreshold;
+            row.DisplayQuantity = $"{row.StockQuantity:N0} {row.Unit}";
+        }
+
+        return rows;
+    }
+
     private static List<Product> Filter(List<Product> products, string? query, string? category)
     {
         if (products == null || products.Count == 0)
@@ -148,4 +170,20 @@ public class ProductService
             .OrderBy(p => p.Name, StringComparer.OrdinalIgnoreCase)
             .ToList();
     }
+}
+
+public class StockRow
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string Category { get; set; } = string.Empty;
+    public string Unit { get; set; } = "pcs";
+    public double StockQuantity { get; set; }
+    public double LowStockThreshold { get; set; }
+    public decimal SellingPrice { get; set; }
+    public decimal CostPrice { get; set; }
+    public decimal CostValue { get; set; }
+    public decimal SellValue { get; set; }
+    public bool IsLowStock { get; set; }
+    public string DisplayQuantity { get; set; } = string.Empty;
 }

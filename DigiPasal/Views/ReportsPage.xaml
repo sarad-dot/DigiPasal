@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="DigiPasal.Views.ReportsPage"
+             Title="Reports"
+             Shell.TabBarIsVisible="False"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="12">
+
+            <Label Text="All Reports" FontSize="20" FontAttributes="Bold"
+                   TextColor="{StaticResource TextPrimary}" Margin="4,8,0,4" />
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12" RowSpacing="12">
+
+                <!-- Sales Report -->
+                <Border Grid.Row="0" Grid.Column="0" Padding="16"
+                        StrokeThickness="0" BackgroundColor="{StaticResource CardBackground}"
+                        StrokeShape="RoundRectangle 14">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="SalesReport_Tapped" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="10">
+                        <Border WidthRequest="40" HeightRequest="40"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource SaleBlue}">
+                            <Label Text="📄" FontSize="16" FontAttributes="Bold"
+                                   TextColor="{StaticResource SaleBlueText}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Text="Sales Report" FontSize="14" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <Label Text="Daily sales, cash &amp; credit" FontSize="12"
+                               TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Stock Report -->
+                <Border Grid.Row="0" Grid.Column="1" Padding="16"
+                        StrokeThickness="0" BackgroundColor="{StaticResource CardBackground}"
+                        StrokeShape="RoundRectangle 14">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="StockReport_Tapped" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="10">
+                        <Border WidthRequest="40" HeightRequest="40"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource BuyOrange}">
+                            <Label Text="📦" FontSize="16" FontAttributes="Bold"
+                                   TextColor="{StaticResource BuyOrangeText}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Text="Stock Report" FontSize="14" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <Label Text="Quantity, value &amp; low stock" FontSize="12"
+                               TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Profit Report -->
+                <Border Grid.Row="1" Grid.Column="0" Padding="16"
+                        StrokeThickness="0" BackgroundColor="{StaticResource CardBackground}"
+                        StrokeShape="RoundRectangle 14">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="ProfitReport_Tapped" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="10">
+                        <Border WidthRequest="40" HeightRequest="40"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource MoneyGreen}">
+                            <Label Text="📈" FontSize="16" FontAttributes="Bold"
+                                   TextColor="{StaticResource MoneyGreenText}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Text="Profit Report" FontSize="14" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <Label Text="Revenue vs estimated COGS" FontSize="12"
+                               TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Credit Report -->
+                <Border Grid.Row="1" Grid.Column="1" Padding="16"
+                        StrokeThickness="0" BackgroundColor="{StaticResource CardBackground}"
+                        StrokeShape="RoundRectangle 14">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="CreditReport_Tapped" />
+                    </Border.GestureRecognizers>
+                    <VerticalStackLayout Spacing="10">
+                        <Border WidthRequest="40" HeightRequest="40"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource MoneyTeal}">
+                            <Label Text="📊" FontSize="16" FontAttributes="Bold"
+                                   TextColor="{StaticResource MoneyTealText}"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Text="Credit Report" FontSize="14" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <Label Text="Aging, summary &amp; payments" FontSize="12"
+                               TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

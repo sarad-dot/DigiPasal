@@ -8,238 +8,392 @@
              x:DataType="vm:QuickSaleViewModel"
              BackgroundColor="{StaticResource AppBackground}">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Style x:Key="DigitKey" TargetType="Button">
+                <Setter Property="FontSize" Value="24" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="14" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="MinimumHeightRequest" Value="54" />
+                <Setter Property="BackgroundColor" Value="{StaticResource InputBg}" />
+                <Setter Property="TextColor" Value="{StaticResource TextPrimary}" />
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal" />
+                            <VisualState x:Name="Disabled">
+                                <VisualState.Setters>
+                                    <Setter Property="Opacity" Value="0.35" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#E5E5E5" />
+                                    <Setter Property="Scale" Value="0.94" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+
+            <Style x:Key="FunctionKey" TargetType="Button">
+                <Setter Property="FontSize" Value="22" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="14" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="MinimumHeightRequest" Value="54" />
+                <Setter Property="BackgroundColor" Value="{StaticResource TealLight}" />
+                <Setter Property="TextColor" Value="{StaticResource TealPrimary}" />
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal" />
+                            <VisualState x:Name="Disabled">
+                                <VisualState.Setters>
+                                    <Setter Property="Opacity" Value="0.35" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#C8E6DE" />
+                                    <Setter Property="Scale" Value="0.94" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+
+            <Style x:Key="ClearKey" TargetType="Button">
+                <Setter Property="FontSize" Value="22" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="14" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="MinimumHeightRequest" Value="54" />
+                <Setter Property="BackgroundColor" Value="#FFEBEE" />
+                <Setter Property="TextColor" Value="{StaticResource ErrorRed}" />
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal" />
+                            <VisualState x:Name="Disabled">
+                                <VisualState.Setters>
+                                    <Setter Property="Opacity" Value="0.35" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#F5CFCF" />
+                                    <Setter Property="Scale" Value="0.94" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+
+            <Style x:Key="AddKey" TargetType="Button">
+                <Setter Property="FontSize" Value="32" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="14" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="MinimumHeightRequest" Value="54" />
+                <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal" />
+                            <VisualState x:Name="Disabled">
+                                <VisualState.Setters>
+                                    <Setter Property="Opacity" Value="0.4" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#00584B" />
+                                    <Setter Property="Scale" Value="0.95" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+
+            <Style x:Key="CompleteButton" TargetType="Button">
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="HeightRequest" Value="54" />
+                <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                <Setter Property="TextColor" Value="White" />
+                <Setter Property="VisualStateManager.VisualStateGroups">
+                    <VisualStateGroupList>
+                        <VisualStateGroup x:Name="CommonStates">
+                            <VisualState x:Name="Normal" />
+                            <VisualState x:Name="Disabled">
+                                <VisualState.Setters>
+                                    <Setter Property="Opacity" Value="0.4" />
+                                </VisualState.Setters>
+                            </VisualState>
+                            <VisualState x:Name="Pressed">
+                                <VisualState.Setters>
+                                    <Setter Property="BackgroundColor" Value="#00584B" />
+                                    <Setter Property="Scale" Value="0.98" />
+                                </VisualState.Setters>
+                            </VisualState>
+                        </VisualStateGroup>
+                    </VisualStateGroupList>
+                </Setter>
+            </Style>
+
+            <Style x:Key="FieldRow" TargetType="Border">
+                <Setter Property="Stroke" Value="{StaticResource InputStroke}" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="BackgroundColor" Value="{StaticResource InputBg}" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+                <Setter Property="Padding" Value="12,0" />
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <Grid RowDefinitions="Auto,*,Auto" Padding="0" RowSpacing="0">
 
-        <!-- Display -->
-        <Border Grid.Row="0" Margin="16,12,16,8" Padding="20,18"
+        <!-- ================================================================ -->
+        <!-- Display                                                          -->
+        <!-- ================================================================ -->
+        <Border Grid.Row="0" Margin="16,12,16,10" Padding="18,16"
                 StrokeThickness="0"
                 BackgroundColor="{StaticResource CardBackground}">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="16"/>
+                <RoundRectangle CornerRadius="16" />
             </Border.StrokeShape>
             <Border.Shadow>
-                <Shadow Brush="Black" Offset="0,2" Radius="12" Opacity="0.08"/>
+                <Shadow Brush="Black" Offset="0,2" Radius="12" Opacity="0.07" />
             </Border.Shadow>
-            <VerticalStackLayout Spacing="6">
+            <VerticalStackLayout Spacing="8">
+
+                <!-- Running breakdown / hint -->
                 <Label Text="{Binding ExpressionHint}"
                        FontSize="13"
                        TextColor="{StaticResource TextSecondary}"
-                       LineBreakMode="TailTruncation" />
-                <Label Text="{Binding CurrentEntryDisplay}"
-                       FontSize="22"
-                       TextColor="{StaticResource TextSecondary}"
-                       HorizontalTextAlignment="End"
-                       LineBreakMode="TailTruncation" />
-                <Grid ColumnDefinitions="Auto,*">
-                    <Label Grid.Column="0" Text="Total"
-                           FontSize="14" FontAttributes="Bold"
+                       LineBreakMode="TailTruncation"
+                       HorizontalTextAlignment="End" />
+
+                <!-- Current entry pill -->
+                <Border HorizontalOptions="End"
+                        Padding="14,6"
+                        StrokeThickness="0"
+                        BackgroundColor="{StaticResource TealLight}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12" />
+                    </Border.StrokeShape>
+                    <Label Text="{Binding CurrentEntryDisplay}"
+                           FontSize="28" FontAttributes="Bold"
                            TextColor="{StaticResource TealPrimary}"
-                           VerticalTextAlignment="End"
-                           Margin="0,0,8,4" />
+                           LineBreakMode="TailTruncation" />
+                </Border>
+
+                <!-- Sum chip (visible while building the total) -->
+                <Border IsVisible="{Binding HasSum}"
+                        HorizontalOptions="End"
+                        Padding="10,2"
+                        StrokeThickness="0"
+                        BackgroundColor="{StaticResource MoneyTeal}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="8" />
+                    </Border.StrokeShape>
+                    <Label Text="{Binding SumDisplay, StringFormat='Sum so far: {0}'}"
+                           FontSize="12"
+                           TextColor="{StaticResource MoneyTealText}" />
+                </Border>
+
+                <!-- Grand total -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Margin="0,2,0,0">
+                    <Label Text="Total" FontSize="13" FontAttributes="Bold"
+                           TextColor="{StaticResource TealPrimary}"
+                           VerticalTextAlignment="End" />
                     <Label Grid.Column="1"
                            Text="{Binding AmountDisplay}"
-                           FontSize="40" FontAttributes="Bold"
+                           FontSize="42" FontAttributes="Bold"
                            TextColor="{StaticResource TextPrimary}"
                            HorizontalTextAlignment="End"
-                           LineBreakMode="TailTruncation"
-                           VerticalTextAlignment="Center" />
+                           LineBreakMode="TailTruncation" />
                 </Grid>
             </VerticalStackLayout>
         </Border>
 
-        <!-- Calculator pad -->
-        <Border Grid.Row="1" Margin="16,0,16,8" Padding="10"
-                StrokeThickness="0"
+        <!-- ================================================================ -->
+        <!-- Calculator pad                                                   -->
+        <!-- ================================================================ -->
+        <Border Grid.Row="1" Margin="16,0,16,10" Padding="8"
+                StrokeThickness="1"
+                Stroke="{StaticResource InputStroke}"
                 BackgroundColor="{StaticResource CardBackground}">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="16"/>
+                <RoundRectangle CornerRadius="16" />
             </Border.StrokeShape>
-            <Border.Shadow>
-                <Shadow Brush="Black" Offset="0,2" Radius="10" Opacity="0.06"/>
-            </Border.Shadow>
             <Grid RowDefinitions="*,*,*,*" ColumnDefinitions="*,*,*,*"
                   ColumnSpacing="8" RowSpacing="8">
 
                 <!-- Row 1 -->
                 <Button Grid.Row="0" Grid.Column="0" Text="7"
-                        Command="{Binding DigitCommand}" CommandParameter="7"
-                        BackgroundColor="{StaticResource InputBg}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="24" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0" />
+                        Style="{StaticResource DigitKey}"
+                        Command="{Binding DigitCommand}" CommandParameter="7" />
                 <Button Grid.Row="0" Grid.Column="1" Text="8"
-                        Command="{Binding DigitCommand}" CommandParameter="8"
-                        BackgroundColor="{StaticResource InputBg}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="24" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0" />
+                        Style="{StaticResource DigitKey}"
+                        Command="{Binding DigitCommand}" CommandParameter="8" />
                 <Button Grid.Row="0" Grid.Column="2" Text="9"
-                        Command="{Binding DigitCommand}" CommandParameter="9"
-                        BackgroundColor="{StaticResource InputBg}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="24" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0" />
+                        Style="{StaticResource DigitKey}"
+                        Command="{Binding DigitCommand}" CommandParameter="9" />
                 <Button Grid.Row="0" Grid.Column="3" Text="⌫"
-                        Command="{Binding BackspaceCommand}"
-                        BackgroundColor="{StaticResource TealLight}"
-                        TextColor="{StaticResource TealPrimary}"
-                        FontSize="22" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0" />
+                        Style="{StaticResource FunctionKey}"
+                        Command="{Binding BackspaceCommand}" />
 
                 <!-- Row 2 -->
                 <Button Grid.Row="1" Grid.Column="0" Text="4"
-                        Command="{Binding DigitCommand}" CommandParameter="4"
-                        BackgroundColor="{StaticResource InputBg}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="24" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0" />
+                        Style="{StaticResource DigitKey}"
+                        Command="{Binding DigitCommand}" CommandParameter="4" />
                 <Button Grid.Row="1" Grid.Column="1" Text="5"
-                        Command="{Binding DigitCommand}" CommandParameter="5"
-                        BackgroundColor="{StaticResource InputBg}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="24" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0" />
+                        Style="{StaticResource DigitKey}"
+                        Command="{Binding DigitCommand}" CommandParameter="5" />
                 <Button Grid.Row="1" Grid.Column="2" Text="6"
-                        Command="{Binding DigitCommand}" CommandParameter="6"
-                        BackgroundColor="{StaticResource InputBg}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="24" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0" />
+                        Style="{StaticResource DigitKey}"
+                        Command="{Binding DigitCommand}" CommandParameter="6" />
                 <Button Grid.Row="1" Grid.Column="3" Text="C"
-                        Command="{Binding ClearCommand}"
-                        BackgroundColor="#FFEBEE"
-                        TextColor="{StaticResource ErrorRed}"
-                        FontSize="22" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0" />
+                        Style="{StaticResource ClearKey}"
+                        Command="{Binding ClearCommand}" />
 
                 <!-- Row 3 -->
                 <Button Grid.Row="2" Grid.Column="0" Text="1"
-                        Command="{Binding DigitCommand}" CommandParameter="1"
-                        BackgroundColor="{StaticResource InputBg}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="24" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0" />
+                        Style="{StaticResource DigitKey}"
+                        Command="{Binding DigitCommand}" CommandParameter="1" />
                 <Button Grid.Row="2" Grid.Column="1" Text="2"
-                        Command="{Binding DigitCommand}" CommandParameter="2"
-                        BackgroundColor="{StaticResource InputBg}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="24" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0" />
+                        Style="{StaticResource DigitKey}"
+                        Command="{Binding DigitCommand}" CommandParameter="2" />
                 <Button Grid.Row="2" Grid.Column="2" Text="3"
-                        Command="{Binding DigitCommand}" CommandParameter="3"
-                        BackgroundColor="{StaticResource InputBg}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="24" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0" />
+                        Style="{StaticResource DigitKey}"
+                        Command="{Binding DigitCommand}" CommandParameter="3" />
                 <Button Grid.Row="2" Grid.Column="3" Grid.RowSpan="2" Text="+"
+                        Style="{StaticResource AddKey}"
                         Command="{Binding AddToSumCommand}"
-                        BackgroundColor="{StaticResource TealPrimary}"
-                        TextColor="White"
-                        FontSize="36" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0"
                         VerticalOptions="Fill" />
 
                 <!-- Row 4 -->
                 <Button Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Text="0"
-                        Command="{Binding DigitCommand}" CommandParameter="0"
-                        BackgroundColor="{StaticResource InputBg}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="24" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0" />
+                        Style="{StaticResource DigitKey}"
+                        Command="{Binding DigitCommand}" CommandParameter="0" />
                 <Button Grid.Row="3" Grid.Column="2" Text="."
-                        Command="{Binding DecimalCommand}"
-                        BackgroundColor="{StaticResource InputBg}"
-                        TextColor="{StaticResource TextPrimary}"
-                        FontSize="24" FontAttributes="Bold"
-                        CornerRadius="12" Padding="0" />
+                        Style="{StaticResource DigitKey}"
+                        Command="{Binding DecimalCommand}" />
             </Grid>
         </Border>
 
-        <!-- Checkout strip -->
+        <!-- ================================================================ -->
+        <!-- Checkout strip                                                    -->
+        <!-- ================================================================ -->
         <Border Grid.Row="2"
                 StrokeThickness="0"
                 BackgroundColor="{StaticResource CardBackground}"
                 Padding="16,12,16,16">
             <Border.StrokeShape>
-                <RoundRectangle CornerRadius="16,16,0,0"/>
+                <RoundRectangle CornerRadius="16,16,0,0" />
             </Border.StrokeShape>
             <Border.Shadow>
-                <Shadow Brush="Black" Offset="0,-2" Radius="12" Opacity="0.08"/>
+                <Shadow Brush="Black" Offset="0,-2" Radius="12" Opacity="0.06" />
             </Border.Shadow>
             <VerticalStackLayout Spacing="10">
-                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                    <Border Grid.Column="0"
-                            Stroke="{StaticResource InputStroke}" StrokeThickness="1"
-                            BackgroundColor="{StaticResource InputBg}" HeightRequest="44">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="10"/>
-                        </Border.StrokeShape>
-                        <Label Text="{Binding SelectedCustomerDisplay}"
-                               FontSize="13" VerticalTextAlignment="Center"
-                               TextColor="{StaticResource TextSecondary}" Margin="12,0"
-                               LineBreakMode="TailTruncation" />
-                    </Border>
-                    <Button Grid.Column="1" Text="Select"
-                            Command="{Binding SelectCustomerCommand}"
-                            BackgroundColor="{StaticResource TealLight}"
-                            TextColor="{StaticResource TealPrimary}"
-                            FontSize="13" FontAttributes="Bold"
-                            HeightRequest="44" CornerRadius="10" Padding="16,0" />
-                </Grid>
 
+                <!-- Customer picker: full-width tappable row -->
+                <Border Style="{StaticResource FieldRow}" HeightRequest="52">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding SelectCustomerCommand}" />
+                    </Border.GestureRecognizers>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <VerticalStackLayout VerticalOptions="Center" Spacing="0">
+                            <Label Text="Customer" FontSize="11"
+                                   TextColor="{StaticResource TextSecondary}" />
+                            <Label Text="{Binding SelectedCustomerDisplay}"
+                                   FontSize="14" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   LineBreakMode="TailTruncation" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="1" Text="›" FontSize="24"
+                               TextColor="{StaticResource TealPrimary}"
+                               VerticalTextAlignment="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- Credit toggle -->
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                     <Label Grid.Column="0" Text="Credit Sale" FontSize="14"
                            TextColor="{StaticResource TextPrimary}"
                            VerticalTextAlignment="Center" />
                     <Switch Grid.Column="1" IsToggled="{Binding IsCreditSale}"
                             OnColor="{StaticResource TealPrimary}"
-                            ThumbColor="{StaticResource TealPrimary}" />
+                            ThumbColor="White" />
                 </Grid>
 
-                <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
-                        BackgroundColor="{StaticResource InputBg}" HeightRequest="44"
-                        IsVisible="{Binding ShowCreditNameField}"
-                        Padding="12,0">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="10"/>
-                    </Border.StrokeShape>
+                <!-- Credit customer name -->
+                <Border Style="{StaticResource FieldRow}" HeightRequest="52"
+                        IsVisible="{Binding ShowCreditNameField}">
                     <Entry Text="{Binding CreditCustomerName}" Placeholder="Customer name (Walk-in)"
                            Keyboard="Text"
                            FontSize="15"
                            BackgroundColor="Transparent"
                            TextColor="{StaticResource TextPrimary}"
-                           PlaceholderColor="{StaticResource Gray400}" />
+                           PlaceholderColor="{StaticResource Gray400}"
+                           VerticalOptions="Center" />
                 </Border>
 
+                <!-- Credit amount paid + due -->
                 <VerticalStackLayout Spacing="6" IsVisible="{Binding IsCreditSale}">
-                    <Label Text="Amount Paid" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" />
-                    <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
-                            BackgroundColor="{StaticResource InputBg}" HeightRequest="44"
-                            Padding="12,0">
-                        <Border.StrokeShape>
-                            <RoundRectangle CornerRadius="10"/>
-                        </Border.StrokeShape>
-                        <Entry Text="{Binding AmountPaid}" Placeholder="0.00"
-                               Keyboard="Numeric"
-                               FontSize="15"
-                               BackgroundColor="Transparent"
-                               TextColor="{StaticResource TextPrimary}"
-                               PlaceholderColor="{StaticResource Gray400}" />
-                    </Border>
-                    <Label Text="{Binding CreditDisplay, StringFormat='Due: {0}'}" FontSize="13"
-                           TextColor="{StaticResource ErrorRed}" FontAttributes="Bold" />
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Border Style="{StaticResource FieldRow}" HeightRequest="52"
+                                Grid.Column="0">
+                            <Entry Text="{Binding AmountPaid}" Placeholder="0.00"
+                                   Keyboard="Numeric"
+                                   FontSize="16"
+                                   BackgroundColor="Transparent"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   PlaceholderColor="{StaticResource Gray400}"
+                                   VerticalOptions="Center" />
+                        </Border>
+                        <Border Grid.Column="1" Padding="12,0"
+                                StrokeThickness="0" HeightRequest="52"
+                                BackgroundColor="{StaticResource MoneyTeal}"
+                                VerticalOptions="Start">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="10" />
+                            </Border.StrokeShape>
+                            <Label Text="{Binding CreditDisplay, StringFormat='Due: {0}'}"
+                                   FontSize="13" FontAttributes="Bold"
+                                   TextColor="{StaticResource ErrorRed}"
+                                   VerticalTextAlignment="Center" />
+                        </Border>
+                    </Grid>
                 </VerticalStackLayout>
 
-                <Button Text="{Binding AmountDisplay, StringFormat='Complete Sale — {0}'}"
-                        Command="{Binding CompleteSaleCommand}"
-                        IsEnabled="{Binding CanComplete}"
-                        BackgroundColor="{StaticResource TealPrimary}"
-                        TextColor="White"
-                        FontAttributes="Bold"
-                        FontSize="16"
-                        HeightRequest="52"
-                        CornerRadius="12" />
+                <!-- Complete sale -->
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                    <Button Grid.Column="0" Text="Complete Sale"
+                            Style="{StaticResource CompleteButton}"
+                            Command="{Binding CompleteSaleCommand}"
+                            IsEnabled="{Binding IsNotCompleting}" />
+                    <ActivityIndicator Grid.Column="1" WidthRequest="24" HeightRequest="24"
+                                       IsRunning="{Binding IsCompleting}"
+                                       IsVisible="{Binding IsCompleting}"
+                                       Color="{StaticResource TealPrimary}"
+                                       VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="{Binding AmountDisplay}"
+                           FontSize="20" FontAttributes="Bold"
+                           TextColor="{StaticResource TealPrimary}"
+                           VerticalTextAlignment="Center" />
+                </Grid>
             </VerticalStackLayout>
         </Border>
     </Grid>

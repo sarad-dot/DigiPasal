@@ -1,0 +1,480 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             xmlns:svc="clr-namespace:DigiPasal.Services"
+             x:Class="DigiPasal.Views.CreditReportsPage"
+             Title="Credit Reports"
+             Shell.TabBarIsVisible="False"
+             Shell.NavBarIsVisible="True"
+             x:DataType="vm:CreditReportsViewModel"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="0">
+
+        <!-- Overview summary cards -->
+        <Border Grid.Row="0" Padding="16,12" StrokeThickness="0">
+            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                <Border Grid.Column="0" StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{StaticResource TealLight}" Padding="10,8">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Total Outstanding" FontSize="10"
+                               TextColor="{StaticResource TealPrimary}" />
+                        <Label Text="{Binding TotalOutstandingDisplay}" FontSize="14" FontAttributes="Bold"
+                               TextColor="{StaticResource TealPrimary}" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="1" StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{StaticResource MoneyGreen}" Padding="10,8">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Collected" FontSize="10"
+                               TextColor="{StaticResource MoneyGreenText}" />
+                        <Label Text="{Binding TotalPaymentsDisplay}" FontSize="14" FontAttributes="Bold"
+                               TextColor="{StaticResource MoneyGreenText}" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="2" StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{StaticResource SaleBlue}" Padding="10,8">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="New Credit" FontSize="10"
+                               TextColor="{StaticResource SaleBlueText}" />
+                        <Label Text="{Binding TotalNewCreditDisplay}" FontSize="14" FontAttributes="Bold"
+                               TextColor="{StaticResource SaleBlueText}" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Tab buttons -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" Padding="16,8" ColumnSpacing="6"
+              BackgroundColor="{StaticResource CardBackground}">
+            <Button Grid.Column="0" Text="Summary" FontAttributes="Bold" FontSize="12"
+                    HeightRequest="36" CornerRadius="8"
+                    Command="{Binding SwitchTabCommand}"
+                    CommandParameter="0"
+                    BackgroundColor="{StaticResource TealLight}"
+                    TextColor="{StaticResource TealPrimary}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsSummaryTab}" Value="True">
+                        <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                        <Setter Property="TextColor" Value="White" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Grid.Column="1" Text="Aging" FontAttributes="Bold" FontSize="12"
+                    HeightRequest="36" CornerRadius="8"
+                    Command="{Binding SwitchTabCommand}"
+                    CommandParameter="1"
+                    BackgroundColor="{StaticResource TealLight}"
+                    TextColor="{StaticResource TealPrimary}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsAgingTab}" Value="True">
+                        <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                        <Setter Property="TextColor" Value="White" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Grid.Column="2" Text="Payments" FontAttributes="Bold" FontSize="12"
+                    HeightRequest="36" CornerRadius="8"
+                    Command="{Binding SwitchTabCommand}"
+                    CommandParameter="2"
+                    BackgroundColor="{StaticResource TealLight}"
+                    TextColor="{StaticResource TealPrimary}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsPaymentsTab}" Value="True">
+                        <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                        <Setter Property="TextColor" Value="White" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Grid.Column="3" Text="Trend" FontAttributes="Bold" FontSize="12"
+                    HeightRequest="36" CornerRadius="8"
+                    Command="{Binding SwitchTabCommand}"
+                    CommandParameter="3"
+                    BackgroundColor="{StaticResource TealLight}"
+                    TextColor="{StaticResource TealPrimary}">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsTrendTab}" Value="True">
+                        <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                        <Setter Property="TextColor" Value="White" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+        </Grid>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- TAB: Daily Summary                                      -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="2" Grid.RowSpan="2" RowDefinitions="Auto,Auto,*"
+              IsVisible="{Binding IsSummaryTab}">
+            <!-- Date range controls -->
+            <Border Grid.Row="0" Padding="16,10" StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="8">
+                    <Label Grid.Column="0" Text="From" FontSize="12"
+                           TextColor="{StaticResource TextSecondary}" VerticalTextAlignment="Center" />
+                    <DatePicker Grid.Column="1" Date="{Binding SummaryFromDate}"
+                                Format="dd MMM yyyy" HeightRequest="36"
+                                TextColor="{StaticResource TextPrimary}" />
+                    <Label Grid.Column="2" Text="To" FontSize="12"
+                           TextColor="{StaticResource TextSecondary}" VerticalTextAlignment="Center" />
+                    <DatePicker Grid.Column="3" Date="{Binding SummaryToDate}"
+                                Format="dd MMM yyyy" HeightRequest="36"
+                                TextColor="{StaticResource TextPrimary}" />
+                    <Button Grid.Column="4" Text="Export CSV" FontSize="12" FontAttributes="Bold"
+                            HeightRequest="36" Padding="10,0"
+                            Command="{Binding ExportCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="{StaticResource TealLight}"
+                            TextColor="{StaticResource TealPrimary}"
+                            CornerRadius="8" />
+                </Grid>
+            </Border>
+
+            <!-- Summary stats -->
+            <Border Grid.Row="1" Margin="16,8,16,0" Padding="12,8"
+                    StrokeShape="RoundRectangle 8" StrokeThickness="0"
+                    BackgroundColor="{StaticResource TealLight}"
+                    HorizontalOptions="Start" VerticalOptions="Start">
+                <HorizontalStackLayout Spacing="16">
+                    <VerticalStackLayout Spacing="1">
+                        <Label Text="Credit Issued" FontSize="10" TextColor="{StaticResource TealPrimary}" />
+                        <Label Text="{Binding SummaryNewCreditDisplay}" FontSize="13" FontAttributes="Bold"
+                               TextColor="{StaticResource TealPrimary}" />
+                    </VerticalStackLayout>
+                    <BoxView WidthRequest="1" HeightRequest="28" Color="{StaticResource DividerColor}"
+                             VerticalOptions="Center" />
+                    <VerticalStackLayout Spacing="1">
+                        <Label Text="Collected" FontSize="10" TextColor="{StaticResource SuccessGreen}" />
+                        <Label Text="{Binding SummaryPaymentsDisplay}" FontSize="13" FontAttributes="Bold"
+                               TextColor="{StaticResource SuccessGreen}" />
+                    </VerticalStackLayout>
+                </HorizontalStackLayout>
+            </Border>
+
+            <CollectionView Grid.Row="2" ItemsSource="{Binding SummaryRows}"
+                            SelectionMode="None" BackgroundColor="{StaticResource AppBackground}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="0,40" HorizontalOptions="Center" Spacing="8">
+                        <Label Text="No data for selected range" FontSize="16" FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.Header>
+                    <Grid Padding="16,4,16,4" ColumnDefinitions="*,Auto,Auto,Auto">
+                        <Label Text="Date" FontSize="11" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Column="1" Text="Credit" FontSize="11" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="End" />
+                        <Label Grid.Column="2" Text="Collected" FontSize="11" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="End" />
+                        <Label Grid.Column="3" Text="Net" FontSize="11" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="End" />
+                    </Grid>
+                </CollectionView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="svc:DailyCreditSummaryRow">
+                        <Border Padding="14,10" Margin="8,3"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource CardBackground}">
+                            <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="16">
+                                <Label Grid.Column="0" Text="{Binding DateDisplay}" FontSize="13"
+                                       TextColor="{StaticResource TextPrimary}" VerticalTextAlignment="Center" />
+                                <Label Grid.Column="1" Text="{Binding CreditSalesDisplay}" FontSize="13"
+                                       FontAttributes="Bold" TextColor="{StaticResource ErrorRed}"
+                                       HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                <Label Grid.Column="2" Text="{Binding PaymentsDisplay}" FontSize="13"
+                                       FontAttributes="Bold" TextColor="{StaticResource SuccessGreen}"
+                                       HorizontalTextAlignment="End" VerticalTextAlignment="Center" />
+                                <Label Grid.Column="3" Text="{Binding NetDisplay}" FontSize="13"
+                                       FontAttributes="Bold" TextColor="{StaticResource SecondaryGold}"
+                                       HorizontalTextAlignment="End" VerticalTextAlignment="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label" Binding="{Binding HasOutstanding}" Value="False">
+                                            <Setter Property="TextColor" Value="{StaticResource SuccessGreen}" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- TAB: Customer Aging                                     -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="2" Grid.RowSpan="2" RowDefinitions="Auto,*,Auto"
+              IsVisible="{Binding IsAgingTab}">
+            <!-- Aging summary -->
+            <Border Grid.Row="0" Padding="16,10" StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}">
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12">
+                    <VerticalStackLayout Spacing="1">
+                        <Label Text="{Binding TotalCustomersDisplay}" FontSize="12" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <Label Text="{Binding TotalOutstandingDisplay}" FontSize="12" FontAttributes="Bold"
+                               TextColor="{StaticResource ErrorRed}" />
+                        <Label Text="{Binding CriticalCountDisplay}" FontSize="10"
+                               TextColor="{StaticResource DangerRed}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="1" HorizontalOptions="End">
+                        <Label Text="{Binding TotalDailyOutstandingDisplay}" FontSize="11"
+                               TextColor="{StaticResource TextSecondary}" />
+                        <Label Text="Daily" FontSize="10" TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout Spacing="1" HorizontalOptions="End">
+                        <Label Text="{Binding TotalPartnerOutstandingDisplay}" FontSize="11"
+                               TextColor="{StaticResource TextSecondary}" />
+                        <Label Text="Partner" FontSize="10" TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                    <Button Grid.Column="3" Text="Export CSV" FontSize="11" FontAttributes="Bold"
+                            HeightRequest="36" Padding="10,0"
+                            Command="{Binding ExportCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="{StaticResource TealLight}"
+                            TextColor="{StaticResource TealPrimary}"
+                            CornerRadius="8"
+                            VerticalOptions="Center" />
+                </Grid>
+            </Border>
+
+            <CollectionView Grid.Row="1" ItemsSource="{Binding AgingRows}"
+                            SelectionMode="None" BackgroundColor="{StaticResource AppBackground}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="0,40" HorizontalOptions="Center" Spacing="8">
+                        <Label Text="No outstanding balances" FontSize="16" FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.Header>
+                    <Grid Padding="16,4,16,4" ColumnDefinitions="*,Auto,Auto">
+                        <Label Text="Customer" FontSize="11" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" />
+                        <Label Grid.Column="1" Text="Balance" FontSize="11" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="End" />
+                        <Label Grid.Column="2" Text="Aging" FontSize="11" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="End" />
+                    </Grid>
+                </CollectionView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="svc:CreditAgingRow">
+                        <Border Padding="14,10" Margin="8,3"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource CardBackground}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="AgingRow_Tapped" />
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                    <Label Text="{Binding CustomerName}" FontSize="14" FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}" />
+                                    <Label FontSize="11" TextColor="{StaticResource TextSecondary}">
+                                        <Label.Text>
+                                            <MultiBinding StringFormat="Last payment: {0}">
+                                                <Binding Path="LastPaymentDisplay" />
+                                            </MultiBinding>
+                                        </Label.Text>
+                                    </Label>
+                                </VerticalStackLayout>
+                                <Label Grid.Column="1" Text="{Binding BalanceDisplay}" FontSize="14" FontAttributes="Bold"
+                                       TextColor="{StaticResource ErrorRed}"
+                                       VerticalTextAlignment="Center" HorizontalTextAlignment="End" />
+                                <Border Grid.Column="2" StrokeShape="RoundRectangle 6"
+                                        Padding="8,4" VerticalOptions="Center"
+                                        BackgroundColor="{StaticResource TealLight}">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsCritical}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#FFEBEE" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsWarning}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="#FFF3E0" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{Binding AgingBucket}" FontSize="10" FontAttributes="Bold"
+                                           TextColor="{StaticResource TealPrimary}">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsCritical}" Value="True">
+                                                <Setter Property="TextColor" Value="{StaticResource DangerRed}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsWarning}" Value="True">
+                                                <Setter Property="TextColor" Value="#EF6C00" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <!-- Aging legend -->
+            <Border Grid.Row="2" Padding="16,8" StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}">
+                <HorizontalStackLayout Spacing="12">
+                    <HorizontalStackLayout Spacing="4">
+                        <BoxView WidthRequest="8" HeightRequest="8" Color="{StaticResource SuccessGreen}"
+                                 CornerRadius="4" VerticalOptions="Center" />
+                        <Label Text="0-30d" FontSize="10" TextColor="{StaticResource TextSecondary}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="4">
+                        <BoxView WidthRequest="8" HeightRequest="8" Color="#EF6C00"
+                                 CornerRadius="4" VerticalOptions="Center" />
+                        <Label Text="31-90d" FontSize="10" TextColor="{StaticResource TextSecondary}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="4">
+                        <BoxView WidthRequest="8" HeightRequest="8" Color="{StaticResource DangerRed}"
+                                 CornerRadius="4" VerticalOptions="Center" />
+                        <Label Text="90+d" FontSize="10" TextColor="{StaticResource TextSecondary}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </HorizontalStackLayout>
+            </Border>
+        </Grid>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- TAB: Payment History                                    -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="2" Grid.RowSpan="2" RowDefinitions="Auto,*"
+              IsVisible="{Binding IsPaymentsTab}">
+            <!-- Date range controls -->
+            <Border Grid.Row="0" Padding="16,10" StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="8">
+                    <Label Grid.Column="0" Text="From" FontSize="12"
+                           TextColor="{StaticResource TextSecondary}" VerticalTextAlignment="Center" />
+                    <DatePicker Grid.Column="1" Date="{Binding HistoryFromDate}"
+                                Format="dd MMM yyyy" HeightRequest="36"
+                                TextColor="{StaticResource TextPrimary}" />
+                    <Label Grid.Column="2" Text="To" FontSize="12"
+                           TextColor="{StaticResource TextSecondary}" VerticalTextAlignment="Center" />
+                    <DatePicker Grid.Column="3" Date="{Binding HistoryToDate}"
+                                Format="dd MMM yyyy" HeightRequest="36"
+                                TextColor="{StaticResource TextPrimary}" />
+                    <Button Grid.Column="4" Text="Export CSV" FontSize="12" FontAttributes="Bold"
+                            HeightRequest="36" Padding="10,0"
+                            Command="{Binding ExportCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="{StaticResource TealLight}"
+                            TextColor="{StaticResource TealPrimary}"
+                            CornerRadius="8" />
+                </Grid>
+            </Border>
+
+            <CollectionView Grid.Row="1" ItemsSource="{Binding PaymentRows}"
+                            SelectionMode="None" BackgroundColor="{StaticResource AppBackground}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="0,40" HorizontalOptions="Center" Spacing="8">
+                        <Label Text="No payments in range" FontSize="16" FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.Header>
+                    <Label Text="Payment History" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}"
+                           Padding="20,4,20,4" />
+                </CollectionView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="svc:PaymentHistoryRow">
+                        <Border Padding="14,10" Margin="8,3"
+                                StrokeShape="RoundRectangle 10"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource CardBackground}">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <VerticalStackLayout Grid.Column="0" Spacing="3">
+                                    <Label Text="{Binding CustomerName}" FontSize="14" FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}" />
+                                    <Label Text="{Binding DetailDisplay}" FontSize="11"
+                                           TextColor="{StaticResource TextSecondary}" />
+                                    <Label Text="{Binding DateDisplay}" FontSize="11"
+                                           TextColor="{StaticResource TextSecondary}" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="1" Text="{Binding AmountDisplay}" FontSize="14" FontAttributes="Bold"
+                                       TextColor="{StaticResource SuccessGreen}"
+                                       VerticalTextAlignment="Center" HorizontalTextAlignment="End" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <!-- TAB: Credit Trend (Visual Chart)                        -->
+        <!-- ═══════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="2" Grid.RowSpan="2" RowDefinitions="Auto,Auto,*"
+              IsVisible="{Binding IsTrendTab}">
+            <!-- Legend -->
+            <Border Grid.Row="0" Padding="16,10" StrokeThickness="0"
+                    BackgroundColor="{StaticResource CardBackground}">
+                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="16">
+                    <Label Text="Last 30 days" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}" VerticalTextAlignment="Center" />
+                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                        <BoxView WidthRequest="8" HeightRequest="8" Color="{StaticResource ErrorRed}"
+                                 CornerRadius="4" VerticalOptions="Center" />
+                        <Label Text="New Credit" FontSize="11" TextColor="{StaticResource TextSecondary}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                        <BoxView WidthRequest="8" HeightRequest="8" Color="{StaticResource SuccessGreen}"
+                                 CornerRadius="4" VerticalOptions="Center" />
+                        <Label Text="Payments" FontSize="11" TextColor="{StaticResource TextSecondary}"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Chart area using CollectionView of bar-pairs -->
+            <CollectionView Grid.Row="2" ItemsSource="{Binding TrendPoints}"
+                            SelectionMode="None" BackgroundColor="{StaticResource AppBackground}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="0,40" HorizontalOptions="Center" Spacing="8">
+                        <Label Text="No trend data" FontSize="16" FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="svc:CreditTrendPoint">
+                        <Border Padding="14,10" Margin="8,2"
+                                StrokeShape="RoundRectangle 8"
+                                StrokeThickness="0"
+                                BackgroundColor="{StaticResource CardBackground}">
+                            <Grid ColumnDefinitions="50,*,*" ColumnSpacing="12">
+                                <Label Grid.Column="0" Text="{Binding DateLabel}" FontSize="11"
+                                       TextColor="{StaticResource TextSecondary}"
+                                       VerticalTextAlignment="Center" />
+                                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                    <Label Text="{Binding NewCredit, StringFormat='रु {0:N0}'}" FontSize="12"
+                                           FontAttributes="Bold" TextColor="{StaticResource ErrorRed}" />
+                                    <BoxView HeightRequest="4" Color="{StaticResource ErrorRed}"
+                                             CornerRadius="2" Opacity="0.6" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="2" Spacing="2">
+                                    <Label Text="{Binding Payments, StringFormat='रु {0:N0}'}" FontSize="12"
+                                           FontAttributes="Bold" TextColor="{StaticResource SuccessGreen}" />
+                                    <BoxView HeightRequest="4" Color="{StaticResource SuccessGreen}"
+                                             CornerRadius="2" Opacity="0.6" />
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!-- Loading indicator -->
+        <ActivityIndicator Grid.Row="4" IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           Color="{StaticResource TealPrimary}"
+                           HorizontalOptions="Center" VerticalOptions="Center" />
+
+    </Grid>
+
+</ContentPage>

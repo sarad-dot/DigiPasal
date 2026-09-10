@@ -58,9 +58,164 @@
             </Grid>
 
         <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="16" Spacing="16">
+            <VerticalStackLayout Padding="16" Spacing="14">
 
-                <!-- ====== BACKUP CARD ====== -->
+                <!-- ====== SHOP ====== -->
+                <Label Text="SHOP" FontSize="12" FontAttributes="Bold"
+                       TextColor="{StaticResource TealPrimary}" Margin="4,6,0,0" />
+
+                <Border BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                        Padding="0">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+
+                    <Grid ColumnDefinitions="Auto,*,Auto" Padding="14,12" ColumnSpacing="12">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="ShopSettings_Tapped"/>
+                        </Grid.GestureRecognizers>
+                        <Border Grid.Column="0" WidthRequest="38" HeightRequest="38"
+                                StrokeShape="RoundRectangle 10"
+                                BackgroundColor="{StaticResource MoneyTeal}">
+                            <Label Text="🏪" FontSize="16" HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="Shop Settings" FontSize="14" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}" />
+                            <Label Text="Name, address, currency, tax, low stock" FontSize="12"
+                                   TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2" Text="›" FontSize="20"
+                               TextColor="{StaticResource Gray400}" VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+
+                <!-- ====== REPORTS ====== -->
+                <Label Text="REPORTS" FontSize="12" FontAttributes="Bold"
+                       TextColor="{StaticResource TealPrimary}" Margin="4,10,0,0" />
+
+                <Border BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                        Padding="0">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="0">
+
+                        <Grid ColumnDefinitions="Auto,*,Auto" Padding="14,12" ColumnSpacing="12">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="SalesReport_Tapped"/>
+                            </Grid.GestureRecognizers>
+                            <Border Grid.Column="0" WidthRequest="38" HeightRequest="38"
+                                    StrokeShape="RoundRectangle 10"
+                                    BackgroundColor="{StaticResource SaleBlue}">
+                                <Label Text="📄" FontSize="16" HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="Sales Report" FontSize="14" FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}" />
+                                <Label Text="Daily sales, cash &amp; credit" FontSize="12"
+                                       TextColor="{StaticResource TextSecondary}" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="›" FontSize="20"
+                                   TextColor="{StaticResource Gray400}" VerticalOptions="Center" />
+                            <BoxView Grid.Column="0" Grid.ColumnSpan="3" HeightRequest="1"
+                                     Color="{StaticResource DividerColor}"
+                                     VerticalOptions="End" Margin="14,0" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*,Auto" Padding="14,12" ColumnSpacing="12">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="StockReport_Tapped"/>
+                            </Grid.GestureRecognizers>
+                            <Border Grid.Column="0" WidthRequest="38" HeightRequest="38"
+                                    StrokeShape="RoundRectangle 10"
+                                    BackgroundColor="{StaticResource BuyOrange}">
+                                <Label Text="📦" FontSize="16" HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="Stock Report" FontSize="14" FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}" />
+                                <Label Text="Quantity, value &amp; low stock" FontSize="12"
+                                       TextColor="{StaticResource TextSecondary}" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="›" FontSize="20"
+                                   TextColor="{StaticResource Gray400}" VerticalOptions="Center" />
+                            <BoxView Grid.Column="0" Grid.ColumnSpan="3" HeightRequest="1"
+                                     Color="{StaticResource DividerColor}"
+                                     VerticalOptions="End" Margin="14,0" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*,Auto" Padding="14,12" ColumnSpacing="12">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="ProfitReport_Tapped"/>
+                            </Grid.GestureRecognizers>
+                            <Border Grid.Column="0" WidthRequest="38" HeightRequest="38"
+                                    StrokeShape="RoundRectangle 10"
+                                    BackgroundColor="{StaticResource MoneyGreen}">
+                                <Label Text="📈" FontSize="16" HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="Profit Report" FontSize="14" FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}" />
+                                <Label Text="Revenue vs estimated COGS" FontSize="12"
+                                       TextColor="{StaticResource TextSecondary}" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="›" FontSize="20"
+                                   TextColor="{StaticResource Gray400}" VerticalOptions="Center" />
+                            <BoxView Grid.Column="0" Grid.ColumnSpan="3" HeightRequest="1"
+                                     Color="{StaticResource DividerColor}"
+                                     VerticalOptions="End" Margin="14,0" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*,Auto" Padding="14,12" ColumnSpacing="12">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="CreditReport_Tapped"/>
+                            </Grid.GestureRecognizers>
+                            <Border Grid.Column="0" WidthRequest="38" HeightRequest="38"
+                                    StrokeShape="RoundRectangle 10"
+                                    BackgroundColor="{StaticResource MoneyTeal}">
+                                <Label Text="📊" FontSize="16" HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="Credit Report" FontSize="14" FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}" />
+                                <Label Text="Aging, summary &amp; payments" FontSize="12"
+                                       TextColor="{StaticResource TextSecondary}" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="›" FontSize="20"
+                                   TextColor="{StaticResource Gray400}" VerticalOptions="Center" />
+                            <BoxView Grid.Column="0" Grid.ColumnSpan="3" HeightRequest="1"
+                                     Color="{StaticResource DividerColor}"
+                                     VerticalOptions="End" Margin="14,0" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*,Auto" Padding="14,12" ColumnSpacing="12">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="Reports_Tapped"/>
+                            </Grid.GestureRecognizers>
+                            <Border Grid.Column="0" WidthRequest="38" HeightRequest="38"
+                                    StrokeShape="RoundRectangle 10"
+                                    BackgroundColor="{StaticResource TealLight}">
+                                <Label Text="🗂" FontSize="16" HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                <Label Text="All Reports" FontSize="14" FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}" />
+                                <Label Text="Open the reports hub" FontSize="12"
+                                       TextColor="{StaticResource TextSecondary}" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="›" FontSize="20"
+                                   TextColor="{StaticResource Gray400}" VerticalOptions="Center" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ====== DATA & BACKUP ====== -->
+                <Label Text="DATA &amp; BACKUP" FontSize="12" FontAttributes="Bold"
+                       TextColor="{StaticResource TealPrimary}" Margin="4,10,0,0" />
+
                 <Border BackgroundColor="{StaticResource CardBackground}"
                         StrokeThickness="0"
                         Padding="16">
@@ -140,7 +295,8 @@
                                TextColor="{StaticResource TextSecondary}"/>
 
                         <CollectionView ItemsSource="{Binding Backups}"
-                                        SelectionMode="None">
+                                        SelectionMode="None"
+                                        MaximumHeightRequest="240">
                             <CollectionView.ItemTemplate>
                                 <DataTemplate x:DataType="services:BackupInfo">
                                     <Grid ColumnDefinitions="*,Auto"
@@ -189,11 +345,81 @@
                     </VerticalStackLayout>
                 </Border>
 
-                <Label Text="DigiPasal v1.2, © 2026"
-                       FontSize="12"
-                       TextColor="{StaticResource Gray300}"
+                <!-- ====== ACCOUNT ====== -->
+                <Label Text="ACCOUNT" FontSize="12" FontAttributes="Bold"
+                       TextColor="{StaticResource TealPrimary}" Margin="4,10,0,0" />
+
+                <Border BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                        Padding="0">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="0">
+
+                        <Grid ColumnDefinitions="Auto,*,Auto" Padding="14,12" ColumnSpacing="12">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="Profile_Tapped"/>
+                            </Grid.GestureRecognizers>
+                            <Border Grid.Column="0" WidthRequest="38" HeightRequest="38"
+                                    StrokeShape="RoundRectangle 10"
+                                    BackgroundColor="{StaticResource SaleBlue}">
+                                <Label Text="👤" FontSize="16" HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+                            <Label Grid.Column="1" Text="Profile" FontSize="14" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}" VerticalOptions="Center" />
+                            <Label Grid.Column="2" Text="›" FontSize="20"
+                                   TextColor="{StaticResource Gray400}" VerticalOptions="Center" />
+                            <BoxView Grid.Column="0" Grid.ColumnSpan="3" HeightRequest="1"
+                                     Color="{StaticResource DividerColor}"
+                                     VerticalOptions="End" Margin="14,0" />
+                        </Grid>
+
+                        <Grid ColumnDefinitions="Auto,*,Auto" Padding="14,12" ColumnSpacing="12">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="ChangePassword_Tapped"/>
+                            </Grid.GestureRecognizers>
+                            <Border Grid.Column="0" WidthRequest="38" HeightRequest="38"
+                                    StrokeShape="RoundRectangle 10"
+                                    BackgroundColor="{StaticResource BuyOrange}">
+                                <Label Text="🔑" FontSize="16" HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+                            <Label Grid.Column="1" Text="Change Password" FontSize="14"
+                                   FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}" VerticalOptions="Center" />
+                            <Label Grid.Column="2" Text="›" FontSize="20"
+                                   TextColor="{StaticResource Gray400}" VerticalOptions="Center" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ====== ABOUT ====== -->
+                <Label Text="ABOUT" FontSize="12" FontAttributes="Bold"
+                       TextColor="{StaticResource TealPrimary}" Margin="4,10,0,0" />
+
+                <Border BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                        Padding="14">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                        <Border Grid.Column="0" WidthRequest="38" HeightRequest="38"
+                                StrokeShape="RoundRectangle 10"
+                                BackgroundColor="{StaticResource TealLight}">
+                            <Label Text="🛒" FontSize="16" HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                            <Label Text="DigiPasal" FontSize="14" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}" />
+                            <Label Text="v1.2, © 2026" FontSize="12"
+                                   TextColor="{StaticResource TextSecondary}" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+
+                <Label Text="DigiPasal - Your shop, your account books."
+                       FontSize="11"
+                       TextColor="{StaticResource Gray400}"
                        HorizontalOptions="Center"
-                       Margin="0,8,0,20"/>
+                       Margin="0,6,0,20"/>
             </VerticalStackLayout>
         </ScrollView>
     </Grid>

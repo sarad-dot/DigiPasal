@@ -90,10 +90,17 @@ public static class MauiProgram
         services.AddTransient<AddEditProductPage>();
         services.AddTransient<CreditPage>();
         services.AddTransient<CreditDetailPage>();
+        services.AddTransient<CreditReportsPage>();
+        services.AddTransient<RecordPaymentPage>();
         services.AddTransient<ProfilePage>();
         services.AddTransient<ChangePasswordPage>();
         services.AddTransient<SettingsPage>();
         services.AddTransient<QuickSalePage>();
+        services.AddTransient<ReportsPage>();
+        services.AddTransient<SalesReportPage>();
+        services.AddTransient<StockReportPage>();
+        services.AddTransient<ProfitReportPage>();
+        services.AddTransient<ShopSettingsPage>();
 
         services.AddTransient<LoginViewModel>();
         services.AddTransient<RegisterViewModel>();
@@ -102,5 +109,6 @@ public static class MauiProgram
         services.AddTransient<ProfileViewModel>();
         services.AddTransient<ChangePasswordViewModel>();
         services.AddTransient<SettingsViewModel>();
+        services.AddTransient<ShopSettingsViewModel>();
     }
 }

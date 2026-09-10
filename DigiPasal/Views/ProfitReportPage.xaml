@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             xmlns:services="clr-namespace:DigiPasal.Services"
+             x:Class="DigiPasal.Views.ProfitReportPage"
+             Title="Profit Report"
+             Shell.TabBarIsVisible="False"
+             x:DataType="vm:ProfitReportViewModel"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="0">
+
+        <!-- Date filter -->
+        <Border Grid.Row="0" Padding="16,12"
+                BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0">
+            <Grid ColumnDefinitions="*,Auto,*,Auto,Auto" ColumnSpacing="8">
+                <Border Grid.Column="0" Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                        BackgroundColor="{StaticResource InputBg}" HeightRequest="42">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                    <DatePicker Date="{Binding FromDate}" Format="dd MMM yyyy" BackgroundColor="Transparent"
+                                TextColor="{StaticResource TextPrimary}" />
+                </Border>
+                <Label Grid.Column="1" Text="—" VerticalTextAlignment="Center"
+                       FontSize="14" TextColor="{StaticResource TextSecondary}" />
+                <Border Grid.Column="2" Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                        BackgroundColor="{StaticResource InputBg}" HeightRequest="42">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                    <DatePicker Date="{Binding ToDate}" Format="dd MMM yyyy" BackgroundColor="Transparent"
+                                TextColor="{StaticResource TextPrimary}" />
+                </Border>
+                <Button Grid.Column="3" Text="Today" Command="{Binding TodayCommand}"
+                        BackgroundColor="{StaticResource TealLight}" TextColor="{StaticResource TealPrimary}"
+                        FontSize="12" HeightRequest="40" CornerRadius="10" Padding="10,0" />
+                <Button Grid.Column="4" Text="30d" Command="{Binding MonthCommand}"
+                        BackgroundColor="{StaticResource TealLight}" TextColor="{StaticResource TealPrimary}"
+                        FontSize="12" HeightRequest="40" CornerRadius="10" Padding="10,0" />
+            </Grid>
+        </Border>
+
+        <!-- Summary strip -->
+        <Border Grid.Row="1" Padding="16,10"
+                BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0">
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
+                <Border Grid.Column="0" StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{StaticResource MoneyTeal}" Padding="8,8">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Revenue" FontSize="11" TextColor="{StaticResource MoneyTealText}"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding TotalRevenueDisplay}" FontSize="13" FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" TextColor="{StaticResource MoneyTealText}" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="1" StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{StaticResource BuyOrange}" Padding="8,8">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="COGS" FontSize="11" TextColor="{StaticResource BuyOrangeText}"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding TotalCostDisplay}" FontSize="13" FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" TextColor="{StaticResource BuyOrangeText}" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="2" StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{StaticResource MoneyGreen}" Padding="8,8">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Profit (est)" FontSize="11" TextColor="{StaticResource SuccessGreen}"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding EstimatedProfitDisplay}" FontSize="13" FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" TextColor="{StaticResource SuccessGreen}" />
+                    </VerticalStackLayout>
+                </Border>
+                <Border Grid.Column="3" StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{StaticResource InputBg}" Padding="8,8">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Sales" FontSize="11" TextColor="{StaticResource TextSecondary}"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding TotalCountDisplay}" FontSize="13" FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" TextColor="{StaticResource TextPrimary}" />
+                    </VerticalStackLayout>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Rows -->
+        <CollectionView Grid.Row="2" ItemsSource="{Binding Rows}" SelectionMode="None"
+                        BackgroundColor="{StaticResource AppBackground}">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="0,40" HorizontalOptions="Center" Spacing="12">
+                    <Label Text="No sales in this range." FontSize="16" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                    <Label Text="Adjust the date filter to see more."
+                           FontSize="13" HorizontalTextAlignment="Center"
+                           TextColor="{StaticResource TextSecondary}" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            <CollectionView.Header>
+                <Grid Padding="16,8" ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
+                    <Label Text="Date" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" />
+                    <Label Grid.Column="1" Text="Revenue" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="End" />
+                    <Label Grid.Column="2" Text="COGS" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="End" />
+                    <Label Grid.Column="3" Text="Profit" FontSize="12" FontAttributes="Bold"
+                           TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="End" />
+                </Grid>
+            </CollectionView.Header>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="services:ProfitDayRow">
+                    <Border Padding="16,10" Margin="8,3" StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0" BackgroundColor="{StaticResource CardBackground}">
+                        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="{Binding DayKey}" FontSize="13" FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}" />
+                                <Label Text="{Binding SalesCount, StringFormat='{0} sales'}"
+                                       FontSize="11" TextColor="{StaticResource TextSecondary}" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="1" Text="{Binding Revenue, StringFormat='रु {0:N2}'}"
+                                   FontSize="12" VerticalTextAlignment="Center" HorizontalTextAlignment="End"
+                                   TextColor="{StaticResource TextPrimary}" />
+                            <Label Grid.Column="2" Text="{Binding CostOfGoods, StringFormat='रु {0:N2}'}"
+                                   FontSize="12" VerticalTextAlignment="Center" HorizontalTextAlignment="End"
+                                   TextColor="{StaticResource TextSecondary}" />
+                            <Label Grid.Column="3" Text="{Binding Profit, StringFormat='रु {0:N2}'}"
+                                   FontSize="12" FontAttributes="Bold"
+                                   VerticalTextAlignment="Center" HorizontalTextAlignment="End"
+                                   TextColor="{StaticResource SuccessGreen}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Export -->
+        <Border Grid.Row="3" Padding="16,10,16,24"
+                BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                StrokeShape="RoundRectangle 16,16,0,0">
+            <Button Text="Export CSV" Command="{Binding ExportCommand}"
+                    IsEnabled="{Binding IsNotBusy}"
+                    BackgroundColor="{StaticResource TealPrimary}" TextColor="White"
+                    FontSize="15" FontAttributes="Bold" HeightRequest="48" CornerRadius="10" />
+        </Border>
+    </Grid>
+</ContentPage>

@@ -33,6 +33,7 @@ public class SaleSuccessViewModel : BaseViewModel, IQueryAttributable
     public ICommand ShareReceiptCommand { get; }
     public ICommand NewSaleCommand { get; }
     public ICommand ViewHistoryCommand { get; }
+    public ICommand GoHomeCommand { get; }
 
     public SaleSuccessViewModel()
     {
@@ -42,6 +43,7 @@ public class SaleSuccessViewModel : BaseViewModel, IQueryAttributable
 
         ShareReceiptCommand = new Command(async () => await ShareReceiptAsync());
         NewSaleCommand = new Command(async () => await Shell.Current.GoToAsync("//Dashboard/Sales"));
+        GoHomeCommand = new Command(async () => await Shell.Current.GoToAsync("//Dashboard"));
         ViewHistoryCommand = new Command(async () => await Shell.Current.GoToAsync("SalesHistory"));
     }
 

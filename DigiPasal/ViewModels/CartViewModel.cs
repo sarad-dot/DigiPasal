@@ -43,7 +43,8 @@ public class CartViewModel : BaseViewModel
         get => _isCreditSale;
         set
         {
-            SetProperty(ref _isCreditSale, value);
+            if (SetProperty(ref _isCreditSale, value) && value)
+                AmountPaid = "0";
             OnPropertyChanged(nameof(ShowCreditNameField));
             OnPropertyChanged(nameof(IsCreditEnabled));
             CalculateTotals();
@@ -104,8 +105,9 @@ public class CartViewModel : BaseViewModel
         set => SetProperty(ref _grandTotal, value);
     }
 
-    public decimal CreditAmount => IsCreditSale && decimal.TryParse(AmountPaid, out var paid)
-        ? Math.Max(0, GrandTotal - paid) : 0;
+    public decimal CreditAmount => IsCreditSale
+        ? Math.Max(0, GrandTotal - (decimal.TryParse(AmountPaid, out var paid) ? paid : 0))
+        : 0;
 
     public string SelectedCustomerDisplay => SelectedCustomer != null
         ? $"{SelectedCustomer.Name} (Balance: {CurrencyFormatter.Format(SelectedCustomer.CurrentBalance)})"
@@ -265,8 +267,9 @@ public class CartViewModel : BaseViewModel
             return;
         }
 
-        var paidAmount = IsCreditSale && decimal.TryParse(AmountPaid, System.Globalization.NumberStyles.Any,
-            System.Globalization.CultureInfo.InvariantCulture, out var p) ? p : GrandTotal;
+        var paidAmount = decimal.TryParse(AmountPaid, System.Globalization.NumberStyles.Any,
+            System.Globalization.CultureInfo.InvariantCulture, out var p) ? p
+            : IsCreditSale ? 0 : GrandTotal;
 
         if (IsCreditSale && paidAmount >= GrandTotal)
         {

@@ -28,4 +28,20 @@ public partial class CreditPage : ContentPage
 
         await _viewModel.LoadAsync();
     }
+
+    private async void DailyEntry_Tapped(object? sender, TappedEventArgs e)
+    {
+        if ((sender as BindableObject)?.BindingContext is not DailyBookEntry entry)
+            return;
+
+        await _viewModel.NavigateToCustomerAsync(entry, null);
+    }
+
+    private async void PartnerItem_Tapped(object? sender, TappedEventArgs e)
+    {
+        if ((sender as BindableObject)?.BindingContext is not PartnerCreditItem item)
+            return;
+
+        await _viewModel.NavigateToCustomerAsync(null, item);
+    }
 }
