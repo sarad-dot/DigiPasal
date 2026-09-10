@@ -34,11 +34,8 @@
                 <DataTemplate x:DataType="models:CartLine">
                     <Border Padding="14,12" Margin="8,4"
                             StrokeShape="RoundRectangle 12"
-                            StrokeThickness="0"
+                            StrokeThickness="1"
                             BackgroundColor="{StaticResource CardBackground}">
-                        <Border.Shadow>
-                            <Shadow Brush="Black" Offset="0,1" Radius="6" Opacity="0.05"/>
-                        </Border.Shadow>
                         <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
                             <VerticalStackLayout Grid.Column="0" Spacing="4">
                                 <Label Text="{Binding ProductName}" FontSize="15" FontAttributes="Bold"
@@ -117,9 +114,24 @@
                            TextColor="{StaticResource TextPrimary}"
                            VerticalTextAlignment="Center" />
                     <Switch Grid.Column="1" IsToggled="{Binding IsCreditSale}"
-                            IsEnabled="{Binding HasCustomer}"
+                            IsEnabled="{Binding HasItems}"
                             ThumbColor="{StaticResource TealPrimary}" />
                 </Grid>
+
+                <!-- Credit Customer Name (walk-in daily credit) -->
+                <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                        BackgroundColor="{StaticResource InputBg}" HeightRequest="42"
+                        IsVisible="{Binding ShowCreditNameField}">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="10"/>
+                    </Border.StrokeShape>
+                    <Entry Text="{Binding CreditCustomerName}" Placeholder="Customer name (Walk-in)"
+                           FontSize="13" MaxLength="100"
+                           BackgroundColor="Transparent"
+                           TextColor="{StaticResource TextPrimary}"
+                           PlaceholderColor="{StaticResource Gray400}"
+                           Margin="12,0" />
+                </Border>
 
                 <!-- Amount Paid (visible for credit) -->
                 <HorizontalStackLayout Spacing="8" IsVisible="{Binding IsCreditSale}">

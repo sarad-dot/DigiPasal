@@ -128,11 +128,8 @@
                 <DataTemplate x:DataType="models:Sale">
                     <Border Padding="16,12" Margin="8,3"
                             StrokeShape="RoundRectangle 12"
-                            StrokeThickness="0"
+                            StrokeThickness="1"
                             BackgroundColor="{StaticResource CardBackground}">
-                        <Border.Shadow>
-                            <Shadow Brush="Black" Offset="0,1" Radius="6" Opacity="0.05"/>
-                        </Border.Shadow>
                         <Border.GestureRecognizers>
                             <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SalesHistoryViewModel}}, Path=ViewSaleCommand}"
                                                   CommandParameter="{Binding .}" />

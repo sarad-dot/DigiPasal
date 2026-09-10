@@ -36,16 +36,10 @@ public class ProductService
 
     public async Task<List<string>> GetCategoriesAsync()
     {
-        var products = await Database.Table<Product>()
-            .Where(p => p.IsActive)
-            .ToListAsync();
-
-        return products
-            .Select(p => p.Category)
-            .Where(c => !string.IsNullOrWhiteSpace(c))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .OrderBy(c => c, StringComparer.OrdinalIgnoreCase)
-            .ToList();
+        return await Database.QueryScalarsAsync<string>(
+            "SELECT DISTINCT Category FROM Products " +
+            "WHERE IsActive = 1 AND Category IS NOT NULL AND Category <> '' " +
+            "ORDER BY Category COLLATE NOCASE");
     }
 
     public async Task<Product?> GetProductAsync(int id)

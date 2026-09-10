@@ -14,6 +14,7 @@ public class CartViewModel : BaseViewModel
 
     private Customer? _selectedCustomer;
     private bool _isCreditSale;
+    private string _creditCustomerName = string.Empty;
     private string _amountPaid = string.Empty;
     private string _notes = string.Empty;
     private decimal _discountAmount;
@@ -33,6 +34,7 @@ public class CartViewModel : BaseViewModel
             OnPropertyChanged(nameof(SelectedCustomerDisplay));
             OnPropertyChanged(nameof(HasCustomer));
             OnPropertyChanged(nameof(IsCreditEnabled));
+            OnPropertyChanged(nameof(ShowCreditNameField));
         }
     }
 
@@ -42,8 +44,19 @@ public class CartViewModel : BaseViewModel
         set
         {
             SetProperty(ref _isCreditSale, value);
+            OnPropertyChanged(nameof(ShowCreditNameField));
             OnPropertyChanged(nameof(IsCreditEnabled));
             CalculateTotals();
+        }
+    }
+
+    public string CreditCustomerName
+    {
+        get => _creditCustomerName;
+        set
+        {
+            SetProperty(ref _creditCustomerName, value);
+            OnPropertyChanged(nameof(ShowCreditNameField));
         }
     }
 
@@ -101,7 +114,8 @@ public class CartViewModel : BaseViewModel
     public bool HasItems => CartItems.Count > 0;
     public int ItemCount => CartItems.Count;
     public bool HasCustomer => SelectedCustomer != null;
-    public bool IsCreditEnabled => IsCreditSale && HasCustomer;
+    public bool IsCreditEnabled => IsCreditSale;
+    public bool ShowCreditNameField => IsCreditSale && !HasCustomer;
 
     public string SubtotalDisplay => CurrencyFormatter.Format(Subtotal);
     public string DiscountDisplay => DiscountAmount > 0 ? $"-{CurrencyFormatter.Format(DiscountAmount)}" : "";
@@ -208,6 +222,7 @@ public class CartViewModel : BaseViewModel
         _cartState.Clear();
         SelectedCustomer = null;
         IsCreditSale = false;
+        CreditCustomerName = string.Empty;
         AmountPaid = string.Empty;
         Notes = string.Empty;
         DiscountAmount = 0;
@@ -250,12 +265,6 @@ public class CartViewModel : BaseViewModel
             return;
         }
 
-        if (IsCreditSale && !HasCustomer)
-        {
-            await Shell.Current.DisplayAlertAsync("Credit Sale", "Please select a customer for credit sales.", "OK");
-            return;
-        }
-
         var paidAmount = IsCreditSale && decimal.TryParse(AmountPaid, System.Globalization.NumberStyles.Any,
             System.Globalization.CultureInfo.InvariantCulture, out var p) ? p : GrandTotal;
 
@@ -266,6 +275,16 @@ public class CartViewModel : BaseViewModel
         }
 
         var user = await AuthService.Instance.GetCurrentUserAsync();
+
+        int? creditCustomerId = null;
+        string creditCustomerName = "Walk-in";
+
+        if (IsCreditSale)
+        {
+            var resolved = await ResolveCreditCustomerAsync();
+            creditCustomerId = resolved.customerId;
+            creditCustomerName = resolved.customerName;
+        }
 
         var sale = new Sale
         {
@@ -278,8 +297,9 @@ public class CartViewModel : BaseViewModel
             CreditAmount = GrandTotal - paidAmount,
             PaymentMethod = IsCreditSale ? "Credit" : "Cash",
             IsCredit = IsCreditSale,
-            CustomerId = SelectedCustomer?.Id,
-            CustomerName = SelectedCustomer?.Name ?? "Walk-in",
+            CreditBookType = (int)CreditBookType.Daily,
+            CustomerId = IsCreditSale ? creditCustomerId : SelectedCustomer?.Id ?? (int?)null,
+            CustomerName = IsCreditSale ? creditCustomerName : SelectedCustomer?.Name ?? "Walk-in",
             UserId = user?.Id ?? 0,
             Notes = Notes
         };
@@ -306,5 +326,25 @@ public class CartViewModel : BaseViewModel
         {
             await Shell.Current.DisplayAlertAsync("Error", $"Failed to complete sale: {ex.Message}", "OK");
         }
+    }
+
+    private async Task<(int customerId, string customerName)> ResolveCreditCustomerAsync()
+    {
+        if (SelectedCustomer != null)
+            return (SelectedCustomer.Id, SelectedCustomer.Name);
+
+        var name = string.IsNullOrWhiteSpace(CreditCustomerName) ? "Walk-in" : CreditCustomerName.Trim();
+
+        var existing = await _customerService.FindActiveByNameAsync(name);
+        if (existing != null)
+            return (existing.Id, existing.Name);
+
+        var created = new Customer
+        {
+            Name = name,
+            IsActive = true
+        };
+        var id = await _customerService.SaveCustomerAsync(created);
+        return (id, name);
     }
 }

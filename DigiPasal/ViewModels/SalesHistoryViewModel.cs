@@ -17,6 +17,7 @@ public class SalesHistoryViewModel : BaseViewModel
     private decimal _cashSales;
     private decimal _creditSales;
     private int _salesCount;
+    private readonly Debouncer _searchDebouncer = new();
 
     public ObservableCollection<Sale> Sales
     {
@@ -42,7 +43,7 @@ public class SalesHistoryViewModel : BaseViewModel
         set
         {
             if (SetProperty(ref _searchQuery, value))
-                _ = LoadSalesAsync();
+                _searchDebouncer.Debounce(300, LoadSalesAsync);
         }
     }
 

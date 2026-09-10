@@ -17,6 +17,10 @@ public class Customer
 
     public decimal CreditLimit { get; set; }
 
+    public decimal DailyBalance { get; set; }
+
+    public decimal PartnerBalance { get; set; }
+
     public decimal CurrentBalance { get; set; }
 
     [Indexed]

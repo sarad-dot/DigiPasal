@@ -10,7 +10,9 @@ public class SaleService
     public static SaleService Instance => _lazyInstance.Value;
 
     private readonly DatabaseService _dbService;
-    private static readonly object _receiptLock = new();
+    private static readonly SemaphoreSlim _receiptLock = new(1, 1);
+    private static int _dailyCounter;
+    private static DateTime _counterDate = DateTime.MinValue;
 
     private SaleService()
     {
@@ -26,7 +28,7 @@ public class SaleService
         if (items == null || items.Count == 0)
             throw new ArgumentException("Sale must have at least one item.", nameof(items));
 
-        sale.ReceiptNumber = GenerateReceiptNumber();
+        sale.ReceiptNumber = await GenerateReceiptNumberAsync();
         sale.CreatedAt = DateTime.UtcNow;
 
         var copiedItems = items.Select(i => new SaleItem
@@ -72,7 +74,15 @@ public class SaleService
 
                 if (customer != null)
                 {
-                    customer.CurrentBalance += sale.CreditAmount;
+                    if (sale.CreditBookType == (int)CreditBookType.Partner)
+                    {
+                        customer.PartnerBalance += sale.CreditAmount;
+                    }
+                    else
+                    {
+                        customer.DailyBalance += sale.CreditAmount;
+                    }
+                    customer.CurrentBalance = customer.DailyBalance + customer.PartnerBalance;
                     customer.UpdatedAt = DateTime.UtcNow;
                     tran.Update(customer);
                 }
@@ -82,7 +92,7 @@ public class SaleService
         return sale;
     }
 
-    public async Task<List<Sale>> GetSalesAsync(DateTime? from = null, DateTime? to = null, string? query = null)
+    public async Task<List<Sale>> GetSalesAsync(DateTime? from = null, DateTime? to = null, string? query = null, int limit = 500)
     {
         var queryBuilder = Database.Table<Sale>()
             .Where(s => !s.IsVoided);
@@ -98,18 +108,19 @@ public class SaleService
             queryBuilder = queryBuilder.Where(s => s.CreatedAt <= toUtc);
         }
 
-        var sales = await queryBuilder.OrderByDescending(s => s.CreatedAt).ToListAsync();
-
-        if (!string.IsNullOrWhiteSpace(query))
+        var q = query?.Trim();
+        if (!string.IsNullOrWhiteSpace(q))
         {
-            var q = query.Trim().ToLowerInvariant();
-            sales = sales.Where(s =>
-                (s.ReceiptNumber ?? string.Empty).ToLowerInvariant().Contains(q) ||
-                (s.CustomerName ?? string.Empty).ToLowerInvariant().Contains(q))
-                .ToList();
+            var lower = q.ToLower();
+            queryBuilder = queryBuilder.Where(s =>
+                s.ReceiptNumber.ToLower().Contains(lower) ||
+                s.CustomerName.ToLower().Contains(lower));
         }
 
-        return sales;
+        return await queryBuilder
+            .OrderByDescending(s => s.CreatedAt)
+            .Take(limit)
+            .ToListAsync();
     }
 
     public async Task<Sale?> GetSaleByIdAsync(int id)
@@ -136,14 +147,9 @@ public class SaleService
             .ToListAsync();
 
         var saleIds = sales.Select(s => s.Id).ToList();
-        var allItems = new List<SaleItem>();
-        foreach (var sid in saleIds)
-        {
-            var items = await Database.Table<SaleItem>()
-                .Where(si => si.SaleId == sid)
-                .ToListAsync();
-            allItems.AddRange(items);
-        }
+        var allItems = await Database.Table<SaleItem>()
+            .Where(si => saleIds.Contains(si.SaleId))
+            .ToListAsync();
 
         return new DailySalesSummary
         {
@@ -191,9 +197,19 @@ public class SaleService
 
                 if (customer != null)
                 {
-                    customer.CurrentBalance -= sale.CreditAmount;
-                    if (customer.CurrentBalance < 0)
-                        customer.CurrentBalance = 0;
+                    if (sale.CreditBookType == (int)CreditBookType.Partner)
+                    {
+                        customer.PartnerBalance -= sale.CreditAmount;
+                        if (customer.PartnerBalance < 0)
+                            customer.PartnerBalance = 0;
+                    }
+                    else
+                    {
+                        customer.DailyBalance -= sale.CreditAmount;
+                        if (customer.DailyBalance < 0)
+                            customer.DailyBalance = 0;
+                    }
+                    customer.CurrentBalance = customer.DailyBalance + customer.PartnerBalance;
                     customer.UpdatedAt = DateTime.UtcNow;
                     tran.Update(customer);
                 }
@@ -214,7 +230,7 @@ public class SaleService
         if (sale == null)
             throw new ArgumentNullException(nameof(sale));
 
-        sale.ReceiptNumber = GenerateReceiptNumber();
+        sale.ReceiptNumber = await GenerateReceiptNumberAsync();
         sale.CreatedAt = DateTime.UtcNow;
         sale.IsQuickSale = true;
         sale.Subtotal = sale.GrandTotal;
@@ -232,7 +248,15 @@ public class SaleService
 
                 if (customer != null)
                 {
-                    customer.CurrentBalance += sale.CreditAmount;
+                    if (sale.CreditBookType == (int)CreditBookType.Partner)
+                    {
+                        customer.PartnerBalance += sale.CreditAmount;
+                    }
+                    else
+                    {
+                        customer.DailyBalance += sale.CreditAmount;
+                    }
+                    customer.CurrentBalance = customer.DailyBalance + customer.PartnerBalance;
                     customer.UpdatedAt = DateTime.UtcNow;
                     tran.Update(customer);
                 }
@@ -242,24 +266,48 @@ public class SaleService
         return sale;
     }
 
-    private static string GenerateReceiptNumber()
+    /// <summary>
+    /// Builds DP-yyyyMMdd-#### by seeding from the highest existing receipt for today
+    /// so app restarts do not reuse numbers and hit UNIQUE on Sales.ReceiptNumber.
+    /// </summary>
+    private async Task<string> GenerateReceiptNumberAsync()
     {
-        lock (_receiptLock)
+        var today = DateTime.UtcNow.Date;
+        var prefix = $"DP-{today:yyyyMMdd}-";
+
+        await _receiptLock.WaitAsync();
+        try
         {
-            var today = DateTime.UtcNow.Date;
             if (today != _counterDate)
             {
                 _counterDate = today;
-                _dailyCounter = 0;
+                _dailyCounter = await GetMaxDailySequenceAsync(prefix);
             }
 
             _dailyCounter++;
-            return $"DP-{today:yyyyMMdd}-{_dailyCounter:D4}";
+            return $"{prefix}{_dailyCounter:D4}";
+        }
+        finally
+        {
+            _receiptLock.Release();
         }
     }
 
-    private static int _dailyCounter;
-    private static DateTime _counterDate = DateTime.MinValue;
+    private async Task<int> GetMaxDailySequenceAsync(string prefix)
+    {
+        var lastNumber = await Database.ExecuteScalarAsync<string>(
+            "SELECT ReceiptNumber FROM Sales WHERE ReceiptNumber LIKE ? ORDER BY ReceiptNumber DESC LIMIT 1",
+            prefix + "%");
+
+        if (string.IsNullOrWhiteSpace(lastNumber))
+            return 0;
+
+        var parts = lastNumber.Split('-');
+        if (parts.Length >= 3 && int.TryParse(parts[^1], out var sequence))
+            return sequence;
+
+        return 0;
+    }
 }
 
 public class DailySalesSummary

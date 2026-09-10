@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             xmlns:svc="clr-namespace:DigiPasal.Services"
+             x:Class="DigiPasal.Views.CreditDetailPage"
+             Title="Credit Detail"
+             Shell.TabBarIsVisible="False"
+             x:DataType="vm:CreditDetailViewModel"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="0">
+
+        <!-- Customer header -->
+        <Border Grid.Row="0" Padding="16,14,16,12" Margin="16,16,16,0"
+                StrokeShape="RoundRectangle 12"
+                StrokeThickness="0"
+                BackgroundColor="{StaticResource CardBackground}">
+            <Border.Shadow>
+                <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.06"/>
+            </Border.Shadow>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                    <Label Text="{Binding CustomerName}" FontSize="19" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}" />
+                    <Label Text="{Binding CustomerSubtitle}" FontSize="13"
+                           TextColor="{StaticResource TextSecondary}" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="End">
+                    <Label Text="Balance" FontSize="11"
+                           TextColor="{StaticResource TextSecondary}"
+                           HorizontalTextAlignment="End" />
+                    <Label Text="{Binding BalanceDisplay}" FontSize="20" FontAttributes="Bold"
+                           TextColor="{StaticResource ErrorRed}"
+                           HorizontalTextAlignment="End" />
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <!-- Record payment -->
+        <Border Grid.Row="1" Padding="16,12" Margin="16,12,16,0"
+                StrokeShape="RoundRectangle 12"
+                StrokeThickness="0"
+                BackgroundColor="{StaticResource CardBackground}">
+            <Border.Shadow>
+                <Shadow Brush="Black" Offset="0,1" Radius="6" Opacity="0.05"/>
+            </Border.Shadow>
+            <Button Text="Record Payment"
+                    Command="{Binding RecordPaymentCommand}"
+                    IsEnabled="{Binding CanRecordPayment}"
+                    BackgroundColor="{StaticResource TealPrimary}"
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    FontSize="15"
+                    HeightRequest="48"
+                    CornerRadius="12" />
+        </Border>
+
+        <!-- History -->
+        <CollectionView Grid.Row="2"
+                        ItemsSource="{Binding History}"
+                        SelectionMode="None"
+                        Margin="16,12,16,0"
+                        BackgroundColor="{StaticResource AppBackground}">
+            <CollectionView.EmptyView>
+                <VerticalStackLayout Padding="0,40" HorizontalOptions="Center" Spacing="12">
+                    <Label Text="No history" FontSize="18" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                    <Label Text="No credit sales or payments for this book yet."
+                           FontSize="14" HorizontalTextAlignment="Center"
+                           TextColor="{StaticResource TextSecondary}" />
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+            <CollectionView.Header>
+                <Label Text="History" FontSize="12" FontAttributes="Bold"
+                       TextColor="{StaticResource TextSecondary}"
+                       Padding="4,12,4,6" />
+            </CollectionView.Header>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="svc:CreditHistoryEntry">
+                    <Border Padding="14,12" Margin="4,4"
+                            StrokeShape="RoundRectangle 12"
+                            StrokeThickness="0"
+                            BackgroundColor="{StaticResource CardBackground}">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                            <Border Grid.Column="0" WidthRequest="56" HeightRequest="56"
+                                    StrokeShape="RoundRectangle 12"
+                                    BackgroundColor="{StaticResource TealLight}">
+                                <Border.Triggers>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsPayment}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="#E8F5E9" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Border" Binding="{Binding IsTransfer}" Value="True">
+                                        <Setter Property="BackgroundColor" Value="{StaticResource SecondaryGold}" />
+                                    </DataTrigger>
+                                </Border.Triggers>
+                                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="0">
+                                    <Label Text="{Binding Date, StringFormat='{0:dd MMM}'}" FontSize="9"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           HorizontalTextAlignment="Center" />
+                                    <Label Text="{Binding Date, StringFormat='{0:HH:mm}'}" FontSize="9" FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           HorizontalTextAlignment="Center" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <VerticalStackLayout Grid.Column="1" Spacing="3" VerticalOptions="Center">
+                                <Label Text="{Binding TypeDisplay}" FontSize="13" FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}" />
+                                <Label Text="{Binding Description}" FontSize="12"
+                                       TextColor="{StaticResource TextSecondary}"
+                                       LineBreakMode="TailTruncation" />
+                            </VerticalStackLayout>
+                            <Label Grid.Column="2" Text="{Binding AmountDisplay}" FontSize="14" FontAttributes="Bold"
+                                   TextColor="{StaticResource ErrorRed}"
+                                   VerticalTextAlignment="Center" HorizontalTextAlignment="End">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsPayment}" Value="True">
+                                        <Setter Property="TextColor" Value="{StaticResource SuccessGreen}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+
+</ContentPage>

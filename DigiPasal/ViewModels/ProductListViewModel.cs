@@ -15,6 +15,7 @@ public class ProductListViewModel : BaseViewModel
     private string _searchQuery = string.Empty;
     private string _selectedCategory = "All";
     private bool _isSearchVisible;
+    private readonly Debouncer _filterDebouncer = new();
 
     public ObservableCollection<Product> Products
     {
@@ -40,7 +41,7 @@ public class ProductListViewModel : BaseViewModel
         set
         {
             if (SetProperty(ref _searchQuery, value))
-                _ = ApplyFilterAsync();
+                _filterDebouncer.Debounce(250, ApplyFilterAsync);
         }
     }
 
@@ -50,7 +51,7 @@ public class ProductListViewModel : BaseViewModel
         set
         {
             if (SetProperty(ref _selectedCategory, value))
-                _ = ApplyFilterAsync();
+                _filterDebouncer.Debounce(250, ApplyFilterAsync);
         }
     }
 

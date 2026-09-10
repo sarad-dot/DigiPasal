@@ -57,6 +57,23 @@ public class BackupService
         }
     }
 
+    /// <summary>
+    /// Creates a backup only if the newest regular backup is older than <paramref name="minAge"/>.
+    /// Used by the startup path so cold starts skip the file copy on frequent launches.
+    /// </summary>
+    public async Task<bool> CreateBackupIfDueAsync(TimeSpan minAge)
+    {
+        var latest = GetAvailableBackups()
+            .Where(b => !b.FileName.Contains("pre_restore"))
+            .OrderByDescending(b => b.CreatedAt)
+            .FirstOrDefault();
+
+        if (latest != null && DateTime.UtcNow - latest.CreatedAt < minAge)
+            return false;
+
+        return await CreateBackupAsync();
+    }
+
     public async Task<bool> RestoreBackupAsync(string backupFilePath)
     {
         if (!File.Exists(backupFilePath))

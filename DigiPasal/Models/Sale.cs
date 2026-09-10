@@ -29,6 +29,8 @@ public class Sale
 
     public bool IsCredit { get; set; }
 
+    public int CreditBookType { get; set; }
+
     [Indexed]
     public int? CustomerId { get; set; }
 

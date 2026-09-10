@@ -1,4 +1,4 @@
-﻿using DigiPasal.Services;
+using DigiPasal.Services;
 using DigiPasal.ViewModels;
 using DigiPasal.Views;
 using Microsoft.Extensions.Logging;
@@ -20,14 +20,44 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 #if ANDROID
-        builder.ConfigureMauiHandlers(handlers =>
+        // Remove Android Material underlines from all text/picker inputs app-wide
+        static void RemoveAndroidUnderline(Android.Views.View? platformView)
         {
-            handlers.AddHandler<Entry, EntryHandler>();
+            if (platformView is null)
+                return;
 
-            EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, view) =>
+            platformView.Background = null;
+            platformView.SetBackgroundColor(Android.Graphics.Color.Transparent);
+            platformView.BackgroundTintList =
+                Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+        }
+
+        EntryHandler.Mapper.AppendToMapping("NoUnderline", (handler, _) =>
+            RemoveAndroidUnderline(handler.PlatformView));
+
+        EditorHandler.Mapper.AppendToMapping("NoUnderline", (handler, _) =>
+            RemoveAndroidUnderline(handler.PlatformView));
+
+        PickerHandler.Mapper.AppendToMapping("NoUnderline", (handler, _) =>
+            RemoveAndroidUnderline(handler.PlatformView));
+
+        DatePickerHandler.Mapper.AppendToMapping("NoUnderline", (handler, _) =>
+            RemoveAndroidUnderline(handler.PlatformView));
+
+        TimePickerHandler.Mapper.AppendToMapping("NoUnderline", (handler, _) =>
+            RemoveAndroidUnderline(handler.PlatformView));
+
+        SearchBarHandler.Mapper.AppendToMapping("NoUnderline", (handler, _) =>
+        {
+            RemoveAndroidUnderline(handler.PlatformView);
+            if (handler.PlatformView is Android.Views.ViewGroup group)
             {
-                handler.PlatformView.Background = null;
-            });
+                for (var i = 0; i < group.ChildCount; i++)
+                {
+                    if (group.GetChildAt(i) is Android.Widget.EditText editText)
+                        RemoveAndroidUnderline(editText);
+                }
+            }
         });
 #endif
 
@@ -59,6 +89,7 @@ public static class MauiProgram
         services.AddTransient<ProductPage>();
         services.AddTransient<AddEditProductPage>();
         services.AddTransient<CreditPage>();
+        services.AddTransient<CreditDetailPage>();
         services.AddTransient<ProfilePage>();
         services.AddTransient<ChangePasswordPage>();
         services.AddTransient<SettingsPage>();

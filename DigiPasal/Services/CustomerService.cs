@@ -49,6 +49,20 @@ public class CustomerService
             .FirstOrDefaultAsync();
     }
 
+    public async Task<Customer?> FindActiveByNameAsync(string name)
+    {
+        var trimmed = name?.Trim() ?? string.Empty;
+        if (string.IsNullOrWhiteSpace(trimmed))
+            return null;
+
+        var customers = await Database.Table<Customer>()
+            .Where(c => c.IsActive)
+            .ToListAsync();
+
+        return customers.FirstOrDefault(c =>
+            string.Equals(c.Name?.Trim(), trimmed, StringComparison.OrdinalIgnoreCase));
+    }
+
     public async Task<int> SaveCustomerAsync(Customer customer)
     {
         if (customer == null)

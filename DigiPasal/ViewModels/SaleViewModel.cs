@@ -17,11 +17,7 @@ public class SaleViewModel : BaseViewModel
     private ObservableCollection<string> _categories = new();
     private int _cartCount;
     private bool _initialized;
-
-    private bool _isQuantityPopupVisible;
-    private Product? _popupProduct;
-    private double _popupQuantity = 1;
-    private string _popupQuantityText = "1";
+    private readonly Debouncer _filterDebouncer = new();
 
     public ObservableCollection<Product> Products
     {
@@ -41,7 +37,7 @@ public class SaleViewModel : BaseViewModel
         set
         {
             if (SetProperty(ref _searchQuery, value))
-                _ = ApplyFilterAsync();
+                _filterDebouncer.Debounce(250, ApplyFilterAsync);
         }
     }
 
@@ -51,7 +47,7 @@ public class SaleViewModel : BaseViewModel
         set
         {
             if (SetProperty(ref _selectedCategory, value))
-                _ = ApplyFilterAsync();
+                _filterDebouncer.Debounce(250, ApplyFilterAsync);
         }
     }
 
@@ -67,59 +63,11 @@ public class SaleViewModel : BaseViewModel
         set => SetProperty(ref _cartCount, value);
     }
 
-    public bool IsQuantityPopupVisible
-    {
-        get => _isQuantityPopupVisible;
-        set => SetProperty(ref _isQuantityPopupVisible, value);
-    }
-
-    public Product? PopupProduct
-    {
-        get => _popupProduct;
-        set => SetProperty(ref _popupProduct, value);
-    }
-
-    public double PopupQuantity
-    {
-        get => _popupQuantity;
-        set
-        {
-            if (SetProperty(ref _popupQuantity, value))
-                PopupQuantityText = value > 0 ? value.ToString("0.##") : "1";
-        }
-    }
-
-    public string PopupQuantityText
-    {
-        get => _popupQuantityText;
-        set
-        {
-            if (SetProperty(ref _popupQuantityText, value))
-            {
-                if (double.TryParse(value, System.Globalization.NumberStyles.Any,
-                    System.Globalization.CultureInfo.InvariantCulture, out var qty) && qty > 0)
-                {
-                    _popupQuantity = qty;
-                    OnPropertyChanged(nameof(PopupQuantity));
-                    OnPropertyChanged(nameof(PopupStockHint));
-                }
-            }
-        }
-    }
-
-    public string PopupStockHint => PopupProduct != null
-        ? $"Available: {PopupProduct.StockQuantity:0.##}"
-        : "";
-
     public ICommand LoadProductsCommand { get; }
     public ICommand AddToCartCommand { get; }
     public ICommand SelectCategoryCommand { get; }
     public ICommand GoToCartCommand { get; }
     public ICommand ScanBarcodeCommand { get; }
-    public ICommand ShowQuantityPopupCommand { get; }
-    public ICommand ConfirmAddToCartCommand { get; }
-    public ICommand CancelQuantityPopupCommand { get; }
-    public ICommand SetQuickQuantityCommand { get; }
 
     public SaleViewModel()
     {
@@ -130,7 +78,7 @@ public class SaleViewModel : BaseViewModel
         _cartState.CartChanged += OnCartChanged;
 
         LoadProductsCommand = new Command(async () => await LoadProductsAsync());
-        AddToCartCommand = new Command<Product>(ShowQuantityPopup);
+        AddToCartCommand = new Command<Product>(AddToCart);
         SelectCategoryCommand = new Command<string>(cat => SelectedCategory = cat ?? "All");
         GoToCartCommand = new Command(async () => await Shell.Current.GoToAsync("Cart"));
         ScanBarcodeCommand = new Command(async () =>
@@ -140,10 +88,6 @@ public class SaleViewModel : BaseViewModel
                 "Barcode scanning will be available in a future update. You can type the barcode manually in the search field.",
                 "OK");
         });
-        ShowQuantityPopupCommand = new Command<Product>(ShowQuantityPopup);
-        ConfirmAddToCartCommand = new Command(ConfirmAddToCart);
-        CancelQuantityPopupCommand = new Command(CancelQuantityPopup);
-        SetQuickQuantityCommand = new Command<double>(SetQuickQuantity);
     }
 
     private void OnCartChanged()
@@ -208,7 +152,7 @@ public class SaleViewModel : BaseViewModel
             filtered.OrderBy(p => p.Name, StringComparer.OrdinalIgnoreCase));
     }
 
-    private void ShowQuantityPopup(Product? product)
+    private void AddToCart(Product? product)
     {
         if (product == null) return;
 
@@ -218,49 +162,14 @@ public class SaleViewModel : BaseViewModel
             return;
         }
 
-        PopupProduct = product;
-        PopupQuantity = 1;
-        IsQuantityPopupVisible = true;
-    }
-
-    private void ConfirmAddToCart()
-    {
-        if (PopupProduct == null) return;
-
-        if (PopupQuantity <= 0) PopupQuantity = 1;
-
-        var stockAvailable = PopupProduct.StockQuantity;
-        var existing = _cartState.Items.FirstOrDefault(c => c.ProductId == PopupProduct.Id);
-        if (existing != null)
-            stockAvailable -= existing.Quantity;
-
-        if (stockAvailable <= 0)
+        var existing = _cartState.Items.FirstOrDefault(c => c.ProductId == product.Id);
+        if (existing != null && existing.Quantity >= existing.StockQuantity)
         {
             Shell.Current.DisplayAlertAsync("Stock Limit",
-                $"No more stock available for \"{PopupProduct.Name}\".", "OK");
-            CancelQuantityPopup();
+                $"No more stock available for \"{product.Name}\".", "OK");
             return;
         }
 
-        if (PopupQuantity > stockAvailable)
-            PopupQuantity = stockAvailable;
-
-        _cartState.AddProduct(PopupProduct, PopupQuantity);
-        CancelQuantityPopup();
-    }
-
-    private void CancelQuantityPopup()
-    {
-        IsQuantityPopupVisible = false;
-        PopupProduct = null;
-        PopupQuantity = 1;
-    }
-
-    private void SetQuickQuantity(double qty)
-    {
-        if (PopupProduct != null && qty > PopupProduct.StockQuantity)
-            qty = PopupProduct.StockQuantity;
-
-        PopupQuantity = qty;
+        _cartState.AddProduct(product, 1);
     }
 }

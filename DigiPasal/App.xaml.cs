@@ -23,7 +23,7 @@ public partial class App : Application
 
         try
         {
-            await BackupService.Instance.CreateBackupAsync();
+            await BackupService.Instance.CreateBackupIfDueAsync(TimeSpan.FromHours(12));
         }
         catch
         {

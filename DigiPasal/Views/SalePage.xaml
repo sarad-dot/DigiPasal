@@ -23,20 +23,19 @@
                 <Border Grid.Column="0"
                         Stroke="{StaticResource InputStroke}" StrokeThickness="1"
                         BackgroundColor="{StaticResource InputBg}"
-                        HeightRequest="44">
+                        HeightRequest="44"
+                        Padding="14,0">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="10"/>
                     </Border.StrokeShape>
-                    <Grid ColumnDefinitions="Auto,*">
-                        <Label Grid.Column="0" Text="&#x1f50d;" FontSize="16"
-                               TextColor="{StaticResource TextSecondary}"
-                               VerticalOptions="Center" Margin="12,0,8,0"/>
-                        <SearchBar Grid.Column="1"
-                                   Placeholder="Search products or type barcode..."
-                                   Text="{Binding SearchQuery}"
-                                   CancelButtonColor="{StaticResource TealPrimary}"
-                                   BackgroundColor="Transparent" />
-                    </Grid>
+                    <Entry Placeholder="Search products or type barcode..."
+                           Text="{Binding SearchQuery}"
+                           BackgroundColor="Transparent"
+                           TextColor="{StaticResource TextPrimary}"
+                           PlaceholderColor="{StaticResource TextSecondary}"
+                           FontSize="14"
+                           VerticalOptions="Center"
+                           ClearButtonVisibility="WhileEditing" />
                 </Border>
                 <Button Grid.Column="1" Text="&#x1f4f7;" WidthRequest="44" HeightRequest="44"
                         Command="{Binding ScanBarcodeCommand}"
@@ -86,17 +85,14 @@
                 </VerticalStackLayout>
             </CollectionView.EmptyView>
             <CollectionView.ItemsLayout>
-                <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" SnapPointsAlignment="Start" SnapPointsType="Mandatory" />
+                <LinearItemsLayout Orientation="Vertical" ItemSpacing="0" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:Product">
                     <Border Padding="14,12" Margin="8,4"
                             StrokeShape="RoundRectangle 12"
-                            StrokeThickness="0"
+                            StrokeThickness="1"
                             BackgroundColor="{StaticResource CardBackground}">
-                        <Border.Shadow>
-                            <Shadow Brush="Black" Offset="0,1" Radius="6" Opacity="0.05"/>
-                        </Border.Shadow>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                             <VerticalStackLayout Grid.Column="0" Spacing="4">
                                 <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold"
@@ -157,118 +153,6 @@
                         HorizontalOptions="Fill" />
             </Grid>
         </Border>
-
-        <!-- ====== QUANTITY POPUP OVERLAY ====== -->
-        <Grid Grid.RowSpan="4" IsVisible="{Binding IsQuantityPopupVisible}"
-              ZIndex="100">
-            <Grid.GestureRecognizers>
-                <TapGestureRecognizer Command="{Binding CancelQuantityPopupCommand}" />
-            </Grid.GestureRecognizers>
-
-            <!-- Backdrop -->
-            <BoxView Color="Black" Opacity="0.4" />
-
-            <!-- Popup Card -->
-            <Border BackgroundColor="{StaticResource CardBackground}"
-                    StrokeThickness="0"
-                    WidthRequest="320"
-                    Padding="24"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="16"/>
-                </Border.StrokeShape>
-                <Border.Shadow>
-                    <Shadow Brush="Black" Offset="0,4" Radius="20" Opacity="0.15"/>
-                </Border.Shadow>
-
-                <VerticalStackLayout Spacing="16">
-                    <!-- Product Name -->
-                    <Label Text="{Binding PopupProduct.Name}" FontSize="18" FontAttributes="Bold"
-                           TextColor="{StaticResource TextPrimary}"
-                           LineBreakMode="TailTruncation" />
-
-                    <!-- Stock Info -->
-                    <Label Text="{Binding PopupStockHint}" FontSize="13"
-                           TextColor="{StaticResource TextSecondary}" />
-
-                    <!-- Quantity Entry -->
-                    <VerticalStackLayout Spacing="6">
-                        <Label Text="Quantity" FontSize="13" FontAttributes="Bold"
-                               TextColor="{StaticResource TextSecondary}" />
-                        <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
-                                BackgroundColor="{StaticResource InputBg}" HeightRequest="50">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="10"/>
-                            </Border.StrokeShape>
-                            <Entry Text="{Binding PopupQuantityText}"
-                                   Keyboard="Numeric"
-                                   FontSize="18" FontAttributes="Bold"
-                                   HorizontalTextAlignment="Center"
-                                   BackgroundColor="Transparent"
-                                   TextColor="{StaticResource TextPrimary}" />
-                        </Border>
-                    </VerticalStackLayout>
-
-                    <!-- Quick Quantity Presets -->
-                    <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="6">
-                        <Button Grid.Column="0" Text="1"
-                                Command="{Binding SetQuickQuantityCommand}"
-                                CommandParameter="1"
-                                BackgroundColor="{StaticResource TealLight}"
-                                TextColor="{StaticResource TealPrimary}"
-                                FontAttributes="Bold" HeightRequest="38"
-                                CornerRadius="8" FontSize="14" />
-                        <Button Grid.Column="1" Text="2"
-                                Command="{Binding SetQuickQuantityCommand}"
-                                CommandParameter="2"
-                                BackgroundColor="{StaticResource TealLight}"
-                                TextColor="{StaticResource TealPrimary}"
-                                FontAttributes="Bold" HeightRequest="38"
-                                CornerRadius="8" FontSize="14" />
-                        <Button Grid.Column="2" Text="5"
-                                Command="{Binding SetQuickQuantityCommand}"
-                                CommandParameter="5"
-                                BackgroundColor="{StaticResource TealLight}"
-                                TextColor="{StaticResource TealPrimary}"
-                                FontAttributes="Bold" HeightRequest="38"
-                                CornerRadius="8" FontSize="14" />
-                        <Button Grid.Column="3" Text="10"
-                                Command="{Binding SetQuickQuantityCommand}"
-                                CommandParameter="10"
-                                BackgroundColor="{StaticResource TealLight}"
-                                TextColor="{StaticResource TealPrimary}"
-                                FontAttributes="Bold" HeightRequest="38"
-                                CornerRadius="8" FontSize="14" />
-                        <Button Grid.Column="4" Text="20"
-                                Command="{Binding SetQuickQuantityCommand}"
-                                CommandParameter="20"
-                                BackgroundColor="{StaticResource TealLight}"
-                                TextColor="{StaticResource TealPrimary}"
-                                FontAttributes="Bold" HeightRequest="38"
-                                CornerRadius="8" FontSize="14" />
-                    </Grid>
-
-                    <!-- Action Buttons -->
-                    <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
-                        <Button Grid.Column="0" Text="Cancel"
-                                Command="{Binding CancelQuantityPopupCommand}"
-                                BackgroundColor="{StaticResource TealLight}"
-                                TextColor="{StaticResource TealPrimary}"
-                                FontAttributes="Bold"
-                                HeightRequest="48"
-                                CornerRadius="10" />
-                        <Button Grid.Column="1" Text="Add to Cart"
-                                Command="{Binding ConfirmAddToCartCommand}"
-                                BackgroundColor="{StaticResource TealPrimary}"
-                                TextColor="White"
-                                FontAttributes="Bold"
-                                HeightRequest="48"
-                                CornerRadius="10" />
-                    </Grid>
-                </VerticalStackLayout>
-            </Border>
-        </Grid>
     </Grid>
 
 </ContentPage>

@@ -95,11 +95,8 @@
                                 </SwipeView.RightItems>
                                 <Border Padding="14,12" Margin="0,4"
                                         StrokeShape="RoundRectangle 12"
-                                        StrokeThickness="0"
+                                        StrokeThickness="1"
                                         BackgroundColor="{StaticResource CardBackground}">
-                                    <Border.Shadow>
-                                        <Shadow Brush="Black" Offset="0,1" Radius="6" Opacity="0.05"/>
-                                    </Border.Shadow>
                                     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
                                         <VerticalStackLayout Grid.Column="0" Spacing="4">
                                             <Label Text="{Binding Name}" FontSize="16" FontAttributes="Bold"
