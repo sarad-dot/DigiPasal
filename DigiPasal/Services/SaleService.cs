@@ -28,8 +28,8 @@ public class SaleService
         if (items == null || items.Count == 0)
             throw new ArgumentException("Sale must have at least one item.", nameof(items));
 
-        sale.ReceiptNumber = await GenerateReceiptNumberAsync();
-        sale.CreatedAt = DateTime.UtcNow;
+        sale.CreatedAt = sale.CreatedAt == default ? DateTime.UtcNow : sale.CreatedAt.ToUniversalTime();
+        sale.ReceiptNumber = await GenerateReceiptNumberAsync(sale.CreatedAt);
 
         var copiedItems = items.Select(i => new SaleItem
         {
@@ -135,6 +135,52 @@ public class SaleService
         return await Database.Table<SaleItem>()
             .Where(si => si.SaleId == saleId)
             .ToListAsync();
+    }
+
+    public async Task<List<SaleListItem>> GetSalesListItemAsync(
+        DateTime? from = null,
+        DateTime? to = null,
+        string? query = null,
+        int limit = 500)
+    {
+        var sql = new System.Text.StringBuilder(
+            "SELECT S.Id, S.ReceiptNumber, S.Subtotal, S.DiscountAmount, S.TaxAmount, " +
+            "S.TotalAmount, S.GrandTotal, S.AmountPaid, S.CreditAmount, S.PaymentMethod, " +
+            "S.IsCredit, S.CreditBookType, S.CustomerId, S.CustomerName, S.UserId, S.Notes, " +
+            "S.IsVoided, S.IsQuickSale, S.CreatedAt, " +
+            "COUNT(SI.Id) AS ItemCount, COALESCE(SUM(SI.Quantity), 0) AS UnitCount " +
+            "FROM Sales S " +
+            "LEFT JOIN SaleItems SI ON SI.SaleId = S.Id " +
+            "WHERE S.IsVoided = 0 ");
+
+        var conditions = new List<string>();
+        var parameters = new List<object>();
+
+        if (from.HasValue)
+        {
+            conditions.Add("S.CreatedAt >= ?");
+            parameters.Add(from.Value.Date.ToUniversalTime());
+        }
+        if (to.HasValue)
+        {
+            conditions.Add("S.CreatedAt <= ?");
+            parameters.Add(to.Value.Date.AddDays(1).AddTicks(-1).ToUniversalTime());
+        }
+        if (!string.IsNullOrWhiteSpace(query))
+        {
+            var like = $"%{query.Trim().ToLower()}%";
+            conditions.Add("(LOWER(S.ReceiptNumber) LIKE ? OR LOWER(S.CustomerName) LIKE ?)");
+            parameters.Add(like);
+            parameters.Add(like);
+        }
+
+        if (conditions.Count > 0)
+            sql.Append("AND " + string.Join(" AND ", conditions) + " ");
+
+        sql.Append("GROUP BY S.Id ORDER BY S.CreatedAt DESC, S.Id DESC LIMIT ?");
+        parameters.Add(limit);
+
+        return await Database.QueryAsync<SaleListItem>(sql.ToString(), parameters.ToArray());
     }
 
     public async Task<DailySalesSummary> GetDailySalesSummaryAsync(DateTime date)
@@ -290,8 +336,8 @@ public class SaleService
         if (sale == null)
             throw new ArgumentNullException(nameof(sale));
 
-        sale.ReceiptNumber = await GenerateReceiptNumberAsync();
-        sale.CreatedAt = DateTime.UtcNow;
+        sale.CreatedAt = sale.CreatedAt == default ? DateTime.UtcNow : sale.CreatedAt.ToUniversalTime();
+        sale.ReceiptNumber = await GenerateReceiptNumberAsync(sale.CreatedAt);
         sale.IsQuickSale = true;
         sale.Subtotal = sale.GrandTotal;
         sale.TotalAmount = sale.GrandTotal;
@@ -327,23 +373,26 @@ public class SaleService
     }
 
     /// <summary>
-    /// Builds DP-yyyyMMdd-#### by seeding from the highest existing receipt for today
+    /// Builds DP-yyyyMMdd-#### using the sale's own date (so backdated receipts carry
+    /// the right prefix), seeding from the highest existing receipt number for that date
     /// so app restarts do not reuse numbers and hit UNIQUE on Sales.ReceiptNumber.
     /// </summary>
-    private async Task<string> GenerateReceiptNumberAsync()
+    private async Task<string> GenerateReceiptNumberAsync(DateTime saleDate)
     {
-        var today = DateTime.UtcNow.Date;
-        var prefix = $"DP-{today:yyyyMMdd}-";
+        var day = saleDate.Date;
+        var prefix = $"DP-{day:yyyyMMdd}-";
 
         await _receiptLock.WaitAsync();
         try
         {
-            if (today != _counterDate)
+            if (day == _counterDate.Date)
             {
-                _counterDate = today;
-                _dailyCounter = await GetMaxDailySequenceAsync(prefix);
+                _dailyCounter++;
+                return $"{prefix}{_dailyCounter:D4}";
             }
 
+            _counterDate = day;
+            _dailyCounter = await GetMaxDailySequenceAsync(prefix);
             _dailyCounter++;
             return $"{prefix}{_dailyCounter:D4}";
         }
@@ -403,4 +452,29 @@ public class ProfitDayRow
     public decimal CostOfGoods { get; set; }
     public int SalesCount { get; set; }
     public decimal Profit => Revenue - CostOfGoods;
+}
+
+public class SaleListItem
+{
+    public int Id { get; set; }
+    public string ReceiptNumber { get; set; } = string.Empty;
+    public decimal Subtotal { get; set; }
+    public decimal DiscountAmount { get; set; }
+    public decimal TaxAmount { get; set; }
+    public decimal TotalAmount { get; set; }
+    public decimal GrandTotal { get; set; }
+    public decimal AmountPaid { get; set; }
+    public decimal CreditAmount { get; set; }
+    public string PaymentMethod { get; set; } = "Cash";
+    public bool IsCredit { get; set; }
+    public int CreditBookType { get; set; }
+    public int? CustomerId { get; set; }
+    public string CustomerName { get; set; } = string.Empty;
+    public int UserId { get; set; }
+    public string Notes { get; set; } = string.Empty;
+    public bool IsVoided { get; set; }
+    public bool IsQuickSale { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public int ItemCount { get; set; }
+    public int UnitCount { get; set; }
 }

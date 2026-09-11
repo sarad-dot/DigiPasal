@@ -216,37 +216,6 @@
 
                 </Grid>
 
-
-                <!-- =================================================
-                     TAGLINE BANNER
-                     ================================================= -->
-
-                <!-- <Border -->
-                <!--     BackgroundColor="{StaticResource SuccessGreen}" -->
-                <!--     StrokeThickness="0" -->
-                <!--     Padding="10" -->
-                <!--     StrokeShape="RoundRectangle 12"> -->
-                <!-- -->
-                <!--     <VerticalStackLayout -->
-                <!--         Spacing="4"> -->
-                <!-- -->
-                <!--         <Label -->
-                <!--             Text="Manage your business easily" -->
-                <!--             FontSize="14" -->
-                <!--             FontAttributes="Bold" -->
-                <!--             TextColor="White" /> -->
-                <!-- -->
-                <!--         <Label -->
-                <!--             Text="Nepal's trusted Kirana management app" -->
-                <!--             FontSize="10" -->
-                <!--             TextColor="White" -->
-                <!--             Opacity="0.92" /> -->
-                <!-- -->
-                <!--     </VerticalStackLayout> -->
-                <!-- -->
-                <!-- </Border> -->
-
-
                 <!-- =================================================
                      METRIC CARDS
                      ================================================= -->
@@ -256,61 +225,6 @@
                     RowDefinitions="Auto,Auto"
                     ColumnSpacing="12"
                     RowSpacing="12">
-
-
-                    <!-- ~1~ RECEIVABLE @1@ -->
-                    <!-- -->
-                    <!-- <Border -->
-                    <!--     Grid.Row="0" -->
-                    <!--     Grid.Column="0" -->
-                    <!--     Style="{StaticResource CardFrameStyle}"> -->
-                    <!-- -->
-                    <!--     <VerticalStackLayout Spacing="8"> -->
-                    <!-- -->
-                    <!--         <Label -->
-                    <!--             Text="Receivable" -->
-                    <!--             Style="{StaticResource MetricTitleStyle}" /> -->
-                    <!-- -->
-                    <!--         <Label -->
-                    <!--             Text="₹80,000" -->
-                    <!--             Style="{StaticResource MetricValueStyle}" /> -->
-                    <!-- -->
-                    <!--         <Label -->
-                    <!--             Text="⬆️ +5%" -->
-                    <!--             Style="{StaticResource TrendStyle}" -->
-                    <!--             TextColor="{StaticResource SuccessGreen}" /> -->
-                    <!-- -->
-                    <!--     </VerticalStackLayout> -->
-                    <!-- -->
-                    <!-- </Border> -->
-                    <!-- -->
-                    <!-- -->
-                    <!-- ~1~ PAYABLE @1@ -->
-                    <!-- -->
-                    <!-- <Border -->
-                    <!--     Grid.Row="0" -->
-                    <!--     Grid.Column="1" -->
-                    <!--     Style="{StaticResource CardFrameStyle}"> -->
-                    <!-- -->
-                    <!--     <VerticalStackLayout Spacing="8"> -->
-                    <!-- -->
-                    <!--         <Label -->
-                    <!--             Text="Payable" -->
-                    <!--             Style="{StaticResource MetricTitleStyle}" /> -->
-                    <!-- -->
-                    <!--         <Label -->
-                    <!--             Text="₹70,000" -->
-                    <!--             Style="{StaticResource MetricValueStyle}" /> -->
-                    <!-- -->
-                    <!--         <Label -->
-                    <!--             Text="⬇️ -2%" -->
-                    <!--             Style="{StaticResource TrendStyle}" -->
-                    <!--             TextColor="{StaticResource DangerRed}" /> -->
-                    <!-- -->
-                    <!--     </VerticalStackLayout> -->
-                    <!-- -->
-                    <!-- </Border> -->
-
 
                     <!-- SALES -->
 

@@ -120,7 +120,7 @@ public partial class DashboardPage : ContentPage
         TappedEventArgs e)
     {
         ProfileDropdownOverlay.IsVisible = false;
-        await Shell.Current.GoToAsync("Profile");
+        await NavigationGuard.GoToAsync("Profile");
     }
 
     private async void MenuChangePassword_Tapped(
@@ -128,7 +128,7 @@ public partial class DashboardPage : ContentPage
         TappedEventArgs e)
     {
         ProfileDropdownOverlay.IsVisible = false;
-        await Shell.Current.GoToAsync("ChangePassword");
+        await NavigationGuard.GoToAsync("ChangePassword");
     }
 
     private async void MenuLogout_Tapped(
@@ -164,7 +164,7 @@ public partial class DashboardPage : ContentPage
         object? sender,
         TappedEventArgs e)
     {
-        await Shell.Current.GoToAsync("Sales");
+        await NavigationGuard.GoToAsync("//Dashboard/Sales");
     }
 
 
@@ -172,7 +172,7 @@ public partial class DashboardPage : ContentPage
         object? sender,
         TappedEventArgs e)
     {
-        await Shell.Current.GoToAsync("SalesReport");
+        await NavigationGuard.GoToAsync("SalesReport");
     }
 
 
@@ -180,7 +180,7 @@ public partial class DashboardPage : ContentPage
         object? sender,
         TappedEventArgs e)
     {
-        await Shell.Current.GoToAsync("StockReport");
+        await NavigationGuard.GoToAsync("StockReport");
     }
 
 
@@ -188,7 +188,7 @@ public partial class DashboardPage : ContentPage
         object? sender,
         TappedEventArgs e)
     {
-        await Shell.Current.GoToAsync("ProfitReport");
+        await NavigationGuard.GoToAsync("ProfitReport");
     }
 
 
@@ -196,7 +196,7 @@ public partial class DashboardPage : ContentPage
         object? sender,
         TappedEventArgs e)
     {
-        await Shell.Current.GoToAsync("CreditReports");
+        await NavigationGuard.GoToAsync("CreditReports");
     }
 
 
@@ -204,7 +204,7 @@ public partial class DashboardPage : ContentPage
         object? sender,
         TappedEventArgs e)
     {
-        await Shell.Current.GoToAsync("Reports");
+        await NavigationGuard.GoToAsync("Reports");
     }
 
 
@@ -212,7 +212,7 @@ public partial class DashboardPage : ContentPage
         object? sender,
         TappedEventArgs e)
     {
-        await Shell.Current.GoToAsync("QuickSale");
+        await NavigationGuard.GoToAsync("//Dashboard/QuickSale");
     }
 
 
@@ -232,7 +232,7 @@ public partial class DashboardPage : ContentPage
         object? sender,
         TappedEventArgs e)
     {
-        await Shell.Current.GoToAsync("Sales");
+        await NavigationGuard.GoToAsync("//Dashboard/Sales");
     }
 
 
@@ -240,7 +240,7 @@ public partial class DashboardPage : ContentPage
         object? sender,
         TappedEventArgs e)
     {
-        await Shell.Current.GoToAsync("Credit");
+        await NavigationGuard.GoToAsync("//Dashboard/Credit");
     }
 
 
@@ -248,7 +248,7 @@ public partial class DashboardPage : ContentPage
         object? sender,
         TappedEventArgs e)
     {
-        await Shell.Current.GoToAsync("Products");
+        await NavigationGuard.GoToAsync("//Dashboard/Products");
     }
 
 
@@ -256,6 +256,6 @@ public partial class DashboardPage : ContentPage
         object? sender,
         TappedEventArgs e)
     {
-        await Shell.Current.GoToAsync("Settings");
+        await NavigationGuard.GoToAsync("//Dashboard/Settings");
     }
 }

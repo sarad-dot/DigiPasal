@@ -19,15 +19,22 @@ public partial class SettingsPage : ContentPage
 
     protected override async void OnAppearing()
     {
-        base.OnAppearing();
-
-        if (!_authService.IsAuthenticated)
+        try
         {
-            await Shell.Current.GoToAsync("//Login");
-            return;
-        }
+            base.OnAppearing();
 
-        await _viewModel.LoadAsync();
+            if (!_authService.IsAuthenticated)
+            {
+                await Shell.Current.GoToAsync("//Login");
+                return;
+            }
+
+            await _viewModel.LoadAsync();
+        }
+        catch (Exception)
+        {
+            throw; // TODO handle exception
+        }
     }
 
     private async void OnBackTapped(object? sender, TappedEventArgs e)
@@ -36,28 +43,46 @@ public partial class SettingsPage : ContentPage
     }
 
     private async void ShopSettings_Tapped(object? sender, TappedEventArgs e)
-        => await Shell.Current.GoToAsync("ShopSettings");
+        => await NavigationGuard.GoToAsync("ShopSettings");
 
     private async void Reports_Tapped(object? sender, TappedEventArgs e)
-        => await Shell.Current.GoToAsync("Reports");
+        => await NavigationGuard.GoToAsync("Reports");
 
     private async void SalesReport_Tapped(object? sender, TappedEventArgs e)
-        => await Shell.Current.GoToAsync("SalesReport");
+        => await NavigationGuard.GoToAsync("SalesReport");
 
     private async void StockReport_Tapped(object? sender, TappedEventArgs e)
-        => await Shell.Current.GoToAsync("StockReport");
+        => await NavigationGuard.GoToAsync("StockReport");
 
     private async void ProfitReport_Tapped(object? sender, TappedEventArgs e)
-        => await Shell.Current.GoToAsync("ProfitReport");
+        => await NavigationGuard.GoToAsync("ProfitReport");
 
     private async void CreditReport_Tapped(object? sender, TappedEventArgs e)
-        => await Shell.Current.GoToAsync("CreditReports");
+        => await NavigationGuard.GoToAsync("CreditReports");
+
+    private async void ReopenBook_Tapped(object? sender, TappedEventArgs e)
+        => await _viewModel.ReopenDailyBookAsync();
+
+    private async void BookLog_Tapped(object? sender, TappedEventArgs e)
+        => await _viewModel.NavigateBookLogAsync();
+
+    private async void ImportPartners_Tapped(object? sender, TappedEventArgs e)
+        => await _viewModel.NavigateImportAsync("partners");
+
+    private async void ImportInventory_Tapped(object? sender, TappedEventArgs e)
+        => await _viewModel.NavigateImportAsync("inventory");
+
+    private async void ImportSales_Tapped(object? sender, TappedEventArgs e)
+        => await _viewModel.NavigateImportAsync("sales");
+
+    private async void WholesaleBill_Tapped(object? sender, TappedEventArgs e)
+        => await _viewModel.NavigateWholesaleBillAsync();
 
     private async void Profile_Tapped(object? sender, TappedEventArgs e)
-        => await Shell.Current.GoToAsync("Profile");
+        => await NavigationGuard.GoToAsync("Profile");
 
     private async void ChangePassword_Tapped(object? sender, TappedEventArgs e)
-        => await Shell.Current.GoToAsync("ChangePassword");
+        => await NavigationGuard.GoToAsync("ChangePassword");
 
     private async void OnRestoreClicked(object? sender, EventArgs e)
     {

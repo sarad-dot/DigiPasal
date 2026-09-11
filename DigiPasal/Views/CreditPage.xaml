@@ -147,8 +147,15 @@
                         FontSize="12" CornerRadius="8" />
                 <Button Grid.Column="4" Text="Close Book" HeightRequest="36" FontAttributes="Bold"
                         Command="{Binding CloseDailyBookCommand}"
+                        IsVisible="{Binding ShowCloseBook}"
                         IsEnabled="{Binding CanCloseBook}"
                         BackgroundColor="{StaticResource ErrorRed}"
+                        TextColor="White"
+                        FontSize="11" CornerRadius="8" />
+                <Button Grid.Column="4" Text="🧾 Voucher" HeightRequest="36" FontAttributes="Bold"
+                        Command="{Binding ViewVoucherCommand}"
+                        IsVisible="{Binding ShowViewVoucher}"
+                        BackgroundColor="{StaticResource TealPrimary}"
                         TextColor="White"
                         FontSize="11" CornerRadius="8" />
             </Grid>

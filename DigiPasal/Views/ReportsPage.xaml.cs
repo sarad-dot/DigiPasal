@@ -23,14 +23,14 @@ public partial class ReportsPage : ContentPage
     }
 
     private async void SalesReport_Tapped(object? sender, TappedEventArgs e)
-        => await Shell.Current.GoToAsync("SalesReport");
+        => await NavigationGuard.GoToAsync("SalesReport");
 
     private async void StockReport_Tapped(object? sender, TappedEventArgs e)
-        => await Shell.Current.GoToAsync("StockReport");
+        => await NavigationGuard.GoToAsync("StockReport");
 
     private async void ProfitReport_Tapped(object? sender, TappedEventArgs e)
-        => await Shell.Current.GoToAsync("ProfitReport");
+        => await NavigationGuard.GoToAsync("ProfitReport");
 
     private async void CreditReport_Tapped(object? sender, TappedEventArgs e)
-        => await Shell.Current.GoToAsync("CreditReports");
+        => await NavigationGuard.GoToAsync("CreditReports");
 }

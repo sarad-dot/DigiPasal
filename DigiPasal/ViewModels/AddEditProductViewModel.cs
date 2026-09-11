@@ -8,6 +8,7 @@ namespace DigiPasal.ViewModels;
 public class AddEditProductViewModel : BaseViewModel, IQueryAttributable
 {
     private readonly ProductService _productService;
+    private bool _isSaving;
 
     private int _productId;
     private string _name = string.Empty;
@@ -144,7 +145,14 @@ public class AddEditProductViewModel : BaseViewModel, IQueryAttributable
     {
         var product = await _productService.GetProductAsync(id);
         if (product == null)
+        {
+            await Shell.Current.DisplayAlertAsync(
+                "Product Not Found",
+                "This product no longer exists. It may have been deleted.",
+                "OK");
+            await Shell.Current.GoToAsync("..");
             return;
+        }
 
         Name = product.Name;
         Category = product.Category;
@@ -161,6 +169,9 @@ public class AddEditProductViewModel : BaseViewModel, IQueryAttributable
 
     private async Task SaveAsync()
     {
+        if (_isSaving)
+            return;
+
         if (string.IsNullOrWhiteSpace(Name))
         {
             await Shell.Current.DisplayAlertAsync("Validation", "Product name is required.", "OK");
@@ -195,6 +206,8 @@ public class AddEditProductViewModel : BaseViewModel, IQueryAttributable
 
         try
         {
+            _isSaving = true;
+
             await _productService.SaveProductAsync(product);
             await Shell.Current.DisplayAlertAsync(
                 "Success",
@@ -205,6 +218,10 @@ public class AddEditProductViewModel : BaseViewModel, IQueryAttributable
         catch (Exception ex)
         {
             await Shell.Current.DisplayAlertAsync("Error", $"Failed to save product: {ex.Message}", "OK");
+        }
+        finally
+        {
+            _isSaving = false;
         }
     }
 }

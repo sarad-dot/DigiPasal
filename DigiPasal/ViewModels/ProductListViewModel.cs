@@ -74,7 +74,7 @@ public class ProductListViewModel : BaseViewModel
         Title = "Products";
 
         LoadProductsCommand = new Command(async () => await LoadProductsAsync());
-        AddProductCommand = new Command(async () => await Shell.Current.GoToAsync("AddProduct"));
+        AddProductCommand = new Command(async () => await NavigationGuard.GoToAsync("AddProduct"));
         EditProductCommand = new Command<Product>(async (product) => await EditProductAsync(product));
         DeleteProductCommand = new Command<Product>(async (product) => await DeleteProductAsync(product));
         ToggleSearchCommand = new Command(() => IsSearchVisible = !IsSearchVisible);
@@ -132,7 +132,7 @@ public class ProductListViewModel : BaseViewModel
         if (product == null)
             return;
 
-        await Shell.Current.GoToAsync($"EditProduct?id={product.Id}");
+        await NavigationGuard.GoToAsync($"EditProduct?id={product.Id}");
     }
 
     private async Task DeleteProductAsync(Product? product)

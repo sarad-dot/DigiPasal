@@ -34,9 +34,9 @@ public class MainActivity : MauiAppCompatActivity
         if (keyguardManager == null || !keyguardManager.IsKeyguardSecure)
             return false;
 
-        IExecutor executor = Build.VERSION.SdkInt >= BuildVersionCodes.P
+        IExecutor executor = (Build.VERSION.SdkInt >= BuildVersionCodes.P
             ? ContextCompat.GetMainExecutor(this) ?? Executors.NewSingleThreadExecutor()
-            : Executors.NewSingleThreadExecutor();
+            : Executors.NewSingleThreadExecutor())!;
 
         var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 

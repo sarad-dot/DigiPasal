@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             xmlns:svc="clr-namespace:DigiPasal.Services"
+             x:Class="DigiPasal.Views.DataImportPage"
+             x:DataType="vm:DataImportViewModel"
+             Title="Import Data"
+             Shell.TabBarIsVisible="False"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource AppBackground}">
+
+        <!-- ══════════ HEADER ══════════ -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
+              Padding="16,52,16,12" BackgroundColor="{StaticResource TealPrimary}">
+            <Grid Grid.Column="0" ColumnDefinitions="Auto,Auto" ColumnSpacing="6"
+                  VerticalOptions="Center">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackTapped"/>
+                </Grid.GestureRecognizers>
+                <Label Text="◀" FontSize="20" TextColor="White" VerticalOptions="Center"/>
+                <Label Text="📥" Grid.Column="1" FontSize="20" TextColor="White"
+                       VerticalOptions="Center"/>
+            </Grid>
+            <Label Grid.Column="1" Text="Import Data" FontSize="20" FontAttributes="Bold"
+                   TextColor="White" VerticalOptions="Center"/>
+            <Label Grid.Column="2" Text=""/>
+        </Grid>
+
+        <!-- ══════════ BODY ══════════ -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="12">
+
+                <!-- Type segment -->
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+                    <Button Grid.Column="0" Text="Partners" Command="{Binding SelectPartnersCommand}"
+                            FontSize="12" HeightRequest="40" CornerRadius="8"
+                            BackgroundColor="{StaticResource InputBg}"
+                            TextColor="{StaticResource TextSecondary}" BorderWidth="1"
+                            BorderColor="{StaticResource InputStroke}">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button" Binding="{Binding IsPartnersSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource TealLight}"/>
+                                <Setter Property="TextColor" Value="{StaticResource TealPrimary}"/>
+                                <Setter Property="BorderColor" Value="{StaticResource TealPrimary}"/>
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                    <Button Grid.Column="1" Text="Inventory" Command="{Binding SelectInventoryCommand}"
+                            FontSize="12" HeightRequest="40" CornerRadius="8"
+                            BackgroundColor="{StaticResource InputBg}"
+                            TextColor="{StaticResource TextSecondary}" BorderWidth="1"
+                            BorderColor="{StaticResource InputStroke}">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button" Binding="{Binding IsInventorySelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource TealLight}"/>
+                                <Setter Property="TextColor" Value="{StaticResource TealPrimary}"/>
+                                <Setter Property="BorderColor" Value="{StaticResource TealPrimary}"/>
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                    <Button Grid.Column="2" Text="Sales" Command="{Binding SelectSalesCommand}"
+                            FontSize="12" HeightRequest="40" CornerRadius="8"
+                            BackgroundColor="{StaticResource InputBg}"
+                            TextColor="{StaticResource TextSecondary}" BorderWidth="1"
+                            BorderColor="{StaticResource InputStroke}">
+                        <Button.Triggers>
+                            <DataTrigger TargetType="Button" Binding="{Binding IsSalesSelected}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource TealLight}"/>
+                                <Setter Property="TextColor" Value="{StaticResource TealPrimary}"/>
+                                <Setter Property="BorderColor" Value="{StaticResource TealPrimary}"/>
+                            </DataTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </Grid>
+
+                <Label Text="{Binding Hint}" FontSize="12"
+                       TextColor="{StaticResource TextSecondary}" LineBreakMode="WordWrap"/>
+
+                <!-- Actions -->
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                    <Button Grid.Column="0" Text="Choose Excel / CSV File"
+                            Command="{Binding PickFileCommand}"
+                            BackgroundColor="{StaticResource TealPrimary}"
+                            TextColor="White" FontSize="14" FontAttributes="Bold"
+                            HeightRequest="46" CornerRadius="10"/>
+                    <Button Grid.Column="1" Text="⬇ Template"
+                            Command="{Binding DownloadTemplateCommand}"
+                            BackgroundColor="{StaticResource InputBg}"
+                            TextColor="{StaticResource TealPrimary}"
+                            FontSize="12" FontAttributes="Bold"
+                            HeightRequest="46" CornerRadius="10"
+                            BorderColor="{StaticResource TealPrimary}" BorderWidth="1"
+                            Padding="14,0"/>
+                </Grid>
+
+                <Label Text="{Binding FileName}" FontSize="13" FontAttributes="Bold"
+                       TextColor="{StaticResource TealPrimary}"
+                       IsVisible="{Binding HasFile}" LineBreakMode="TailTruncation"/>
+
+                <Label Text="{Binding FileError}" FontSize="13"
+                       TextColor="{StaticResource ErrorRed}"
+                       IsVisible="{Binding HasFileError}" LineBreakMode="WordWrap"/>
+
+                <Label Text="{Binding PreviewNote}" FontSize="12"
+                       TextColor="{StaticResource TextSecondary}"
+                       IsVisible="{Binding HasPreview}"
+                       HorizontalTextAlignment="End"/>
+
+                <!-- Preview -->
+                <VerticalStackLayout Spacing="8" IsVisible="{Binding HasPreview}">
+                    <BindableLayout.ItemsSource>
+                        <Binding Path="Rows"/>
+                    </BindableLayout.ItemsSource>
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="svc:ImportRow">
+                            <Border BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                                    Padding="12,10">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="10"/></Border.StrokeShape>
+                                <VerticalStackLayout Spacing="2">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                                        <Label Text="{Binding RowNumber, StringFormat='#{0}'}"
+                                               FontSize="11" TextColor="{StaticResource Gray400}"
+                                               VerticalOptions="Center"/>
+                                        <Label Text="{Binding Summary}" FontSize="13" FontAttributes="Bold"
+                                               TextColor="{StaticResource TextPrimary}"
+                                               LineBreakMode="TailTruncation" MaxLines="1"/>
+                                        <Label Text="⚠" FontSize="14" TextColor="{StaticResource ErrorRed}"
+                                               IsVisible="{Binding HasError}"/>
+                                    </Grid>
+                                    <Label Text="{Binding Detail}" FontSize="12"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           LineBreakMode="TailTruncation" MaxLines="2"/>
+                                    <Label Text="{Binding Error}" FontSize="12"
+                                           TextColor="{StaticResource ErrorRed}"
+                                           IsVisible="{Binding HasError}"/>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <Button Text="Import Now" Command="{Binding ImportCommand}"
+                        IsEnabled="{Binding IsNotBusy}"
+                        BackgroundColor="{StaticResource SuccessGreen}"
+                        TextColor="White" FontSize="15" FontAttributes="Bold"
+                        HeightRequest="48" CornerRadius="10"
+                        IsVisible="{Binding HasPreview}"/>
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                   Color="{StaticResource TealPrimary}"/>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

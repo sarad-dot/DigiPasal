@@ -88,7 +88,9 @@ public class DatabaseService
             { 2, Migration_V2_ProductsCustomersSettings },
             { 3, Migration_V3_SalesSaleItems },
             { 4, Migration_V4_QuickSale },
-            { 5, Migration_V5_CreditBooks }
+            { 5, Migration_V5_CreditBooks },
+            { 6, Migration_V6_DayBookLog },
+            { 7, Migration_V7_Purchases }
         };
 
         int currentVersion = await GetCurrentVersionAsync();
@@ -180,6 +182,17 @@ public class DatabaseService
         }
 
         await _database!.CreateTableAsync<CreditPayment>();
+    }
+
+    private async Task Migration_V6_DayBookLog()
+    {
+        await _database!.CreateTableAsync<DayBookLog>();
+    }
+
+    private async Task Migration_V7_Purchases()
+    {
+        await _database!.CreateTableAsync<Purchase>();
+        await _database!.CreateTableAsync<PurchaseItem>();
     }
 
     private class ColumnInfo

@@ -72,6 +72,9 @@ namespace DigiPasal.ViewModels
 
         private async Task Register()
         {
+            if (IsBusy)
+                return;
+
             if (string.IsNullOrWhiteSpace(Username))
             {
                 SetError("Username is required");

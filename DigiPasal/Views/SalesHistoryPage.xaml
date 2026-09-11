@@ -2,30 +2,167 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:DigiPasal.ViewModels"
-             xmlns:models="clr-namespace:DigiPasal.Models"
              x:Class="DigiPasal.Views.SalesHistoryPage"
              Title="Sales History"
              Shell.TabBarIsVisible="False"
              x:DataType="vm:SalesHistoryViewModel"
              BackgroundColor="{StaticResource AppBackground}">
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="0">
+    <Grid RowDefinitions="Auto,Auto,*" RowSpacing="0">
 
-        <!-- Date Range -->
+        <!-- Filter Card -->
         <Border Grid.Row="0" Padding="16,14"
                 BackgroundColor="{StaticResource CardBackground}"
                 StrokeThickness="0">
             <Border.Shadow>
                 <Shadow Brush="Black" Offset="0,2" Radius="8" Opacity="0.06"/>
             </Border.Shadow>
-            <VerticalStackLayout Spacing="10">
-                <Grid ColumnDefinitions="*,Auto,*,Auto" ColumnSpacing="8">
+            <VerticalStackLayout Spacing="12">
+
+                <!-- Search -->
+                <Border Stroke="{StaticResource InputStroke}" StrokeThickness="1"
+                        BackgroundColor="{StaticResource InputBg}" HeightRequest="44">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="12"/>
+                    </Border.StrokeShape>
+                    <Entry Placeholder="Search receipt or customer"
+                           Text="{Binding SearchQuery}"
+                           BackgroundColor="Transparent"
+                           Margin="12,0" VerticalOptions="Center"
+                           FontSize="14" />
+                </Border>
+
+                <!-- Preset Chips -->
+                <ScrollView Orientation="Horizontal"
+                            HorizontalScrollBarVisibility="Never">
+                    <HorizontalStackLayout Spacing="8">
+                        <Border Padding="16,0" HeightRequest="34" VerticalOptions="Center"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource TealLight}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectPresetCommand}" CommandParameter="today"/>
+                            </Border.GestureRecognizers>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding SelectedPreset}" Value="today">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Label Text="Today" FontSize="12" FontAttributes="Bold"
+                                   VerticalOptions="Center" HorizontalOptions="Center"
+                                   TextColor="{StaticResource TealPrimary}">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding SelectedPreset}" Value="today">
+                                        <Setter Property="TextColor" Value="White" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Border>
+
+                        <Border Padding="16,0" HeightRequest="34" VerticalOptions="Center"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource TealLight}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectPresetCommand}" CommandParameter="week"/>
+                            </Border.GestureRecognizers>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding SelectedPreset}" Value="week">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Label Text="Week" FontSize="12" FontAttributes="Bold"
+                                   VerticalOptions="Center" HorizontalOptions="Center"
+                                   TextColor="{StaticResource TealPrimary}">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding SelectedPreset}" Value="week">
+                                        <Setter Property="TextColor" Value="White" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Border>
+
+                        <Border Padding="16,0" HeightRequest="34" VerticalOptions="Center"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource TealLight}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectPresetCommand}" CommandParameter="month"/>
+                            </Border.GestureRecognizers>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding SelectedPreset}" Value="month">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Label Text="Month" FontSize="12" FontAttributes="Bold"
+                                   VerticalOptions="Center" HorizontalOptions="Center"
+                                   TextColor="{StaticResource TealPrimary}">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding SelectedPreset}" Value="month">
+                                        <Setter Property="TextColor" Value="White" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Border>
+
+                        <Border Padding="16,0" HeightRequest="34" VerticalOptions="Center"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource TealLight}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectPresetCommand}" CommandParameter="year"/>
+                            </Border.GestureRecognizers>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding SelectedPreset}" Value="year">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Label Text="Year" FontSize="12" FontAttributes="Bold"
+                                   VerticalOptions="Center" HorizontalOptions="Center"
+                                   TextColor="{StaticResource TealPrimary}">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding SelectedPreset}" Value="year">
+                                        <Setter Property="TextColor" Value="White" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Border>
+
+                        <Border Padding="16,0" HeightRequest="34" VerticalOptions="Center"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource TealLight}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding SelectPresetCommand}" CommandParameter="custom"/>
+                            </Border.GestureRecognizers>
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding SelectedPreset}" Value="custom">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Label Text="Custom" FontSize="12" FontAttributes="Bold"
+                                   VerticalOptions="Center" HorizontalOptions="Center"
+                                   TextColor="{StaticResource TealPrimary}">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding SelectedPreset}" Value="custom">
+                                        <Setter Property="TextColor" Value="White" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                        </Border>
+                    </HorizontalStackLayout>
+                </ScrollView>
+
+                <!-- Custom Range -->
+                <Grid IsVisible="{Binding IsCustomRange}"
+                      ColumnDefinitions="*,Auto,*,Auto" ColumnSpacing="8">
                     <Border Grid.Column="0" Stroke="{StaticResource InputStroke}" StrokeThickness="1"
                             BackgroundColor="{StaticResource InputBg}" HeightRequest="42">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="10"/>
                         </Border.StrokeShape>
                         <DatePicker Date="{Binding DateFrom}" Format="dd MMM yyyy"
+                                    MaximumDate="{Binding MaximumDate}"
                                     BackgroundColor="Transparent" />
                     </Border>
                     <Label Grid.Column="1" Text="to" VerticalTextAlignment="Center"
@@ -36,6 +173,7 @@
                             <RoundRectangle CornerRadius="10"/>
                         </Border.StrokeShape>
                         <DatePicker Date="{Binding DateTo}" Format="dd MMM yyyy"
+                                    MaximumDate="{Binding MaximumDate}"
                                     BackgroundColor="Transparent" />
                     </Border>
                     <Button Grid.Column="3" Text="Go" WidthRequest="50"
@@ -43,44 +181,31 @@
                             BackgroundColor="{StaticResource TealPrimary}" TextColor="White"
                             CornerRadius="10" HeightRequest="42" />
                 </Grid>
-                <HorizontalStackLayout Spacing="8">
-                    <Button Text="Today" Command="{Binding SetTodayCommand}"
-                            BackgroundColor="{StaticResource TealLight}"
-                            TextColor="{StaticResource TealPrimary}"
-                            FontSize="12" HeightRequest="32" CornerRadius="8" />
-                    <Button Text="This Week" Command="{Binding SetWeekCommand}"
-                            BackgroundColor="{StaticResource TealLight}"
-                            TextColor="{StaticResource TealPrimary}"
-                            FontSize="12" HeightRequest="32" CornerRadius="8" />
-                    <Button Text="This Month" Command="{Binding SetMonthCommand}"
-                            BackgroundColor="{StaticResource TealLight}"
-                            TextColor="{StaticResource TealPrimary}"
-                            FontSize="12" HeightRequest="32" CornerRadius="8" />
-                </HorizontalStackLayout>
+
             </VerticalStackLayout>
         </Border>
 
-        <!-- Summary Stats Row -->
+        <!-- Stats -->
         <Border Grid.Row="1" Padding="16,10"
                 BackgroundColor="{StaticResource CardBackground}"
                 StrokeThickness="0">
             <Border.Shadow>
                 <Shadow Brush="Black" Offset="0,1" Radius="6" Opacity="0.04"/>
             </Border.Shadow>
-            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8">
+            <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
                 <Border Grid.Column="0" StrokeShape="RoundRectangle 10"
                         BackgroundColor="{StaticResource TealLight}" Padding="8,8">
                     <VerticalStackLayout Spacing="2">
-                        <Label Text="Total" FontSize="11"
+                        <Label Text="Sales" FontSize="11" FontAttributes="Bold"
                                TextColor="{StaticResource TealPrimary}" HorizontalTextAlignment="Center" />
-                        <Label Text="{Binding TotalSalesDisplay}" FontSize="14" FontAttributes="Bold"
+                        <Label Text="{Binding SalesCountDisplay}" FontSize="14" FontAttributes="Bold"
                                HorizontalTextAlignment="Center" TextColor="{StaticResource TealPrimary}" />
                     </VerticalStackLayout>
                 </Border>
                 <Border Grid.Column="1" StrokeShape="RoundRectangle 10"
                         BackgroundColor="#E8F5E9" Padding="8,8">
                     <VerticalStackLayout Spacing="2">
-                        <Label Text="Cash" FontSize="11"
+                        <Label Text="Cash" FontSize="11" FontAttributes="Bold"
                                TextColor="{StaticResource SuccessGreen}" HorizontalTextAlignment="Center" />
                         <Label Text="{Binding CashSalesDisplay}" FontSize="14" FontAttributes="Bold"
                                HorizontalTextAlignment="Center" TextColor="{StaticResource SuccessGreen}" />
@@ -89,90 +214,102 @@
                 <Border Grid.Column="2" StrokeShape="RoundRectangle 10"
                         BackgroundColor="#FFF3E0" Padding="8,8">
                     <VerticalStackLayout Spacing="2">
-                        <Label Text="Credit" FontSize="11"
+                        <Label Text="Credit" FontSize="11" FontAttributes="Bold"
                                TextColor="{StaticResource SecondaryGold}" HorizontalTextAlignment="Center" />
                         <Label Text="{Binding CreditSalesDisplay}" FontSize="14" FontAttributes="Bold"
                                HorizontalTextAlignment="Center" TextColor="{StaticResource SecondaryGold}" />
                     </VerticalStackLayout>
                 </Border>
+                <Border Grid.Column="3" StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{StaticResource TealLight}" Padding="8,8">
+                    <VerticalStackLayout Spacing="2">
+                        <Label Text="Units" FontSize="11" FontAttributes="Bold"
+                               TextColor="{StaticResource TextSecondary}" HorizontalTextAlignment="Center" />
+                        <Label Text="{Binding UnitsCountDisplay}" FontSize="14" FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                </Border>
             </Grid>
         </Border>
 
-        <!-- Sales List -->
-        <CollectionView Grid.Row="2"
-                        ItemsSource="{Binding Sales}"
-                        SelectionMode="None"
-                        BackgroundColor="{StaticResource AppBackground}">
-            <CollectionView.EmptyView>
-                <VerticalStackLayout Padding="0,40" HorizontalOptions="Center" Spacing="12">
-                    <Label Text="No sales recorded." FontSize="18" FontAttributes="Bold"
-                           HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
-                    <Label Text="Complete a sale to see it here."
-                           FontSize="14" HorizontalTextAlignment="Center"
-                           TextColor="{StaticResource TextSecondary}" />
-                </VerticalStackLayout>
-            </CollectionView.EmptyView>
-            <CollectionView.Header>
-                <Grid Padding="16,8" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
-                    <Label Text="Receipt" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" />
-                    <Label Grid.Column="1" Text="Items" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" />
-                    <Label Grid.Column="2" Text="Total" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" />
-                    <Label Grid.Column="3" Text="Type" FontSize="12" FontAttributes="Bold"
-                           TextColor="{StaticResource TextSecondary}" />
-                </Grid>
-            </CollectionView.Header>
-            <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="models:Sale">
-                    <Border Padding="16,12" Margin="8,3"
-                            StrokeShape="RoundRectangle 12"
-                            StrokeThickness="1"
-                            BackgroundColor="{StaticResource CardBackground}">
-                        <Border.GestureRecognizers>
-                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SalesHistoryViewModel}}, Path=ViewSaleCommand}"
-                                                  CommandParameter="{Binding .}" />
-                        </Border.GestureRecognizers>
-                        <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12">
-                            <VerticalStackLayout Grid.Column="0" Spacing="4">
-                                <Label Text="{Binding ReceiptNumber}" FontSize="14" FontAttributes="Bold"
-                                       TextColor="{StaticResource TextPrimary}" />
-                                <Label Text="{Binding CreatedAt, StringFormat='{0:dd MMM yyyy HH:mm}'}"
-                                       FontSize="11" TextColor="{StaticResource TextSecondary}" />
-                            </VerticalStackLayout>
-                            <Label Grid.Column="1" Text="{Binding CustomerName}" FontSize="12"
-                                   VerticalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
-                            <Label Grid.Column="2" Text="{Binding GrandTotal, StringFormat='रु {0:N2}'}"
-                                   FontSize="14" FontAttributes="Bold" VerticalTextAlignment="Center"
+        <!-- Grouped Sales List -->
+        <RefreshView Grid.Row="2"
+                     Command="{Binding RefreshCommand}"
+                     IsRefreshing="{Binding IsRefreshing, Mode=TwoWay}">
+            <CollectionView ItemsSource="{Binding Groups}"
+                            IsGrouped="True"
+                            SelectionMode="None"
+                            BackgroundColor="{StaticResource AppBackground}">
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout Padding="0,48" HorizontalOptions="Center" Spacing="12">
+                        <Label Text="No sales found." FontSize="18" FontAttributes="Bold"
+                               HorizontalTextAlignment="Center" TextColor="{StaticResource TextSecondary}" />
+                        <Label Text="Try a different date range or search."
+                               FontSize="14" HorizontalTextAlignment="Center"
+                               TextColor="{StaticResource TextSecondary}" />
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.GroupHeaderTemplate>
+                    <DataTemplate x:DataType="vm:SaleGroup">
+                        <Grid Padding="16,12,16,4" ColumnDefinitions="*,Auto">
+                            <Label Text="{Binding Title}" FontSize="13" FontAttributes="Bold"
                                    TextColor="{StaticResource TealPrimary}" />
-                            <Border Grid.Column="3" Padding="8,4"
-                                    StrokeShape="RoundRectangle 12"
-                                    BackgroundColor="{StaticResource SuccessGreen}">
-                                <Border.Triggers>
-                                    <DataTrigger TargetType="Border" Binding="{Binding IsCredit}" Value="True">
-                                        <Setter Property="BackgroundColor" Value="{StaticResource SecondaryGold}" />
-                                    </DataTrigger>
-                                    <DataTrigger TargetType="Border" Binding="{Binding IsQuickSale}" Value="True">
-                                        <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
-                                    </DataTrigger>
-                                </Border.Triggers>
-                                <Label FontSize="11" FontAttributes="Bold" TextColor="White" Text="Cash">
-                                    <Label.Triggers>
-                                        <DataTrigger TargetType="Label" Binding="{Binding IsCredit}" Value="True">
-                                            <Setter Property="Text" Value="Credit" />
-                                        </DataTrigger>
-                                        <DataTrigger TargetType="Label" Binding="{Binding IsQuickSale}" Value="True">
-                                            <Setter Property="Text" Value="Quick" />
-                                        </DataTrigger>
-                                    </Label.Triggers>
-                                </Label>
-                            </Border>
+                            <Label Grid.Column="1" Text="{Binding TotalDisplay}"
+                                   FontSize="13" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}" />
                         </Grid>
-                    </Border>
-                </DataTemplate>
-            </CollectionView.ItemTemplate>
-        </CollectionView>
+                    </DataTemplate>
+                </CollectionView.GroupHeaderTemplate>
+                <CollectionView.Header>
+                    <BoxView HeightRequest="4" Color="Transparent" />
+                </CollectionView.Header>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="vm:SaleRow">
+                        <Border Padding="16,12" Margin="16,3"
+                                StrokeShape="RoundRectangle 12"
+                                StrokeThickness="1"
+                                Stroke="{StaticResource DividerColor}"
+                                BackgroundColor="{StaticResource CardBackground}">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:SalesHistoryViewModel}}, Path=ViewSaleCommand}"
+                                                      CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                    <Label Text="{Binding ReceiptNumber}" FontSize="14" FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}" />
+                                    <Label Text="{Binding SubtitleDisplay}" FontSize="11"
+                                           TextColor="{StaticResource TextSecondary}" />
+                                </VerticalStackLayout>
+                                <VerticalStackLayout Grid.Column="1" Spacing="4" HorizontalOptions="End">
+                                    <Label Text="{Binding GrandTotalDisplay}" FontSize="15" FontAttributes="Bold"
+                                           HorizontalTextAlignment="End"
+                                           TextColor="{StaticResource TealPrimary}" />
+                                    <Border Padding="10,3" HorizontalOptions="End"
+                                            StrokeShape="RoundRectangle 12"
+                                            BackgroundColor="{StaticResource SuccessGreen}">
+                                        <Border.Triggers>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsCredit}" Value="True">
+                                                <Setter Property="BackgroundColor" Value="{StaticResource SecondaryGold}" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Border" Binding="{Binding IsQuickSale}" Value="True">
+                                                <Setter Property="BackgroundColor" Value="{StaticResource TealPrimary}" />
+                                            </DataTrigger>
+                                        </Border.Triggers>
+                                        <Label Text="{Binding BadgeText}" FontSize="10" FontAttributes="Bold"
+                                               TextColor="White" />
+                                    </Border>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                <CollectionView.Footer>
+                    <BoxView HeightRequest="16" Color="Transparent" />
+                </CollectionView.Footer>
+            </CollectionView>
+        </RefreshView>
+
     </Grid>
 
 </ContentPage>

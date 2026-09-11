@@ -17,6 +17,7 @@ public class SaleViewModel : BaseViewModel
     private ObservableCollection<string> _categories = new();
     private int _cartCount;
     private bool _initialized;
+    private bool _cartSubscribed;
     private readonly Debouncer _filterDebouncer = new();
 
     public ObservableCollection<Product> Products
@@ -75,12 +76,10 @@ public class SaleViewModel : BaseViewModel
         _cartState = CartState.Instance;
         Title = "New Sale";
 
-        _cartState.CartChanged += OnCartChanged;
-
         LoadProductsCommand = new Command(async () => await LoadProductsAsync());
         AddToCartCommand = new Command<Product>(AddToCart);
         SelectCategoryCommand = new Command<string>(cat => SelectedCategory = cat ?? "All");
-        GoToCartCommand = new Command(async () => await Shell.Current.GoToAsync("Cart"));
+        GoToCartCommand = new Command(async () => await NavigationGuard.GoToAsync("Cart"));
         ScanBarcodeCommand = new Command(async () =>
         {
             await Shell.Current.DisplayAlertAsync(
@@ -95,8 +94,22 @@ public class SaleViewModel : BaseViewModel
         CartCount = _cartState.ItemCount;
     }
 
+    public void SubscribeToCart()
+    {
+        if (_cartSubscribed)
+            return;
+
+        _cartSubscribed = true;
+        _cartState.CartChanged += OnCartChanged;
+        CartCount = _cartState.ItemCount;
+    }
+
     public void Cleanup()
     {
+        if (!_cartSubscribed)
+            return;
+
+        _cartSubscribed = false;
         _cartState.CartChanged -= OnCartChanged;
     }
 

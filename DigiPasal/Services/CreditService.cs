@@ -1,3 +1,4 @@
+using System.Globalization;
 using DigiPasal.Models;
 using SQLite;
 
@@ -114,16 +115,205 @@ public class CreditService
 
         await _dbService.SaveSettingAsync(LastClosedSettingKey, date.Date.ToString("yyyy-MM-dd"));
 
+        await LogDayBookAsync(date, "Closed");
+
         return count;
     }
 
     public async Task<bool> IsDailyBookClosedAsync(DateTime date)
     {
-        if (date.Date < DateTime.Today)
+        var startUtc = date.Date.ToUniversalTime();
+        var endUtc = date.Date.AddDays(1).ToUniversalTime().AddTicks(-1);
+
+        var transferCount = await Database.Table<CreditPayment>()
+            .Where(p => p.IsTransfer && p.PaymentDate >= startUtc && p.PaymentDate <= endUtc)
+            .CountAsync();
+
+        if (transferCount > 0)
             return true;
 
         var lastClosed = await _dbService.GetSettingAsync(LastClosedSettingKey);
         return lastClosed == date.Date.ToString("yyyy-MM-dd");
+    }
+
+    /// <summary>
+    /// Reverses a day-book close: moves the carried amounts back from the Partner
+    /// book to the Daily book for the given date and records an audit entry.
+    /// </summary>
+    public async Task<int> ReopenDailyBookAsync(DateTime date)
+    {
+        var startUtc = date.Date.ToUniversalTime();
+        var endUtc = date.Date.AddDays(1).ToUniversalTime().AddTicks(-1);
+        var now = DateTime.UtcNow;
+        var count = 0;
+
+        await Database.RunInTransactionAsync(tran =>
+        {
+            var transfers = tran.Table<CreditPayment>()
+                .Where(p => p.IsTransfer && p.PaymentDate >= startUtc && p.PaymentDate <= endUtc)
+                .ToList();
+
+            count = transfers.Count;
+
+            foreach (var transfer in transfers)
+            {
+                var customer = tran.Table<Customer>()
+                    .Where(c => c.Id == transfer.CustomerId)
+                    .FirstOrDefault();
+
+                if (customer == null)
+                    continue;
+
+                customer.PartnerBalance -= transfer.Amount;
+                if (customer.PartnerBalance < 0)
+                    customer.PartnerBalance = 0;
+
+                customer.DailyBalance += transfer.Amount;
+                customer.CurrentBalance = customer.DailyBalance + customer.PartnerBalance;
+                customer.UpdatedAt = now;
+                tran.Update(customer);
+
+                tran.Delete(transfer);
+            }
+        });
+
+        var lastClosed = await _dbService.GetSettingAsync(LastClosedSettingKey);
+        var clearedKey = lastClosed == date.Date.ToString("yyyy-MM-dd");
+        if (clearedKey)
+            await _dbService.SaveSettingAsync(LastClosedSettingKey, string.Empty);
+
+        if (count > 0 || clearedKey)
+            await LogDayBookAsync(date, "Opened");
+
+        return count;
+    }
+
+    /// <summary>Reopens the day's book if it is currently closed (used by backdated credit checkout).</summary>
+    public async Task EnsureDailyBookOpenForAsync(DateTime date)
+    {
+        if (await IsDailyBookClosedAsync(date))
+            await ReopenDailyBookAsync(date);
+    }
+
+    public async Task<DateTime?> GetLastClosedDateAsync()
+    {
+        var rows = await Database.QueryAsync<MaxDateRow>(
+            "SELECT MAX(PaymentDate) AS Value FROM CreditPayments WHERE IsTransfer = 1");
+
+        var value = rows.FirstOrDefault()?.Value;
+        if (value.HasValue)
+            return value.Value.ToLocalTime().Date;
+
+        var lastClosed = await _dbService.GetSettingAsync(LastClosedSettingKey);
+        if (DateTime.TryParseExact(lastClosed, "yyyy-MM-dd", CultureInfo.InvariantCulture,
+            DateTimeStyles.AssumeLocal, out var parsed))
+            return parsed.Date;
+
+        return null;
+    }
+
+    /// <summary>Builds the running open/close balance for a single day.</summary>
+    public async Task<DayVoucher> GetDayVoucherAsync(DateTime date)
+    {
+        var startUtc = date.Date.ToUniversalTime();
+        var endUtc = date.Date.AddDays(1).ToUniversalTime().AddTicks(-1);
+
+        var sales = await Database.Table<Sale>()
+            .Where(s => !s.IsVoided && s.CreatedAt >= startUtc && s.CreatedAt <= endUtc)
+            .ToListAsync();
+
+        var payments = await Database.Table<CreditPayment>()
+            .Where(p => p.PaymentDate >= startUtc && p.PaymentDate <= endUtc)
+            .ToListAsync();
+
+        var opening = await GetOutstandingBeforeAsync(date);
+
+        var cashSales = sales.Where(s => !s.IsCredit).Sum(s => s.GrandTotal);
+        var creditDaily = sales
+            .Where(s => s.IsCredit && s.CreditBookType == (int)CreditBookType.Daily)
+            .Sum(s => s.CreditAmount);
+        var creditPartner = sales
+            .Where(s => s.IsCredit && s.CreditBookType == (int)CreditBookType.Partner)
+            .Sum(s => s.CreditAmount);
+        var creditGiven = creditDaily + creditPartner;
+
+        var collections = payments.Where(p => !p.IsTransfer).Sum(p => p.Amount);
+        var carried = payments.Where(p => p.IsTransfer).Sum(p => p.Amount);
+
+        var saleIds = sales.Select(s => s.Id).ToList();
+        var items = saleIds.Count == 0
+            ? new List<SaleItem>()
+            : await Database.Table<SaleItem>().Where(si => saleIds.Contains(si.SaleId)).ToListAsync();
+
+        return new DayVoucher
+        {
+            Date = date.Date,
+            OpeningBalance = opening,
+            CashSales = cashSales,
+            CreditDaily = creditDaily,
+            CreditPartner = creditPartner,
+            Collections = collections,
+            CarriedToPartner = carried,
+            SalesCount = sales.Count,
+            ItemsSold = (int)items.Sum(i => i.Quantity),
+            TotalSales = cashSales + creditGiven,
+            ClosingBalance = opening + creditGiven - collections,
+            IsClosed = await IsDailyBookClosedAsync(date)
+        };
+    }
+
+    /// <summary>
+    /// Total money owed to the shop (Daily + Partner, transfers excluded) as of the
+    /// instant just before the given date. Closing of one day equals this for the next.
+    /// </summary>
+    private async Task<decimal> GetOutstandingBeforeAsync(DateTime date)
+    {
+        var startUtc = date.Date.ToUniversalTime();
+
+        var creditGiven = await Database.ExecuteScalarAsync<decimal>(
+            "SELECT COALESCE(SUM(CreditAmount), 0) FROM Sales " +
+            "WHERE IsCredit = 1 AND IsVoided = 0 AND CreatedAt < ?", startUtc);
+
+        var collected = await Database.ExecuteScalarAsync<decimal>(
+            "SELECT COALESCE(SUM(Amount), 0) FROM CreditPayments " +
+            "WHERE IsTransfer = 0 AND PaymentDate < ?", startUtc);
+
+        return creditGiven - collected;
+    }
+
+    /// <summary>Global open/close audit trail, newest first.</summary>
+    public async Task<List<DayBookLogRow>> GetDayBookLogsAsync()
+    {
+        var logs = await Database.Table<DayBookLog>()
+            .OrderByDescending(l => l.Timestamp)
+            .ToListAsync();
+
+        return logs.Select(l => new DayBookLogRow
+        {
+            Timestamp = l.Timestamp,
+            BookDate = l.BookDate,
+            Action = l.Action,
+            UserName = l.UserName,
+            Note = l.Note
+        }).ToList();
+    }
+
+    private async Task LogDayBookAsync(DateTime date, string action, string? note = null)
+    {
+        var user = await AuthService.Instance.GetCurrentUserAsync();
+        var userName = !string.IsNullOrWhiteSpace(user?.FullName) ? user.FullName
+            : !string.IsNullOrWhiteSpace(user?.Username) ? user.Username
+            : "Unknown";
+
+        await Database.InsertAsync(new DayBookLog
+        {
+            BookDate = date.Date,
+            Action = action,
+            UserId = user?.Id ?? 0,
+            UserName = userName,
+            Timestamp = DateTime.UtcNow,
+            Note = note ?? string.Empty
+        });
     }
 
     public async Task<DailyBookReport> GetDailyBookReportAsync(DateTime date)
@@ -287,6 +477,7 @@ public class CreditService
                 grouped[key] = row;
             }
             row.CreditSales += s.CreditAmount;
+            row.TrackCustomer(s.CustomerId ?? 0);
         }
 
         foreach (var p in payments)
@@ -298,6 +489,7 @@ public class CreditService
                 grouped[key] = row;
             }
             row.PaymentsCollected += p.Amount;
+            row.TrackCustomer(p.CustomerId);
         }
 
         return grouped.Values
@@ -542,18 +734,29 @@ public class CreditHistoryEntry
 }
 
 public class DailyCreditSummaryRow
-{
-    public DateTime Date { get; set; }
-    public decimal CreditSales { get; set; }
-    public decimal PaymentsCollected { get; set; }
-    public decimal NetOutstanding => CreditSales - PaymentsCollected;
+    {
+        private readonly HashSet<int> _customerIds = new();
 
-    public string DateDisplay => Date.ToString("dd MMM yyyy");
-    public string CreditSalesDisplay => CurrencyFormatter.Format(CreditSales);
-    public string PaymentsDisplay => CurrencyFormatter.Format(PaymentsCollected);
-    public string NetDisplay => CurrencyFormatter.Format(NetOutstanding);
-    public bool HasOutstanding => NetOutstanding > 0;
-}
+        public DateTime Date { get; set; }
+        public decimal CreditSales { get; set; }
+        public decimal PaymentsCollected { get; set; }
+        public decimal NetOutstanding => CreditSales - PaymentsCollected;
+
+        public void TrackCustomer(int customerId)
+        {
+            if (customerId > 0)
+                _customerIds.Add(customerId);
+        }
+
+        public string DateDisplay => NepaliDateConverter.Format(Date);
+        public string DateShortDisplay => NepaliDateConverter.FormatShort(Date);
+        public string CreditSalesDisplay => CurrencyFormatter.Format(CreditSales);
+        public string PaymentsDisplay => CurrencyFormatter.Format(PaymentsCollected);
+        public string NetDisplay => CurrencyFormatter.Format(NetOutstanding);
+        public bool HasOutstanding => NetOutstanding > 0;
+        public string CustomerCountDisplay =>
+            _customerIds.Count == 1 ? "1 customer" : $"{_customerIds.Count} customers";
+    }
 
 public class CreditAgingRow
 {
@@ -586,7 +789,9 @@ public class PaymentHistoryRow
     public string SaleInfo { get; set; } = string.Empty;
 
     public string AmountDisplay => CurrencyFormatter.Format(Amount);
-    public string DateDisplay => PaymentDate.ToString("dd MMM yyyy");
+    public string DateDisplay => NepaliDateConverter.Format(PaymentDate);
+    public string DateShortDisplay => NepaliDateConverter.FormatShort(PaymentDate);
+    public string BookTypeShort => BookType == "Partner" ? "P" : "D";
     public string DetailDisplay => $"{BookType} book{SaleInfo}";
 }
 
@@ -598,4 +803,65 @@ public class CreditTrendPoint
 
     public string DateLabel => Date.ToString("dd MMM");
     public decimal Outstanding => NewCredit - Payments;
+}
+
+public class MaxDateRow
+{
+    public DateTime? Value { get; set; }
+}
+
+/// <summary>
+/// A single day's settlement voucher. ClosingBalance is the total money owed to the
+/// shop at the end of the day and is, by construction, the OpeningBalance of the
+/// next day, so backdated entries cascade forward automatically.
+/// </summary>
+public class DayVoucher
+{
+    public DateTime Date { get; set; }
+    public decimal OpeningBalance { get; set; }
+    public decimal CashSales { get; set; }
+    public decimal CreditDaily { get; set; }
+    public decimal CreditPartner { get; set; }
+    public decimal Collections { get; set; }
+    public decimal CarriedToPartner { get; set; }
+    public int SalesCount { get; set; }
+    public int ItemsSold { get; set; }
+    public decimal TotalSales { get; set; }
+    public decimal ClosingBalance { get; set; }
+    public bool IsClosed { get; set; }
+
+    public decimal CreditGiven => CreditDaily + CreditPartner;
+
+    public string DateNepali => NepaliDateConverter.FormatWeekday(Date);
+    public string DateNepaliShort => NepaliDateConverter.Format(Date);
+    public string NextDayLabel => NepaliDateConverter.FormatShort(Date.AddDays(1));
+    public string OpeningDisplay => CurrencyFormatter.Format(OpeningBalance);
+    public string CashSalesDisplay => CurrencyFormatter.Format(CashSales);
+    public string CreditDailyDisplay => CurrencyFormatter.Format(CreditDaily);
+    public string CreditPartnerDisplay => CurrencyFormatter.Format(CreditPartner);
+    public string CreditGivenDisplay => CurrencyFormatter.Format(CreditGiven);
+    public string CollectionsDisplay => CurrencyFormatter.Format(Collections);
+    public string CarriedDisplay => CurrencyFormatter.Format(CarriedToPartner);
+    public string TotalSalesDisplay => CurrencyFormatter.Format(TotalSales);
+    public string ClosingDisplay => CurrencyFormatter.Format(ClosingBalance);
+    public string SalesCountDisplay => $"{SalesCount} {(SalesCount == 1 ? "sale" : "sales")}";
+    public string ItemsSoldDisplay => $"{ItemsSold} {(ItemsSold == 1 ? "item" : "items")}";
+    public string StatusLabel => IsClosed ? "CLOSED" : "OPEN";
+    public bool HasCarried => CarriedToPartner > 0;
+}
+
+public class DayBookLogRow
+{
+    public DateTime Timestamp { get; set; }
+    public DateTime BookDate { get; set; }
+    public string Action { get; set; } = string.Empty;
+    public string UserName { get; set; } = string.Empty;
+    public string Note { get; set; } = string.Empty;
+
+    public bool IsOpened => Action.Equals("Opened", StringComparison.OrdinalIgnoreCase);
+    public string TimestampDisplay => NepaliDateConverter.FormatWeekday(Timestamp.ToLocalTime());
+    public string TimeDisplay => Timestamp.ToLocalTime().ToString("h:mm tt");
+    public string BookDateDisplay => NepaliDateConverter.FormatShort(BookDate);
+    public string BookDateFullDisplay => NepaliDateConverter.Format(BookDate);
+    public string ActionLabel => IsOpened ? "Opened" : "Closed";
 }

@@ -85,7 +85,7 @@ namespace DigiPasal.ViewModels
             BeginEditCommand = new Command(BeginEdit);
             SaveEditCommand = new Command(async () => await SaveEdit());
             CancelEditCommand = new Command(CancelEdit);
-            ChangePasswordCommand = new Command(async () => await Shell.Current.GoToAsync("ChangePassword"));
+            ChangePasswordCommand = new Command(async () => await NavigationGuard.GoToAsync("ChangePassword"));
             LogoutCommand = new Command(async () => await Logout());
         }
 

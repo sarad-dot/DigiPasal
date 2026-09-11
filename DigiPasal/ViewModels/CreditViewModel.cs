@@ -33,10 +33,11 @@ public class CreditViewModel : BaseViewModel
         SwitchToDailyCommand = new Command(async () => await SwitchToDailyAsync());
         SwitchToPartnerCommand = new Command(async () => await SwitchToPartnerAsync());
         CloseDailyBookCommand = new Command(async () => await CloseDailyBookAsync());
+        ViewVoucherCommand = new Command(async () => await ViewVoucherAsync());
         PreviousDayCommand = new Command(async () => { if (SelectedDate > DateTime.MinValue) { SelectedDate = SelectedDate.AddDays(-1); await LoadDailyAsync(); } });
         NextDayCommand = new Command(async () => { if (SelectedDate.Date < DateTime.Today) { SelectedDate = SelectedDate.AddDays(1); await LoadDailyAsync(); } });
         TodayCommand = new Command(async () => { SelectedDate = DateTime.Today; await LoadDailyAsync(); });
-        OpenReportsCommand = new Command(async () => await Shell.Current.GoToAsync("CreditReports"));
+        OpenReportsCommand = new Command(async () => await NavigationGuard.GoToAsync("CreditReports"));
         SearchCommand = new Command(() => ApplySearchFilter());
         ClearSearchCommand = new Command(async () => { SearchText = string.Empty; ApplySearchFilter(); });
     }
@@ -46,8 +47,13 @@ public class CreditViewModel : BaseViewModel
         get => _isDailyTab;
         set
         {
-            SetProperty(ref _isDailyTab, value);
-            OnPropertyChanged(nameof(IsPartnerTab));
+            if (SetProperty(ref _isDailyTab, value))
+            {
+                OnPropertyChanged(nameof(IsPartnerTab));
+                OnPropertyChanged(nameof(CanCloseBook));
+                OnPropertyChanged(nameof(ShowCloseBook));
+                OnPropertyChanged(nameof(ShowViewVoucher));
+            }
         }
     }
 
@@ -63,7 +69,7 @@ public class CreditViewModel : BaseViewModel
         }
     }
 
-    public string SelectedDateDisplay => SelectedDate.ToString("dd MMM yyyy");
+    public string SelectedDateDisplay => NepaliDateConverter.Format(SelectedDate);
 
     public decimal DailyOutstanding
     {
@@ -94,16 +100,25 @@ public class CreditViewModel : BaseViewModel
         get => _isBookClosed;
         set
         {
-            SetProperty(ref _isBookClosed, value);
-            OnPropertyChanged(nameof(CanCloseBook));
-            OnPropertyChanged(nameof(BookStatusLabel));
+            if (SetProperty(ref _isBookClosed, value))
+            {
+                OnPropertyChanged(nameof(CanCloseBook));
+                OnPropertyChanged(nameof(BookStatusLabel));
+                OnPropertyChanged(nameof(ShowCloseBook));
+                OnPropertyChanged(nameof(ShowViewVoucher));
+                OnPropertyChanged(nameof(CanViewVoucher));
+            }
         }
     }
 
-    public bool CanCloseBook => IsDailyTab && SelectedDate.Date >= DateTime.Today && !IsBookClosed && !_isClosing;
+    public bool CanCloseBook => IsDailyTab && SelectedDate.Date <= DateTime.Today && !IsBookClosed && !_isClosing;
+
+    public bool ShowCloseBook => IsDailyTab && !IsBookClosed;
+    public bool ShowViewVoucher => IsDailyTab && IsBookClosed;
+    public bool CanViewVoucher => IsBookClosed;
 
     public string BookStatusLabel => IsBookClosed
-        ? "Daily book is closed — outstanding carried to Partners"
+        ? "Daily book is closed — see the Day Voucher for this day's balances"
         : "Daily book is open";
 
     public bool HasDailyEntries => DailyEntries.Count > 0;
@@ -130,6 +145,7 @@ public class CreditViewModel : BaseViewModel
     public ICommand SwitchToDailyCommand { get; }
     public ICommand SwitchToPartnerCommand { get; }
     public ICommand CloseDailyBookCommand { get; }
+    public ICommand ViewVoucherCommand { get; }
     public ICommand PreviousDayCommand { get; }
     public ICommand NextDayCommand { get; }
     public ICommand TodayCommand { get; }
@@ -250,15 +266,9 @@ public class CreditViewModel : BaseViewModel
 
     private async Task CloseDailyBookAsync()
     {
-        if (SelectedDate.Date < DateTime.Today)
-        {
-            await Shell.Current.DisplayAlertAsync("Close Book", "You can only close today's daily book.", "OK");
-            return;
-        }
-
         var confirm = await Shell.Current.DisplayAlertAsync(
             "Close Daily Book",
-            $"Move all remaining daily credit to the Partners book for {SelectedDate:dd MMM yyyy}? This cannot be undone.",
+            $"Move all remaining daily credit to the Partners book for {NepaliDateConverter.Format(SelectedDate)}? This cannot be undone.",
             "Close Book", "Cancel");
 
         if (!confirm)
@@ -269,13 +279,25 @@ public class CreditViewModel : BaseViewModel
         try
         {
             var count = await _creditService.CloseDailyBookAsync(SelectedDate);
-            await LoadAsync();
-            await Shell.Current.DisplayAlertAsync(
-                "Daily Book Closed",
-                count > 0
-                    ? $"{count} customer(s) carried forward to the Partners book."
-                    : "Nothing to carry — all daily credit is settled.",
-                "OK");
+
+            if (count > 0)
+            {
+                await LoadAsync();
+                await Shell.Current.DisplayAlertAsync(
+                    "Daily Book Closed",
+                    $"{count} customer(s) carried forward to the Partners book.",
+                    "View Voucher");
+            }
+            else
+            {
+                await LoadAsync();
+                await Shell.Current.DisplayAlertAsync(
+                    "Daily Book Closed",
+                    "Nothing to carry — all daily credit is settled.",
+                    "View Voucher");
+            }
+
+await NavigationGuard.GoToAsync($"DayVoucher?date={SelectedDate:yyyy-MM-dd}");
         }
         catch (Exception ex)
         {
@@ -288,15 +310,20 @@ public class CreditViewModel : BaseViewModel
         }
     }
 
+    private async Task ViewVoucherAsync()
+    {
+        await NavigationGuard.GoToAsync($"DayVoucher?date={SelectedDate:yyyy-MM-dd}");
+    }
+
     public async Task NavigateToCustomerAsync(DailyBookEntry? dailyEntry, PartnerCreditItem? partner)
     {
         if (dailyEntry != null)
         {
-            await Shell.Current.GoToAsync($"CreditDetail?customerId={dailyEntry.CustomerIdValue}&book={(int)CreditBookType.Daily}");
+            await NavigationGuard.GoToAsync($"CreditDetail?customerId={dailyEntry.CustomerIdValue}&book={(int)CreditBookType.Daily}");
         }
         else if (partner != null)
         {
-            await Shell.Current.GoToAsync($"CreditDetail?customerId={partner.CustomerId}&book={(int)CreditBookType.Partner}");
+            await NavigationGuard.GoToAsync($"CreditDetail?customerId={partner.CustomerId}&book={(int)CreditBookType.Partner}");
         }
     }
 }

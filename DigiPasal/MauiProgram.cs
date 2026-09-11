@@ -101,6 +101,11 @@ public static class MauiProgram
         services.AddTransient<StockReportPage>();
         services.AddTransient<ProfitReportPage>();
         services.AddTransient<ShopSettingsPage>();
+        services.AddTransient<DayVoucherPage>();
+        services.AddTransient<DayBookLogPage>();
+        services.AddTransient<DataImportPage>();
+        services.AddTransient<WholesaleBillPage>();
+        services.AddTransient<WholesaleBillEditPage>();
 
         services.AddTransient<LoginViewModel>();
         services.AddTransient<RegisterViewModel>();
@@ -110,5 +115,10 @@ public static class MauiProgram
         services.AddTransient<ChangePasswordViewModel>();
         services.AddTransient<SettingsViewModel>();
         services.AddTransient<ShopSettingsViewModel>();
+        services.AddTransient<DayVoucherViewModel>();
+        services.AddTransient<DayBookLogViewModel>();
+        services.AddTransient<DataImportViewModel>();
+        services.AddTransient<WholesaleBillViewModel>();
+        services.AddTransient<WholesaleBillEditViewModel>();
     }
 }

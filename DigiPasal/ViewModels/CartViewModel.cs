@@ -10,6 +10,7 @@ public class CartViewModel : BaseViewModel
     private readonly SaleService _saleService;
     private readonly CustomerService _customerService;
     private readonly ReceiptService _receiptService;
+    private readonly CreditService _creditService;
     private readonly CartState _cartState;
 
     private Customer? _selectedCustomer;
@@ -22,6 +23,8 @@ public class CartViewModel : BaseViewModel
     private decimal _subtotal;
     private decimal _taxAmount;
     private decimal _grandTotal;
+    private DateTime _saleDate;
+    private bool _isCompleting;
 
     public ObservableCollection<CartLine> CartItems => _cartState.Items;
 
@@ -76,6 +79,27 @@ public class CartViewModel : BaseViewModel
         get => _notes;
         set => SetProperty(ref _notes, value);
     }
+
+    public DateTime SaleDate
+    {
+        get => _saleDate;
+        set
+        {
+            if (SetProperty(ref _saleDate, value.Date))
+            {
+                OnPropertyChanged(nameof(IsBackdated));
+                OnPropertyChanged(nameof(BackdateHint));
+            }
+        }
+    }
+
+    public DateTime MaximumDate => DateTime.Today;
+
+    public bool IsBackdated => SaleDate.Date < DateTime.Today;
+
+    public string BackdateHint => IsBackdated
+        ? $"Recording this sale on {NepaliDateConverter.Format(SaleDate)}"
+        : string.Empty;
 
     public decimal DiscountAmount
     {
@@ -137,7 +161,9 @@ public class CartViewModel : BaseViewModel
         _saleService = SaleService.Instance;
         _customerService = CustomerService.Instance;
         _receiptService = ReceiptService.Instance;
+        _creditService = CreditService.Instance;
         _cartState = CartState.Instance;
+        _saleDate = _cartState.SaleDate ?? DateTime.Today;
         Title = "Cart";
 
         _cartState.CartChanged += OnCartChanged;
@@ -261,6 +287,9 @@ public class CartViewModel : BaseViewModel
 
     private async Task CheckoutAsync()
     {
+        if (_isCompleting)
+            return;
+
         if (!HasItems)
         {
             await Shell.Current.DisplayAlertAsync("Empty Cart", "Add products to the cart before checkout.", "OK");
@@ -307,6 +336,8 @@ public class CartViewModel : BaseViewModel
             Notes = Notes
         };
 
+        sale.CreatedAt = SaleDate.Date;
+
         var items = CartItems.Select(c => new SaleItem
         {
             ProductId = c.ProductId,
@@ -319,15 +350,26 @@ public class CartViewModel : BaseViewModel
 
         try
         {
+            _isCompleting = true;
+
+            if (IsCreditSale && IsBackdated)
+                await _creditService.EnsureDailyBookOpenForAsync(SaleDate.Date);
+
             var createdSale = await _saleService.CreateSaleAsync(sale, items);
 
+            _cartState.SaleDate = null;
             ClearCart();
+            OnPropertyChanged(nameof(IsBackdated));
 
             await Shell.Current.GoToAsync($"SaleSuccess?id={createdSale.Id}");
         }
         catch (Exception ex)
         {
             await Shell.Current.DisplayAlertAsync("Error", $"Failed to complete sale: {ex.Message}", "OK");
+        }
+        finally
+        {
+            _isCompleting = false;
         }
     }
 

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             xmlns:svc="clr-namespace:DigiPasal.Services"
+             x:Class="DigiPasal.Views.WholesaleBillPage"
+             x:DataType="vm:WholesaleBillViewModel"
+             Title="Wholesaler Bills"
+             Shell.TabBarIsVisible="False"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource AppBackground}">
+
+        <!-- ══════════ HEADER ══════════ -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
+              Padding="16,52,16,12" BackgroundColor="{StaticResource TealPrimary}">
+            <Grid Grid.Column="0" ColumnDefinitions="Auto,Auto" ColumnSpacing="6"
+                  VerticalOptions="Center">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackTapped"/>
+                </Grid.GestureRecognizers>
+                <Label Text="◀" FontSize="20" TextColor="White" VerticalOptions="Center"/>
+                <Label Text="🧾" Grid.Column="1" FontSize="20" TextColor="White"
+                       VerticalOptions="Center"/>
+            </Grid>
+            <Label Grid.Column="1" Text="Wholesaler Bills" FontSize="20" FontAttributes="Bold"
+                   TextColor="White" VerticalOptions="Center" LineBreakMode="TailTruncation"/>
+            <Label Grid.Column="2" Text="＋ Add" FontSize="15" FontAttributes="Bold"
+                   TextColor="{StaticResource SecondaryGold}" VerticalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnAddTapped"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </Grid>
+
+        <!-- ══════════ BODY ══════════ -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="10">
+
+                <Label Text="Wholesaler bills let you bring stock in. Each bill line adds that product's quantity to your inventory."
+                       FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+
+                <VerticalStackLayout Spacing="10">
+                    <BindableLayout.ItemsSource>
+                        <Binding Path="Bills"/>
+                    </BindableLayout.ItemsSource>
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="svc:PurchaseSummaryItem">
+                            <Border BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                                    Padding="12,12">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnBillTapped"
+                                                          CommandParameter="{Binding .}"/>
+                                </Border.GestureRecognizers>
+                                <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto"
+                                      RowSpacing="3" ColumnSpacing="12">
+                                    <Label Grid.Row="0" Grid.Column="0" Text="{Binding TitleDisplay}"
+                                           FontSize="14" FontAttributes="Bold"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           LineBreakMode="TailTruncation"/>
+                                    <Label Grid.Row="1" Grid.Column="0" Text="{Binding WholesalerName}"
+                                           FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+                                    <Label Grid.Row="2" Grid.Column="0"
+                                           Text="{Binding DateDisplay, StringFormat='{0}'}"
+                                           FontSize="12" TextColor="{StaticResource Gray400}"/>
+                                    <VerticalStackLayout Grid.Row="0" Grid.Column="1" Grid.RowSpan="3"
+                                                         Spacing="2" HorizontalOptions="End"
+                                                         VerticalOptions="Center">
+                                        <Label Text="{Binding TotalDisplay}" FontSize="15" FontAttributes="Bold"
+                                               TextColor="{StaticResource ErrorRed}"
+                                               HorizontalTextAlignment="End"/>
+<Label Text="{Binding ItemsDisplay}" FontSize="11"
+                                                TextColor="{StaticResource TextSecondary}"
+                                                HorizontalTextAlignment="End"/>
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <Label Text="{Binding Footer}" FontSize="12"
+                       TextColor="{StaticResource Gray400}"
+                       HorizontalTextAlignment="Center" Margin="0,8,0,20"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <ActivityIndicator Grid.Row="1" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                           Color="{StaticResource TealPrimary}"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+    </Grid>
+</ContentPage>

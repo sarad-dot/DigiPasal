@@ -1,7 +1,7 @@
 namespace DigiPasal.ViewModels;
 
 /// <summary>
-/// Cancels any pending invocation and schedules another after <paramref name="delayMs"/>.
+/// Cancels any pending invocation and schedules another after the given delay.
 /// Continuations run on the captured SynchronizationContext (UI thread), so the action
 /// may safely touch ObservableCollections.
 /// </summary>

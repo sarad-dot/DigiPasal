@@ -108,6 +108,26 @@
                             FontSize="12" HeightRequest="42" CornerRadius="10" />
                 </Grid>
 
+                <!-- Sale Date (supports backdated entry) -->
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                    <Label Grid.Column="0" Text="Sale Date" FontSize="14"
+                           TextColor="{StaticResource TextPrimary}"
+                           VerticalTextAlignment="Center" />
+                    <DatePicker Grid.Column="1"
+                                Date="{Binding SaleDate}"
+                                MaximumDate="{Binding MaximumDate}"
+                                Format="dd MMM yyyy"
+                                FontSize="13"
+                                TextColor="{StaticResource TextPrimary}"
+                                HorizontalOptions="End" />
+                </Grid>
+
+                <Label Text="{Binding BackdateHint}"
+                       IsVisible="{Binding IsBackdated}"
+                       FontSize="12"
+                       TextColor="{StaticResource SecondaryGold}"
+                       Margin="4,0,0,0" />
+
                 <!-- Credit Toggle -->
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                     <Label Grid.Column="0" Text="Credit Sale" FontSize="14"

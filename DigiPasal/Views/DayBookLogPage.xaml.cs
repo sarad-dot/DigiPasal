@@ -3,17 +3,17 @@ using DigiPasal.ViewModels;
 
 namespace DigiPasal.Views;
 
-public partial class SalePage : ContentPage
+public partial class DayBookLogPage : ContentPage
 {
     private readonly AuthService _authService;
-    private readonly SaleViewModel _viewModel;
+    private readonly DayBookLogViewModel _viewModel;
 
-    public SalePage(AuthService authService)
+    public DayBookLogPage(DayBookLogViewModel viewModel, AuthService authService)
     {
         InitializeComponent();
         _authService = authService;
-        _viewModel = new SaleViewModel();
-        BindingContext = _viewModel;
+        _viewModel = viewModel;
+        BindingContext = viewModel;
     }
 
     protected override async void OnAppearing()
@@ -26,13 +26,11 @@ public partial class SalePage : ContentPage
             return;
         }
 
-        _viewModel.SubscribeToCart();
-        await _viewModel.LoadProductsAsync();
+        await _viewModel.LoadAsync();
     }
 
-    protected override void OnDisappearing()
+    private async void OnBackTapped(object? sender, TappedEventArgs e)
     {
-        base.OnDisappearing();
-        _viewModel.Cleanup();
+        await Shell.Current.GoToAsync("..");
     }
 }

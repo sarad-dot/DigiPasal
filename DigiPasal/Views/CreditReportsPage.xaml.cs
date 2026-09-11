@@ -34,6 +34,14 @@ public partial class CreditReportsPage : ContentPage
         if ((sender as BindableObject)?.BindingContext is not CreditAgingRow row)
             return;
 
-        await Shell.Current.GoToAsync($"CreditDetail?customerId={row.CustomerId}&book=0");
+        await NavigationGuard.GoToAsync($"CreditDetail?customerId={row.CustomerId}&book=0");
+    }
+
+    private async void PaymentsRow_Tapped(object? sender, TappedEventArgs e)
+    {
+        if ((sender as BindableObject)?.BindingContext is not PaymentHistoryRow row)
+            return;
+
+        await NavigationGuard.GoToAsync($"CreditDetail?customerId={row.CustomerId}&book=0");
     }
 }

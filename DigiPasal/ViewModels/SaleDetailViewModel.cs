@@ -35,6 +35,22 @@ public class SaleDetailViewModel : BaseViewModel, IQueryAttributable
     public string StatusBadge => Sale?.IsCredit ?? false ? "Credit" : "Cash";
     public bool IsCreditSale => Sale?.IsCredit ?? false;
 
+    public string CustomerNameDisplay =>
+        Sale != null && !string.IsNullOrWhiteSpace(Sale.CustomerName)
+            ? Sale.CustomerName
+            : "Walk-in (Cash)";
+
+    public string PaymentMethodDisplay =>
+        !string.IsNullOrWhiteSpace(Sale?.PaymentMethod) ? Sale.PaymentMethod : "Cash";
+
+    public string AmountPaidDisplay => Sale != null ? CurrencyFormatter.Format(Sale.AmountPaid) : "रु 0.00";
+
+    public string CreditDueDisplay => Sale != null ? CurrencyFormatter.Format(Sale.CreditAmount) : "रु 0.00";
+
+    public string CreditDueLabel => IsCreditSale ? "Credit Due" : "Balance";
+
+    public bool HasNotes => Sale != null && !string.IsNullOrWhiteSpace(Sale.Notes);
+
     public ICommand ShareReceiptCommand { get; }
     public ICommand VoidSaleCommand { get; }
 
@@ -62,7 +78,15 @@ public class SaleDetailViewModel : BaseViewModel, IQueryAttributable
         try
         {
             Sale = await _saleService.GetSaleByIdAsync(saleId);
-            if (Sale == null) return;
+            if (Sale == null)
+            {
+                await Shell.Current.DisplayAlertAsync(
+                    "Sale Not Found",
+                    "This sale record no longer exists. It may have been deleted.",
+                    "OK");
+                await Shell.Current.GoToAsync("..");
+                return;
+            }
 
             Items = await _saleService.GetSaleItemsAsync(saleId);
             ReceiptText = await _receiptService.GenerateReceiptTextAsync(Sale, Items);
@@ -70,6 +94,12 @@ public class SaleDetailViewModel : BaseViewModel, IQueryAttributable
             OnPropertyChanged(nameof(TotalDisplay));
             OnPropertyChanged(nameof(StatusBadge));
             OnPropertyChanged(nameof(IsCreditSale));
+            OnPropertyChanged(nameof(CustomerNameDisplay));
+            OnPropertyChanged(nameof(PaymentMethodDisplay));
+            OnPropertyChanged(nameof(AmountPaidDisplay));
+            OnPropertyChanged(nameof(CreditDueDisplay));
+            OnPropertyChanged(nameof(CreditDueLabel));
+            OnPropertyChanged(nameof(HasNotes));
         }
         finally
         {

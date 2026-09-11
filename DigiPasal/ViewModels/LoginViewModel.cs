@@ -50,13 +50,16 @@ namespace DigiPasal.ViewModels
             LoginCommand = new Command(async () => await Login());
             DeviceLockCommand = new Command(async () => await DeviceLockLogin());
             GoogleLoginCommand = new Command(async () => await GoogleLogin());
-            ForgotPasswordCommand = new Command(async () => await Shell.Current.GoToAsync("ForgotPassword"));
+            ForgotPasswordCommand = new Command(async () => await NavigationGuard.GoToAsync("ForgotPassword"));
             NavigateToRegisterCommand = new Command(async () => await Shell.Current.GoToAsync("//Register"));
             TogglePasswordVisibilityCommand = new Command(() => IsPasswordHidden = !IsPasswordHidden);
         }
 
         private async Task Login()
         {
+            if (IsBusy)
+                return;
+
             if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(Password))
             {
                 SetError("Please enter username and password");
@@ -103,6 +106,9 @@ namespace DigiPasal.ViewModels
 
         private async Task GoogleLogin()
         {
+            if (IsBusy)
+                return;
+
             IsBusy = true;
             ClearError();
 
@@ -119,6 +125,9 @@ namespace DigiPasal.ViewModels
 
         private async Task DeviceLockLogin()
         {
+            if (IsBusy)
+                return;
+
             IsBusy = true;
             ClearError();
 

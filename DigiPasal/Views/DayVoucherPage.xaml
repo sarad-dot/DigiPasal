@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             xmlns:svc="clr-namespace:DigiPasal.Services"
+             x:Class="DigiPasal.Views.DayVoucherPage"
+             x:DataType="vm:DayVoucherViewModel"
+             Title="Day Voucher"
+             Shell.TabBarIsVisible="False"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource AppBackground}">
+
+        <!-- ══════════ HEADER ══════════ -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
+              Padding="16,52,16,12" BackgroundColor="{StaticResource TealPrimary}">
+            <Grid Grid.Column="0" ColumnDefinitions="Auto,Auto" ColumnSpacing="6"
+                  VerticalOptions="Center">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackTapped"/>
+                </Grid.GestureRecognizers>
+                <Label Text="◀" FontSize="20" TextColor="White" VerticalOptions="Center"/>
+                <Label Text="🧾" Grid.Column="1" FontSize="20" TextColor="White"
+                       VerticalOptions="Center"/>
+            </Grid>
+            <Label Grid.Column="1" Text="Day Voucher" FontSize="20" FontAttributes="Bold"
+                   TextColor="White" VerticalOptions="Center"/>
+            <Label Grid.Column="2" Text="{Binding DateNepali}"
+                   FontSize="12" TextColor="White" VerticalTextAlignment="Center"
+                   LineBreakMode="TailTruncation"/>
+        </Grid>
+
+        <!-- ══════════ BODY ══════════ -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="14" IsVisible="{Binding HasVoucher}">
+
+                <!-- Receipt header -->
+                <Border BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                        Padding="20,16">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="{Binding ShopName}" FontSize="15" FontAttributes="Bold"
+                               TextColor="{StaticResource TealPrimary}"
+                               HorizontalTextAlignment="Center"/>
+                        <Label Text="DAY VOUCHER" FontSize="11" CharacterSpacing="2"
+                               TextColor="{StaticResource TextSecondary}"
+                               HorizontalTextAlignment="Center"/>
+                        <Label Text="{Binding Voucher.DateNepali}" FontSize="13"
+                               TextColor="{StaticResource TextPrimary}"
+                               HorizontalTextAlignment="Center" Margin="0,4,0,0"/>
+                        <Border HorizontalOptions="Center" Padding="14,4" Margin="0,2,0,2"
+                                StrokeShape="RoundRectangle 12"
+                                BackgroundColor="{StaticResource TealPrimary}">
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsClosed}" Value="True">
+                                    <Setter Property="BackgroundColor" Value="{StaticResource ErrorRed}"/>
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Label Text="{Binding StatusLabel}" FontSize="11" FontAttributes="Bold"
+                                   TextColor="White"/>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Balance chain -->
+                <Border BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                        Padding="16,14">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Opening balance" FontSize="13" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Label Grid.Column="1" Text="{Binding Voucher.OpeningDisplay}"
+                                   FontSize="14" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="+ Credit given" FontSize="13"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Grid.Column="1" Text="{Binding Voucher.CreditGivenDisplay}"
+                                   FontSize="14" TextColor="{StaticResource TealPrimary}"/>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="16,0,0,0">
+                            <Label Text="Daily book" FontSize="12"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Label Grid.Column="1" Text="{Binding Voucher.CreditDailyDisplay}"
+                                   FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" Margin="16,0,0,0">
+                            <Label Text="Partner book" FontSize="12"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Label Grid.Column="1" Text="{Binding Voucher.CreditPartnerDisplay}"
+                                   FontSize="12" TextColor="{StaticResource TextSecondary}"/>
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="− Collections" FontSize="13"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Grid.Column="1" Text="{Binding Voucher.CollectionsDisplay}"
+                                   FontSize="14" TextColor="{StaticResource SaleBlueText}"/>
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="{StaticResource DividerColor}"/>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Closing balance" FontSize="15" FontAttributes="Bold"
+                                   TextColor="{StaticResource TextPrimary}"/>
+                            <Label Grid.Column="1" Text="{Binding Voucher.ClosingDisplay}"
+                                   FontSize="17" FontAttributes="Bold"
+                                   TextColor="{StaticResource TealPrimary}"/>
+                        </Grid>
+                        <Label Text="{Binding ClosingNote}" FontSize="11"
+                               TextColor="{StaticResource TextSecondary}"
+                               HorizontalTextAlignment="End"/>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Sales stats -->
+                <Border BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                        Padding="16,14">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="Total Sales" FontSize="11"
+                                       TextColor="{StaticResource TextSecondary}"/>
+                                <Label Text="{Binding Voucher.TotalSalesDisplay}" FontSize="16"
+                                       FontAttributes="Bold" TextColor="{StaticResource TealPrimary}"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="Cash Sales" FontSize="11"
+                                       TextColor="{StaticResource TextSecondary}"/>
+                                <Label Text="{Binding Voucher.CashSalesDisplay}" FontSize="16"
+                                       FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                        <BoxView HeightRequest="1" Color="{StaticResource DividerColor}"/>
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="Sales" FontSize="11"
+                                       TextColor="{StaticResource TextSecondary}"/>
+                                <Label Text="{Binding Voucher.SalesCountDisplay}" FontSize="14"
+                                       FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                            </VerticalStackLayout>
+                            <VerticalStackLayout Spacing="2">
+                                <Label Text="Items Sold" FontSize="11"
+                                       TextColor="{StaticResource TextSecondary}"/>
+                                <Label Text="{Binding Voucher.ItemsSoldDisplay}" FontSize="14"
+                                       FontAttributes="Bold" TextColor="{StaticResource TextPrimary}"/>
+                            </VerticalStackLayout>
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Carried to partner -->
+                <Border IsVisible="{Binding Voucher.HasCarried}"
+                        BackgroundColor="#2AF0505C" StrokeThickness="0" Padding="14,12">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <Label Text="Carried to Partner book" FontSize="13" FontAttributes="Bold"
+                               TextColor="{StaticResource ErrorRed}" VerticalTextAlignment="Center"/>
+                        <Label Grid.Column="1" Text="{Binding Voucher.CarriedDisplay}" FontSize="15"
+                               FontAttributes="Bold" TextColor="{StaticResource ErrorRed}"/>
+                    </Grid>
+                </Border>
+
+                <!-- Add sale -->
+                <Button Text="Add Sale" Command="{Binding AddSaleCommand}"
+                        BackgroundColor="{StaticResource TealPrimary}"
+                        TextColor="White" FontAttributes="Bold" FontSize="15"
+                        HeightRequest="48" CornerRadius="10" Margin="0,4,0,0"/>
+
+                <Label Text="— End of Day Voucher —" FontSize="11"
+                       TextColor="{StaticResource Gray400}"
+                       HorizontalTextAlignment="Center" Margin="0,4,0,20"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <ActivityIndicator Grid.Row="1" IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                           Color="{StaticResource TealPrimary}"
+                           HorizontalOptions="Center" VerticalOptions="Center"/>
+    </Grid>
+</ContentPage>

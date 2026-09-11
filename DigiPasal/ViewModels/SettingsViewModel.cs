@@ -7,11 +7,17 @@ namespace DigiPasal.ViewModels
     public class SettingsViewModel : BaseViewModel
     {
         private readonly BackupService _backupService;
+        private readonly CreditService _creditService;
 
         private string _lastBackupTime = "No backups yet";
         private string _statusMessage = string.Empty;
         private bool _isRestoring;
         private BackupInfo? _selectedBackup;
+        private bool _canReopenBook;
+        private string _reopenBookHint = string.Empty;
+        private string _shopName = "DigiPasal";
+        private string _shopAddress = string.Empty;
+        private string _shopPhone = string.Empty;
 
         public ObservableCollection<BackupInfo> Backups { get; } = new();
 
@@ -19,6 +25,36 @@ namespace DigiPasal.ViewModels
         {
             get => _lastBackupTime;
             set => SetProperty(ref _lastBackupTime, value);
+        }
+
+        public bool CanReopenBook
+        {
+            get => _canReopenBook;
+            set => SetProperty(ref _canReopenBook, value);
+        }
+
+        public string ReopenBookHint
+        {
+            get => _reopenBookHint;
+            set => SetProperty(ref _reopenBookHint, value);
+        }
+
+        public string ShopName
+        {
+            get => _shopName;
+            set => SetProperty(ref _shopName, value);
+        }
+
+        public string ShopAddress
+        {
+            get => _shopAddress;
+            set => SetProperty(ref _shopAddress, value);
+        }
+
+        public string ShopPhone
+        {
+            get => _shopPhone;
+            set => SetProperty(ref _shopPhone, value);
         }
 
         public string StatusMessage
@@ -54,6 +90,7 @@ namespace DigiPasal.ViewModels
         public SettingsViewModel(BackupService backupService)
         {
             _backupService = backupService;
+            _creditService = CreditService.Instance;
             Title = "Settings";
 
             BackupNowCommand = new Command(async () => await BackupNowAsync());
@@ -66,13 +103,101 @@ namespace DigiPasal.ViewModels
             IsBusy = true;
             try
             {
+                await LoadShopInfoAsync();
                 ReloadBackups();
                 LastBackupTime = _backupService.GetLastBackupTime() ?? "No backups yet";
+                await RefreshBookkeepingAsync();
             }
             finally
             {
                 IsBusy = false;
             }
+        }
+
+        private async Task LoadShopInfoAsync()
+        {
+            try
+            {
+                var settings = await SettingService.Instance.GetShopSettingsAsync();
+                ShopName = settings.ShopName;
+                ShopAddress = settings.ShopAddress;
+                ShopPhone = settings.ShopPhone;
+            }
+            catch
+            {
+                ShopName = "DigiPasal";
+                ShopAddress = string.Empty;
+                ShopPhone = string.Empty;
+            }
+        }
+
+        public async Task RefreshBookkeepingAsync()
+        {
+            try
+            {
+                var lastClosed = await _creditService.GetLastClosedDateAsync();
+                CanReopenBook = lastClosed.HasValue && lastClosed.Value.Date <= DateTime.Today;
+                ReopenBookHint = lastClosed.HasValue
+                    ? $"Reopens the day book for {NepaliDateConverter.Format(lastClosed.Value.Date)} so a backdated credit sale can be recorded"
+                    : string.Empty;
+            }
+            catch
+            {
+                CanReopenBook = false;
+                ReopenBookHint = string.Empty;
+            }
+        }
+
+        public async Task ReopenDailyBookAsync()
+        {
+            if (!CanReopenBook)
+                return;
+
+            var lastClosed = await _creditService.GetLastClosedDateAsync();
+            if (!lastClosed.HasValue)
+            {
+                CanReopenBook = false;
+                return;
+            }
+
+            var confirm = await Shell.Current.DisplayAlertAsync(
+                "Reopen Daily Book",
+                $"Reopen the daily book for {NepaliDateConverter.Format(lastClosed.Value.Date)}? Transactions from the Partners book will be moved back under 'Closed' as a credit carry.",
+                "Reopen", "Cancel");
+
+            if (!confirm)
+                return;
+
+            try
+            {
+                var count = await _creditService.ReopenDailyBookAsync(lastClosed.Value.Date);
+                await RefreshBookkeepingAsync();
+                await Shell.Current.DisplayAlertAsync(
+                    "Daily Book Reopened",
+                    count > 0
+                        ? $"The day book is open again. {count} transfer(s) were undone."
+                        : "The day book is open again.",
+                    "OK");
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to reopen daily book: {ex.Message}", "OK");
+            }
+        }
+
+        public async Task NavigateBookLogAsync()
+        {
+            await NavigationGuard.GoToAsync("DayBookLog");
+        }
+
+        public async Task NavigateImportAsync(string type)
+        {
+            await NavigationGuard.GoToAsync($"DataImport?type={type}");
+        }
+
+        public async Task NavigateWholesaleBillAsync()
+        {
+            await NavigationGuard.GoToAsync("WholesaleBill");
         }
 
         public async Task<bool> BackupNowAsync()

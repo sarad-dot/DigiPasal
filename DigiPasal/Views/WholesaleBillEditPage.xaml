@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DigiPasal.ViewModels"
+             x:Class="DigiPasal.Views.WholesaleBillEditPage"
+             x:DataType="vm:WholesaleBillEditViewModel"
+             Title="Supplier Bill"
+             Shell.TabBarIsVisible="False"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource AppBackground}">
+
+    <Grid RowDefinitions="Auto,*" BackgroundColor="{StaticResource AppBackground}">
+
+        <!-- ══════════ HEADER ══════════ -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto"
+              Padding="16,52,16,12" BackgroundColor="{StaticResource TealPrimary}">
+            <Grid Grid.Column="0" ColumnDefinitions="Auto,Auto" ColumnSpacing="6"
+                  VerticalOptions="Center">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnBackTapped"/>
+                </Grid.GestureRecognizers>
+                <Label Text="◀" FontSize="20" TextColor="White" VerticalOptions="Center"/>
+                <Label Text="🧾" Grid.Column="1" FontSize="20" TextColor="White"
+                       VerticalOptions="Center"/>
+            </Grid>
+            <Label Grid.Column="1" Text="{Binding Title}"
+                   FontSize="20" FontAttributes="Bold" TextColor="White"
+                   VerticalOptions="Center" LineBreakMode="TailTruncation"/>
+            <Button Grid.Column="2" Text="Save" FontSize="14" FontAttributes="Bold"
+                    BackgroundColor="Transparent" TextColor="{StaticResource SecondaryGold}"
+                    Command="{Binding SaveCommand}" VerticalOptions="Center"
+                    IsEnabled="{Binding IsNotBusy}"/>
+        </Grid>
+
+        <!-- ══════════ BODY ══════════ -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="16" Spacing="12">
+
+                <Label Text="Bill details" FontSize="12" FontAttributes="Bold"
+                       TextColor="{StaticResource TealPrimary}" Margin="4,4,0,0"/>
+
+                <Border BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                        Padding="14,12">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                    <VerticalStackLayout Spacing="10">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Bill number (optional)" FontSize="12"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Entry Text="{Binding BillNumber}" Placeholder="e.g. SL-2026-0142"
+                                   FontSize="14" TextColor="{StaticResource TextPrimary}"
+                                   PlaceholderColor="{StaticResource Gray400}"
+                                   BackgroundColor="{StaticResource InputBg}"/>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Wholesaler name (optional)" FontSize="12"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Entry Text="{Binding WholesalerName}" Placeholder="e.g. Kathmandu Traders"
+                                   FontSize="14" TextColor="{StaticResource TextPrimary}"
+                                   PlaceholderColor="{StaticResource Gray400}"
+                                   BackgroundColor="{StaticResource InputBg}"/>
+                        </VerticalStackLayout>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Label Text="Bill date" FontSize="12"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   VerticalOptions="Center"/>
+                            <DatePicker Grid.Column="1" Date="{Binding BillDate}"
+                                        MaximumDate="{Binding MaximumDate}"
+                                        Format="dd MMM yyyy"
+                                        TextColor="{StaticResource TextPrimary}"
+                                        FontSize="13" HorizontalOptions="End"/>
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                            <Label Text="In Nepali" FontSize="12"
+                                   TextColor="{StaticResource TextSecondary}"
+                                   VerticalOptions="Center"/>
+                            <Label Grid.Column="1" Text="{Binding DateNepaliDisplay}"
+                                   FontSize="13" FontAttributes="Bold"
+                                   TextColor="{StaticResource TealPrimary}"
+                                   HorizontalTextAlignment="End" VerticalOptions="Center"/>
+                        </Grid>
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Notes (optional)" FontSize="12"
+                                   TextColor="{StaticResource TextSecondary}"/>
+                            <Entry Text="{Binding Notes}" Placeholder="Any note for this bill"
+                                   FontSize="14" TextColor="{StaticResource TextPrimary}"
+                                   PlaceholderColor="{StaticResource Gray400}"
+                                   BackgroundColor="{StaticResource InputBg}"/>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Label Text="LINES" FontSize="12" FontAttributes="Bold"
+                       TextColor="{StaticResource TealPrimary}" Margin="4,4,0,0"/>
+
+                <VerticalStackLayout Spacing="10">
+                    <BindableLayout.ItemsSource>
+                        <Binding Path="Items"/>
+                    </BindableLayout.ItemsSource>
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="vm:BillItemEdit">
+                            <Border BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                                    Padding="12,10">
+                                <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                                <VerticalStackLayout Spacing="8">
+                                    <Picker ItemsSource="{Binding Products}"
+                                            SelectedItem="{Binding SelectedProduct}"
+                                            ItemDisplayBinding="{Binding Name}"
+                                            Title="Select product"
+                                            FontSize="13"
+                                            TextColor="{StaticResource TextPrimary}"
+                                            BackgroundColor="{StaticResource InputBg}"/>
+                                    <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="8">
+                                        <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                            <Label Text="Qty" FontSize="11"
+                                                   TextColor="{StaticResource TextSecondary}"/>
+                                            <Entry Text="{Binding QuantityText}" Keyboard="Numeric"
+                                                   FontSize="14" TextColor="{StaticResource TextPrimary}"
+                                                   BackgroundColor="{StaticResource InputBg}"
+                                                   Placeholder="1"/>
+                                        </VerticalStackLayout>
+                                        <VerticalStackLayout Grid.Column="1" Spacing="2">
+                                            <Label Text="Cost price" FontSize="11"
+                                                   TextColor="{StaticResource TextSecondary}"/>
+                                            <Entry Text="{Binding CostText}" Keyboard="Numeric"
+                                                   FontSize="14" TextColor="{StaticResource TextPrimary}"
+                                                   BackgroundColor="{StaticResource InputBg}"
+                                                   Placeholder="0"/>
+                                        </VerticalStackLayout>
+                                        <Grid Grid.Column="2" VerticalOptions="End">
+                                            <Border BackgroundColor="{StaticResource ErrorRed}"
+                                                    WidthRequest="40" HeightRequest="40"
+                                                    StrokeShape="RoundRectangle 10">
+                                                <Label Text="✕" FontSize="16" TextColor="White"
+                                                       HorizontalOptions="Center" VerticalOptions="Center"/>
+                                            </Border>
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnRemoveLineTapped"
+                                                                      CommandParameter="{Binding .}"/>
+                                            </Grid.GestureRecognizers>
+                                        </Grid>
+                                    </Grid>
+                                </VerticalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </VerticalStackLayout>
+
+                <Button Text="＋ Add Line" Command="{Binding AddItemCommand}"
+                        BackgroundColor="{StaticResource TealLight}"
+                        TextColor="{StaticResource TealPrimary}"
+                        FontSize="13" FontAttributes="Bold" HeightRequest="40" CornerRadius="10"
+                        BorderColor="{StaticResource TealPrimary}" BorderWidth="1"/>
+
+                <Border BackgroundColor="{StaticResource CardBackground}" StrokeThickness="0"
+                        Padding="14,12">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12"/></Border.StrokeShape>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Total" FontSize="14" FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}"/>
+                        <Label Grid.Column="1" Text="{Binding TotalDisplay}" FontSize="17"
+                               FontAttributes="Bold" TextColor="{StaticResource ErrorRed}"/>
+                    </Grid>
+                </Border>
+
+                <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}"
+                                   Color="{StaticResource TealPrimary}"/>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

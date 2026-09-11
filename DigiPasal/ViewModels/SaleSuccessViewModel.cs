@@ -42,9 +42,9 @@ public class SaleSuccessViewModel : BaseViewModel, IQueryAttributable
         Title = "Sale Complete";
 
         ShareReceiptCommand = new Command(async () => await ShareReceiptAsync());
-        NewSaleCommand = new Command(async () => await Shell.Current.GoToAsync("//Dashboard/Sales"));
-        GoHomeCommand = new Command(async () => await Shell.Current.GoToAsync("//Dashboard"));
-        ViewHistoryCommand = new Command(async () => await Shell.Current.GoToAsync("SalesHistory"));
+        NewSaleCommand = new Command(async () => await NavigationGuard.GoToAsync("//Dashboard/Sales"));
+        GoHomeCommand = new Command(async () => await NavigationGuard.GoToAsync("//Dashboard"));
+        ViewHistoryCommand = new Command(async () => await NavigationGuard.GoToAsync("//Dashboard/SalesHistory"));
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -61,7 +61,15 @@ public class SaleSuccessViewModel : BaseViewModel, IQueryAttributable
         try
         {
             Sale = await _saleService.GetSaleByIdAsync(saleId);
-            if (Sale == null) return;
+            if (Sale == null)
+            {
+                await Shell.Current.DisplayAlertAsync(
+                    "Sale Not Found",
+                    "This sale record no longer exists. It may have been deleted.",
+                    "OK");
+                await Shell.Current.GoToAsync("//Dashboard");
+                return;
+            }
 
             _saleItems = await _saleService.GetSaleItemsAsync(saleId);
             ReceiptText = await _receiptService.GenerateReceiptTextAsync(Sale, _saleItems);

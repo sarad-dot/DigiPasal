@@ -13,6 +13,9 @@ public class CartState
 
     public ObservableCollection<CartLine> Items { get; } = new();
 
+    /// <summary>When set (e.g. from a Day Voucher "Add Sale"), new sales are recorded on this date.</summary>
+    public DateTime? SaleDate { get; set; }
+
     public event Action? CartChanged;
 
     public void AddProduct(Product product, double quantity = 1)

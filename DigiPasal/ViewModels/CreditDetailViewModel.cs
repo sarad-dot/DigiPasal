@@ -112,7 +112,14 @@ public class CreditDetailViewModel : BaseViewModel
         {
             Customer = await _customerService.GetCustomerAsync(_customerId);
             if (Customer == null)
+            {
+                await Shell.Current.DisplayAlertAsync(
+                    "Customer Not Found",
+                    "This customer no longer exists. It may have been removed.",
+                    "OK");
+                await Shell.Current.GoToAsync("..");
                 return;
+            }
 
             Balance = await _creditService.GetOutstandingForBookAsync(_customerId, _bookType);
 
@@ -142,6 +149,6 @@ public class CreditDetailViewModel : BaseViewModel
             return;
         }
 
-        await Shell.Current.GoToAsync($"RecordPayment?customerId={_customerId}&book={(int)_bookType}");
+        await NavigationGuard.GoToAsync($"RecordPayment?customerId={_customerId}&book={(int)_bookType}");
     }
 }
